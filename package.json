@@ -1,0 +1,16 @@
+{
+  "name": "banf-web-dev",
+  "version": "1.0.0",
+  "description": "BANF Web Platform - Backend Services for DEV Site",
+  "main": "src/backend/index.js",
+  "scripts": {
+    "dev": "wix dev",
+    "build": "wix build",
+    "preview": "wix preview",
+    "publish": "wix publish"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@wix/cli": "latest"
+  }
+}
