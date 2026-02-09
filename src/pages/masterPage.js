@@ -4,6 +4,8 @@
 import wixWindow from 'wix-window';
 import wixLocation from 'wix-location';
 import wixUsers from 'wix-users';
+// Static import to avoid webpack bundling issues
+import { verifyAdmin } from 'backend/admin-auth.jsw';
 
 $w.onReady(function () {
     initializeNavigation();
@@ -105,7 +107,7 @@ function initializeUserMenu() {
 
 async function checkAdminStatus() {
     try {
-        const { verifyAdmin } = await import('backend/admin-auth.jsw');
+        // Using static import at top of file instead of dynamic import
         const result = await verifyAdmin();
         
         if (result.isAdmin && $w('#btnAdminDashboard').show) {
@@ -115,7 +117,8 @@ async function checkAdminStatus() {
             });
         }
     } catch (e) {
-        // Not admin or error
+        // Not admin or error - silently fail
+        console.log('Admin check skipped');
     }
 }
 
