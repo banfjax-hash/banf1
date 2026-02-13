@@ -33,15 +33,51 @@
         }
 
         /* ========== EMBED-SPECIFIC STYLES ========== */
-        html, body {
+        /* 
+         * FIX: For Wix iframe embedding, DO NOT use height:100% on html/body
+         * This causes content to be compressed. Instead, let content flow naturally
+         * and the iframe should auto-resize OR have internal scrolling.
+         */
+        html {
             width: 100%;
             min-height: 100%;
+            margin: 0;
+            padding: 0;
             overflow-x: hidden;
+            /* Let content determine height naturally */
         }
         
-        /* Fix for Wix iframe embedding */
+        body {
+            width: 100%;
+            min-height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            /* Content flows naturally - no fixed height constraint */
+        }
+        
+        /* Fix for Wix iframe embedding - make content visible */
         .wix-embed-mode {
-            /* Applied when embedded in Wix */
+            min-height: 100vh !important;
+            /* Removed height: 100% which was causing the compression */
+        }
+        
+        /* Ensure all content sections have proper display */
+        section {
+            display: block;
+            position: relative;
+        }
+        
+        /* Force all sections to be visible */
+        body > * {
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Prevent footer from collapsing */
+        footer {
+            position: relative;
+            z-index: 1;
         }
         
         /* ========== BASE STYLES ========== */
@@ -130,14 +166,14 @@
 
         /* ========== HERO SECTION ========== */
         .hero {
-            min-height: 100vh;
+            min-height: 80vh; /* Reduced from 100vh to allow other content to be visible */
             display: flex;
             align-items: center;
             justify-content: center;
             position: relative;
             background: var(--gradient-hero);
             padding-top: 80px;
-            overflow: hidden;
+            overflow: visible; /* Changed from hidden to allow content flow */
         }
         .hero::before {
             content: '';
@@ -477,8 +513,147 @@
             color: #fff;
         }
 
-        /* ========== SERVICES SECTION ========== */
-        .services-section { background: #fff; }
+        /* ========== SERVICES SECTION (REDESIGNED PORTAL HUB) ========== */
+        .services-section { background: linear-gradient(180deg, #fff 0%, #f8f9fa 100%); }
+        
+        /* Portal Hub Container */
+        .portal-hub {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        
+        /* Portal Cards - Main Entry Points */
+        .portal-card {
+            background: #fff;
+            border-radius: 24px;
+            padding: 2.5rem;
+            text-align: center;
+            transition: all 0.4s ease;
+            border: 3px solid transparent;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+            position: relative;
+            overflow: hidden;
+        }
+        .portal-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: var(--gradient-primary);
+        }
+        .portal-card.member-portal::before { background: var(--gradient-green); }
+        .portal-card.admin-portal::before { background: linear-gradient(135deg, #8B0000, #DC143C); }
+        .portal-card.visitor-portal::before { background: linear-gradient(135deg, #673AB7, #9C27B0); }
+        
+        .portal-card:hover {
+            transform: translateY(-12px) scale(1.02);
+            box-shadow: 0 25px 60px rgba(0,0,0,0.15);
+        }
+        
+        .portal-icon {
+            width: 100px;
+            height: 100px;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2.5rem;
+            color: #fff;
+        }
+        .visitor-portal .portal-icon { background: linear-gradient(135deg, #673AB7, #9C27B0); }
+        .member-portal .portal-icon { background: var(--gradient-green); }
+        .admin-portal .portal-icon { background: linear-gradient(135deg, #8B0000, #DC143C); }
+        
+        .portal-card h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            color: var(--banf-charcoal);
+        }
+        .portal-card .portal-subtitle {
+            font-size: 0.95rem;
+            color: #6c757d;
+            margin-bottom: 1.5rem;
+        }
+        
+        .portal-features {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 1.5rem 0;
+            text-align: left;
+        }
+        .portal-features li {
+            padding: 0.6rem 0;
+            border-bottom: 1px dashed #eee;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.9rem;
+        }
+        .portal-features li:last-child { border-bottom: none; }
+        .portal-features li i {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            background: rgba(0,106,78,0.1);
+            color: var(--banf-green);
+        }
+        
+        .portal-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1rem;
+            width: 100%;
+            transition: all 0.3s;
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+        }
+        .portal-btn.visitor-btn {
+            background: linear-gradient(135deg, #673AB7, #9C27B0);
+            color: #fff;
+        }
+        .portal-btn.member-btn {
+            background: var(--gradient-green);
+            color: #fff;
+        }
+        .portal-btn.admin-btn {
+            background: linear-gradient(135deg, #8B0000, #DC143C);
+            color: #fff;
+        }
+        .portal-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+        
+        .portal-note {
+            font-size: 0.8rem;
+            color: #888;
+            margin-top: 1rem;
+        }
+        .portal-note i { color: var(--banf-orange); }
+        
+        /* Service Cards Grid (for individual services) */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+        
         .service-card {
             background: #f8f9fa;
             border-radius: 20px;
@@ -525,6 +700,40 @@
         }
         .service-link:hover {
             color: var(--banf-deep-red);
+        }
+        
+        /* Quick Access Bar */
+        .quick-access {
+            background: linear-gradient(135deg, var(--banf-charcoal), #3d3d3d);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+        }
+        .quick-access h4 {
+            color: #fff;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+        .quick-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+        .quick-link {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            padding: 0.6rem 1.2rem;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .quick-link:hover {
+            background: var(--banf-orange);
+            color: #fff;
         }
 
         /* ========== EVENTS SECTION ========== */
@@ -1316,129 +1525,198 @@
         </div>
     </section>
 
-    <!-- ========== SERVICES SECTION ========== -->
+    <!-- ========== SERVICES SECTION - PORTAL HUB ========== -->
     <section class="services-section" id="services">
         <div class="container">
             <div class="section-header">
-                <h2>Our Services</h2>
-                <p>Comprehensive digital platform for the Bengali community in Jacksonville</p>
+                <h2>Service Portals</h2>
+                <p>Access comprehensive digital services for the Bengali community in Jacksonville</p>
             </div>
-            <div class="row g-4">
+            
+            <!-- Quick Access Bar -->
+            <div class="quick-access">
+                <h4><i class="fas fa-bolt me-2"></i>Quick Access</h4>
+                <div class="quick-links">
+                    <a href="#radio" class="quick-link"><i class="fas fa-broadcast-tower"></i> BANF Radio</a>
+                    <a href="#events" class="quick-link"><i class="fas fa-calendar"></i> Events</a>
+                    <a href="#surveys" class="quick-link" onclick="openSurveySection()"><i class="fas fa-poll"></i> Surveys</a>
+                    <a href="#complaints" class="quick-link" onclick="openComplaintForm()"><i class="fas fa-shield-alt"></i> Complaints</a>
+                    <a href="#guide" class="quick-link"><i class="fas fa-map-marked-alt"></i> Jax Guide</a>
+                    <a href="#magazine" class="quick-link"><i class="fas fa-book-open"></i> E-Magazine</a>
+                    <a href="#sponsors" class="quick-link"><i class="fas fa-handshake"></i> Sponsors</a>
+                </div>
+            </div>
+            
+            <!-- Portal Hub - Three Main Entry Points -->
+            <div class="portal-hub">
+                <!-- Visitor Portal (Public Access) -->
+                <div class="portal-card visitor-portal">
+                    <div class="portal-icon"><i class="fas fa-globe"></i></div>
+                    <h3>Visitor Portal</h3>
+                    <p class="portal-subtitle">Explore BANF without logging in</p>
+                    
+                    <ul class="portal-features">
+                        <li><i class="fas fa-calendar-alt"></i> Browse upcoming events & programs</li>
+                        <li><i class="fas fa-broadcast-tower"></i> Listen to BANF Radio 24/7</li>
+                        <li><i class="fas fa-book-open"></i> Read E-Magazine articles</li>
+                        <li><i class="fas fa-map-marked-alt"></i> Explore Jacksonville Guide</li>
+                        <li><i class="fas fa-poll"></i> Participate in public surveys</li>
+                        <li><i class="fas fa-shield-alt"></i> Submit anonymous complaints</li>
+                        <li><i class="fas fa-handshake"></i> View sponsorship opportunities</li>
+                    </ul>
+                    
+                    <button class="portal-btn visitor-btn" onclick="scrollToSection('events')">
+                        <i class="fas fa-arrow-right"></i> Explore Now
+                    </button>
+                    <p class="portal-note"><i class="fas fa-unlock me-1"></i>No login required</p>
+                </div>
+                
+                <!-- Member Portal (Login Required) -->
+                <div class="portal-card member-portal">
+                    <div class="portal-icon"><i class="fas fa-user-circle"></i></div>
+                    <h3>Member Portal</h3>
+                    <p class="portal-subtitle">Exclusive member services & features</p>
+                    
+                    <ul class="portal-features">
+                        <li><i class="fas fa-tachometer-alt"></i> Personal Dashboard</li>
+                        <li><i class="fas fa-id-card"></i> Profile & Family Management</li>
+                        <li><i class="fas fa-credit-card"></i> Payments & Receipts</li>
+                        <li><i class="fas fa-file-alt"></i> Meeting Minutes Access</li>
+                        <li><i class="fas fa-calendar-check"></i> Event Registration & Check-in</li>
+                        <li><i class="fas fa-wallet"></i> View Budget Reports</li>
+                        <li><i class="fas fa-poll-h"></i> Member-only Surveys</li>
+                        <li><i class="fas fa-music"></i> Request Songs on Radio</li>
+                        <li><i class="fas fa-pen-fancy"></i> Submit Magazine Content</li>
+                        <li><i class="fas fa-address-book"></i> Member Directory</li>
+                    </ul>
+                    
+                    <button class="portal-btn member-btn" onclick="openMemberLoginModal()">
+                        <i class="fas fa-sign-in-alt"></i> Member Login
+                    </button>
+                    <p class="portal-note"><i class="fas fa-lock me-1"></i>Login required • <a href="#membership" style="color: var(--banf-orange);">Register Now</a></p>
+                </div>
+                
+                <!-- Admin Portal (EC Login Required) -->
+                <div class="portal-card admin-portal">
+                    <div class="portal-icon"><i class="fas fa-user-shield"></i></div>
+                    <h3>Admin Portal</h3>
+                    <p class="portal-subtitle">EC Management Dashboard</p>
+                    
+                    <ul class="portal-features">
+                        <li><i class="fas fa-users-cog"></i> Member Management & Approvals</li>
+                        <li><i class="fas fa-money-check-alt"></i> Payment Verification</li>
+                        <li><i class="fas fa-calendar-plus"></i> Event & Meeting Management</li>
+                        <li><i class="fas fa-broadcast-tower"></i> Radio Station Control</li>
+                        <li><i class="fas fa-chart-bar"></i> Survey Administration</li>
+                        <li><i class="fas fa-exclamation-triangle"></i> Complaint Resolution</li>
+                        <li><i class="fas fa-piggy-bank"></i> Budget & Finance</li>
+                        <li><i class="fas fa-store"></i> Vendor & Sponsor Management</li>
+                        <li><i class="fas fa-hands-helping"></i> Volunteer Coordination</li>
+                        <li><i class="fas fa-newspaper"></i> Magazine Administration</li>
+                    </ul>
+                    
+                    <button class="portal-btn admin-btn" onclick="openAdminLoginModal()">
+                        <i class="fas fa-user-lock"></i> Admin Login
+                    </button>
+                    <p class="portal-note"><i class="fas fa-key me-1"></i>EC Members Only</p>
+                </div>
+            </div>
+            
+            <!-- Individual Services Grid -->
+            <div class="section-header" style="margin-top: 3rem;">
+                <h3 style="font-size: 1.5rem;">All Services</h3>
+                <p>Detailed access to all BANF digital services</p>
+            </div>
+            
+            <div class="services-grid">
                 <!-- Membership Portal -->
-                <div class="col-lg-4 col-md-6">
-                    <div class="service-card">
-                        <div class="service-icon"><i class="fas fa-id-card"></i></div>
-                        <h5>Membership Portal</h5>
-                        <p>Register, renew membership, manage family profiles, view payment history and download receipts.</p>
-                        <a href="#membership" class="service-link" data-action="join">
-                            Join Now <i class="fas fa-arrow-right"></i>
-                        </a>
-                        <small class="text-muted d-block mt-2">API: members.jsw → registerMember()</small>
-                    </div>
+                <div class="service-card">
+                    <div class="service-icon"><i class="fas fa-id-card"></i></div>
+                    <h5>Membership Portal</h5>
+                    <p>Register, renew membership, manage family profiles, view payment history and download receipts.</p>
+                    <a href="#membership" class="service-link" data-action="join">
+                        Join Now <i class="fas fa-arrow-right"></i>
+                    </a>
                 </div>
                 
                 <!-- Event Management -->
-                <div class="col-lg-4 col-md-6">
-                    <div class="service-card">
-                        <div class="service-icon" style="background: var(--gradient-green);"><i class="fas fa-calendar-alt"></i></div>
-                        <h5>Events & Programs</h5>
-                        <p>Browse upcoming/past events, register online, pay fees, submit feedback, and check-in at venues.</p>
-                        <a href="#events" class="service-link" data-action="events">
-                            View Events <i class="fas fa-arrow-right"></i>
-                        </a>
-                        <small class="text-muted d-block mt-2">API: events.jsw → getUpcomingEvents()</small>
-                    </div>
+                <div class="service-card">
+                    <div class="service-icon" style="background: var(--gradient-green);"><i class="fas fa-calendar-alt"></i></div>
+                    <h5>Events & Programs</h5>
+                    <p>Browse upcoming/past events, register online, pay fees, submit feedback, and check-in at venues.</p>
+                    <a href="#events" class="service-link" data-action="events">
+                        View Events <i class="fas fa-arrow-right"></i>
+                    </a>
                 </div>
                 
                 <!-- Community Radio -->
-                <div class="col-lg-4 col-md-6">
-                    <div class="service-card">
-                        <div class="service-icon" style="background: linear-gradient(135deg, #673AB7, #9C27B0);"><i class="fas fa-broadcast-tower"></i></div>
-                        <h5>BANF Radio 24/7</h5>
-                        <p>Listen to Bengali music, view schedule, browse song library, and request your favorite songs.</p>
-                        <a href="#radio" class="service-link" data-action="radio">
-                            Listen Live <i class="fas fa-arrow-right"></i>
-                        </a>
-                        <small class="text-muted d-block mt-2">API: radio.jsw → getRadioStationConfig()</small>
-                    </div>
+                <div class="service-card">
+                    <div class="service-icon" style="background: linear-gradient(135deg, #673AB7, #9C27B0);"><i class="fas fa-broadcast-tower"></i></div>
+                    <h5>BANF Radio 24/7</h5>
+                    <p>Listen to Bengali music, view schedule, browse song library, and request your favorite songs.</p>
+                    <a href="#radio" class="service-link" data-action="radio">
+                        Listen Live <i class="fas fa-arrow-right"></i>
+                    </a>
                 </div>
                 
                 <!-- E-Magazine -->
-                <div class="col-lg-4 col-md-6">
-                    <div class="service-card">
-                        <div class="service-icon" style="background: linear-gradient(135deg, #E91E63, #FF5722);"><i class="fas fa-book-open"></i></div>
-                        <h5>E-Magazine</h5>
-                        <p>Browse issues, read articles by category, search content, and submit your own literary works.</p>
-                        <a href="#magazine" class="service-link" data-action="magazine">
-                            Read Now <i class="fas fa-arrow-right"></i>
-                        </a>
-                        <small class="text-muted d-block mt-2">API: magazine.jsw → getPublishedMagazines()</small>
-                    </div>
+                <div class="service-card">
+                    <div class="service-icon" style="background: linear-gradient(135deg, #E91E63, #FF5722);"><i class="fas fa-book-open"></i></div>
+                    <h5>E-Magazine</h5>
+                    <p>Browse issues, read articles by category, search content, and submit your own literary works.</p>
+                    <a href="#magazine" class="service-link" data-action="magazine">
+                        Read Now <i class="fas fa-arrow-right"></i>
+                    </a>
                 </div>
                 
                 <!-- Jacksonville Guide -->
-                <div class="col-lg-4 col-md-6">
-                    <div class="service-card">
-                        <div class="service-icon" style="background: linear-gradient(135deg, #00BCD4, #009688);"><i class="fas fa-map-marked-alt"></i></div>
-                        <h5>Jacksonville Guide</h5>
-                        <p>Find Bengali restaurants, grocery stores, doctors, schools. Read reviews and submit new listings.</p>
-                        <a href="#guide" class="service-link" data-action="guide">
-                            Explore Guide <i class="fas fa-arrow-right"></i>
-                        </a>
-                        <small class="text-muted d-block mt-2">API: guide.jsw → getGuideByCategory()</small>
-                    </div>
+                <div class="service-card">
+                    <div class="service-icon" style="background: linear-gradient(135deg, #00BCD4, #009688);"><i class="fas fa-map-marked-alt"></i></div>
+                    <h5>Jacksonville Guide</h5>
+                    <p>Find Bengali restaurants, grocery stores, doctors, schools. Read reviews and submit new listings.</p>
+                    <a href="#guide" class="service-link" data-action="guide">
+                        Explore Guide <i class="fas fa-arrow-right"></i>
+                    </a>
                 </div>
                 
                 <!-- Surveys -->
-                <div class="col-lg-4 col-md-6">
-                    <div class="service-card">
-                        <div class="service-icon" style="background: linear-gradient(135deg, #FF9800, #FFC107);"><i class="fas fa-poll"></i></div>
-                        <h5>Community Surveys</h5>
-                        <p>Participate in community polls and surveys. Share your voice anonymously or as a member.</p>
-                        <a href="#surveys" class="service-link" data-action="surveys">
-                            Take Survey <i class="fas fa-arrow-right"></i>
-                        </a>
-                        <small class="text-muted d-block mt-2">API: surveys.jsw → getActiveSurveys()</small>
-                    </div>
+                <div class="service-card">
+                    <div class="service-icon" style="background: linear-gradient(135deg, #FF9800, #FFC107);"><i class="fas fa-poll"></i></div>
+                    <h5>Community Surveys</h5>
+                    <p>Participate in community polls and surveys. Share your voice anonymously or as a member.</p>
+                    <a href="#surveys" class="service-link" data-action="surveys" onclick="openSurveySection()">
+                        Take Survey <i class="fas fa-arrow-right"></i>
+                    </a>
                 </div>
                 
                 <!-- Anonymous Complaints -->
-                <div class="col-lg-4 col-md-6">
-                    <div class="service-card">
-                        <div class="service-icon" style="background: linear-gradient(135deg, #607D8B, #455A64);"><i class="fas fa-shield-alt"></i></div>
-                        <h5>Anonymous Complaints</h5>
-                        <p>Submit anonymous complaints securely. Track status with access codes and add follow-ups.</p>
-                        <a href="#complaints" class="service-link" data-action="complaints">
-                            Submit Complaint <i class="fas fa-arrow-right"></i>
-                        </a>
-                        <small class="text-muted d-block mt-2">API: complaints.jsw → submitComplaint()</small>
-                    </div>
+                <div class="service-card">
+                    <div class="service-icon" style="background: linear-gradient(135deg, #607D8B, #455A64);"><i class="fas fa-shield-alt"></i></div>
+                    <h5>Anonymous Complaints</h5>
+                    <p>Submit anonymous complaints securely. Track status with access codes and add follow-ups.</p>
+                    <a href="#complaints" class="service-link" data-action="complaints" onclick="openComplaintForm()">
+                        Submit Complaint <i class="fas fa-arrow-right"></i>
+                    </a>
                 </div>
                 
                 <!-- Meeting Minutes -->
-                <div class="col-lg-4 col-md-6">
-                    <div class="service-card">
-                        <div class="service-icon" style="background: linear-gradient(135deg, #795548, #8D6E63);"><i class="fas fa-file-alt"></i></div>
-                        <h5>Meeting Minutes</h5>
-                        <p>Members can access meeting summaries, decisions, and action items from EC meetings.</p>
-                        <a href="#minutes" class="service-link" data-action="login" title="Members only - Login required">
-                            View Minutes <i class="fas fa-arrow-right"></i>
-                        </a>
-                        <small class="text-muted d-block mt-2">API: documents.jsw → DOCUMENT_CATEGORIES.MEETING_DOCS</small>
-                    </div>
+                <div class="service-card">
+                    <div class="service-icon" style="background: linear-gradient(135deg, #795548, #8D6E63);"><i class="fas fa-file-alt"></i></div>
+                    <h5>Meeting Minutes</h5>
+                    <p>Members can access meeting summaries, decisions, and action items from EC meetings.</p>
+                    <a href="#" class="service-link" data-action="login" onclick="openMemberLoginModal()" title="Members only - Login required">
+                        View Minutes <i class="fas fa-lock ms-1"></i>
+                    </a>
                 </div>
                 
                 <!-- Sponsorship -->
-                <div class="col-lg-4 col-md-6">
-                    <div class="service-card">
-                        <div class="service-icon" style="background: linear-gradient(135deg, #D4AF37, #FFD700);"><i class="fas fa-handshake"></i></div>
-                        <h5>Become a Sponsor</h5>
-                        <p>Support BANF as a Platinum, Gold, Silver, or Bronze sponsor. Magazine ads & food sponsorships.</p>
-                        <a href="#sponsors" class="service-link" data-action="sponsors">
-                            Learn More <i class="fas fa-arrow-right"></i>
-                        </a>
-                        <small class="text-muted d-block mt-2">API: sponsorship.jsw → SPONSORSHIP_TIERS</small>
-                    </div>
+                <div class="service-card">
+                    <div class="service-icon" style="background: linear-gradient(135deg, #D4AF37, #FFD700);"><i class="fas fa-handshake"></i></div>
+                    <h5>Become a Sponsor</h5>
+                    <p>Support BANF as a Platinum, Gold, Silver, or Bronze sponsor. Magazine ads & food sponsorships.</p>
+                    <a href="#sponsors" class="service-link" data-action="sponsors">
+                        Learn More <i class="fas fa-arrow-right"></i>
+                    </a>
                 </div>
             </div>
         </div>
@@ -1452,8 +1730,102 @@
                 <p>Join us for cultural celebrations and community gatherings</p>
             </div>
             <div class="row g-4">
+                <!-- Saraswati Puja - COMPLETED -->
+                <div class="col-md-4 col-lg-3">
+                    <div class="event-card">
+                        <div class="event-image" style="background: linear-gradient(135deg, #ffc107, #ff9800);">
+                            📚
+                            <span class="event-badge" style="background: #28a745;">✓ Completed</span>
+                        </div>
+                        <div class="event-content">
+                            <span class="event-date"><i class="fas fa-calendar me-1"></i>Feb 2, 2026</span>
+                            <h4>Saraswati Puja</h4>
+                            <p class="event-location"><i class="fas fa-map-marker-alt"></i>Basant Panchami • Temple</p>
+                            <p class="small text-muted">Food: Polao, Alu Fulkopi, Goat Curry</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bosonto Utsob - COMPLETED -->
+                <div class="col-md-4 col-lg-3">
+                    <div class="event-card">
+                        <div class="event-image" style="background: linear-gradient(135deg, #E91E63, #FF69B4);">
+                            🌸
+                            <span class="event-badge" style="background: #28a745;">✓ Completed</span>
+                        </div>
+                        <div class="event-content">
+                            <span class="event-date"><i class="fas fa-calendar me-1"></i>Mar 7, 2026</span>
+                            <h4>Bosonto Utsob</h4>
+                            <p class="event-location"><i class="fas fa-map-marker-alt"></i>Spring Festival</p>
+                            <p class="small text-muted">Holi celebration & cultural program</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Nabo Borsho / Pohela Boishakh -->
+                <div class="col-md-4 col-lg-3">
+                    <div class="event-card">
+                        <div class="event-image" style="background: linear-gradient(135deg, #E91E63, #FF5722);">
+                            🎉
+                            <span class="event-badge">Coming Soon</span>
+                        </div>
+                        <div class="event-content">
+                            <span class="event-date"><i class="fas fa-calendar me-1"></i>April 25, 2026</span>
+                            <h4>Nabo Borsho 1433</h4>
+                            <p class="event-location"><i class="fas fa-map-marker-alt"></i>Bengali New Year</p>
+                            <p class="small text-muted">Pohela Boishakh celebration</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Summer Camp -->
+                <div class="col-md-4 col-lg-3">
+                    <div class="event-card">
+                        <div class="event-image" style="background: linear-gradient(135deg, #4CAF50, #8BC34A);">
+                            🏕️
+                        </div>
+                        <div class="event-content">
+                            <span class="event-date"><i class="fas fa-calendar me-1"></i>June 2026</span>
+                            <h4>Summer Camp</h4>
+                            <p class="event-location"><i class="fas fa-map-marker-alt"></i>Youth Programs</p>
+                            <p class="small text-muted">Kids & youth activities</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Spandan Cultural Night -->
+                <div class="col-md-4 col-lg-3">
+                    <div class="event-card">
+                        <div class="event-image" style="background: linear-gradient(135deg, #006A4E, #00856F);">
+                            🎭
+                            <span class="event-badge">Title: Sargam</span>
+                        </div>
+                        <div class="event-content">
+                            <span class="event-date"><i class="fas fa-calendar me-1"></i>August 7, 2026</span>
+                            <h4>Spandan Cultural</h4>
+                            <p class="event-location"><i class="fas fa-map-marker-alt"></i>Music, Dance & Drama</p>
+                            <p class="small text-muted">Theme: Sargam</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mahalaya -->
+                <div class="col-md-4 col-lg-3">
+                    <div class="event-card">
+                        <div class="event-image" style="background: linear-gradient(135deg, #FFA500, #FF6347);">
+                            🌅
+                        </div>
+                        <div class="event-content">
+                            <span class="event-date"><i class="fas fa-calendar me-1"></i>October 17, 2026</span>
+                            <h4>Mahalaya</h4>
+                            <p class="event-location"><i class="fas fa-map-marker-alt"></i>Dawn Program</p>
+                            <p class="small text-muted">Puja inauguration</p>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Durga Puja -->
-                <div class="col-md-4">
+                <div class="col-md-4 col-lg-3">
                     <div class="event-card">
                         <div class="event-image" style="background: linear-gradient(135deg, #8B0000, #A52A2A);">
                             🕉️
@@ -1462,41 +1834,59 @@
                         <div class="event-content">
                             <span class="event-date"><i class="fas fa-calendar me-1"></i>October 2026</span>
                             <h4>Durga Puja 2026</h4>
-                            <p class="event-location"><i class="fas fa-map-marker-alt"></i>Annual Celebration • 230+ Attendees</p>
+                            <p class="event-location"><i class="fas fa-map-marker-alt"></i>230+ Attendees</p>
+                            <p class="small text-muted">5-day puja celebration</p>
                         </div>
                     </div>
                 </div>
-                
-                <!-- Saraswati Puja -->
-                <div class="col-md-4">
+
+                <!-- Kali Puja -->
+                <div class="col-md-4 col-lg-3">
+                    <div class="event-card">
+                        <div class="event-image" style="background: linear-gradient(135deg, #1a1a2e, #4a148c);">
+                            🪔
+                        </div>
+                        <div class="event-content">
+                            <span class="event-date"><i class="fas fa-calendar me-1"></i>November 7, 2026</span>
+                            <h4>Kali Puja & Diwali</h4>
+                            <p class="event-location"><i class="fas fa-map-marker-alt"></i>Festival of Lights</p>
+                            <p class="small text-muted">Lakshmi Puja & fireworks</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Saraswati Puja 2027 -->
+                <div class="col-md-4 col-lg-3">
                     <div class="event-card">
                         <div class="event-image" style="background: linear-gradient(135deg, #ffc107, #ff9800);">
                             📚
                         </div>
                         <div class="event-content">
-                            <span class="event-date"><i class="fas fa-calendar me-1"></i>February 2026</span>
-                            <h4>Saraswati Puja</h4>
-                            <p class="event-location"><i class="fas fa-map-marker-alt"></i>Basant Panchami Celebration</p>
+                            <span class="event-date"><i class="fas fa-calendar me-1"></i>January 25, 2027</span>
+                            <h4>Saraswati Puja 2027</h4>
+                            <p class="event-location"><i class="fas fa-map-marker-alt"></i>+ Winter Picnic</p>
+                            <p class="small text-muted">Basant Panchami celebration</p>
                         </div>
                     </div>
                 </div>
-                
-                <!-- Cultural Program -->
-                <div class="col-md-4">
+
+                <!-- GBM -->
+                <div class="col-md-4 col-lg-3">
                     <div class="event-card">
-                        <div class="event-image" style="background: linear-gradient(135deg, #006A4E, #00856F);">
-                            🎭
+                        <div class="event-image" style="background: linear-gradient(135deg, #607D8B, #78909C);">
+                            📋
                         </div>
                         <div class="event-content">
-                            <span class="event-date"><i class="fas fa-calendar me-1"></i>TBD 2026</span>
-                            <h4>Spandan Cultural Night</h4>
-                            <p class="event-location"><i class="fas fa-map-marker-alt"></i>Music, Dance & Drama</p>
+                            <span class="event-date"><i class="fas fa-calendar me-1"></i>February 2027</span>
+                            <h4>GBM & Budget Review</h4>
+                            <p class="event-location"><i class="fas fa-map-marker-alt"></i>Annual Meeting</p>
+                            <p class="small text-muted">FY 2026-27 Closing</p>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="text-center mt-4">
-                <a href="#" class="btn-primary-custom">
+                <a href="#" class="btn-primary-custom" onclick="if(window.parent){window.parent.postMessage({type:'NAVIGATE',target:'/events'},'*');}">
                     <i class="fas fa-calendar-alt me-2"></i>View Full Calendar
                 </a>
             </div>
@@ -1683,7 +2073,7 @@
     <section class="py-5" id="magazine" style="background: var(--cream);">
         <div class="container">
             <div class="section-header">
-                <h2 class="bengali-text">📚 উৎসব E-Magazine</h2>
+                <h2 class="bengali-text">📚 Jagriti E-Magazine</h2>
                 <p>Community literary works — Articles, poems, stories & recipes</p>
             </div>
             <div class="row g-4 align-items-center">
@@ -1741,56 +2131,189 @@
         </div>
     </section>
 
-    <!-- ========== SPONSORS SECTION ========== -->
+    <!-- ========== SPONSORSHIP TIERS SECTION (PROPOSED) ========== -->
     <section class="py-5" id="sponsors" style="background: linear-gradient(135deg, #1a1a2e, #2d2d44); color: #fff;">
         <div class="container">
             <div class="section-header">
-                <h2 style="color: #fff;">Our Sponsors & Partners</h2>
-                <p style="color: rgba(255,255,255,0.8);">Supporting BANF's mission to preserve Bengali culture</p>
+                <h2 style="color: #fff;">Sponsorship Opportunities</h2>
+                <p style="color: rgba(255,255,255,0.8);">FY 2026-27 Season • Support Our Community</p>
             </div>
-            <div class="row g-4 text-center">
-                <div class="col-6 col-md-3">
-                    <div class="p-3">
-                        <div class="rounded-circle mx-auto mb-2 d-flex align-items-center justify-content-center" style="width: 80px; height: 80px; background: linear-gradient(135deg, #FFD700, #FFA500);">
-                            <i class="fas fa-crown fa-2x text-white"></i>
-                        </div>
-                        <h6 style="color: var(--gold);">Platinum</h6>
-                        <p class="small opacity-75">$2,000+</p>
-                    </div>
-                </div>
-                <div class="col-6 col-md-3">
-                    <div class="p-3">
-                        <div class="rounded-circle mx-auto mb-2 d-flex align-items-center justify-content-center" style="width: 80px; height: 80px; background: linear-gradient(135deg, #C0C0C0, #A8A8A8);">
-                            <i class="fas fa-medal fa-2x text-white"></i>
-                        </div>
-                        <h6 style="color: #C0C0C0;">Gold</h6>
-                        <p class="small opacity-75">$1,000+</p>
-                    </div>
-                </div>
-                <div class="col-6 col-md-3">
-                    <div class="p-3">
-                        <div class="rounded-circle mx-auto mb-2 d-flex align-items-center justify-content-center" style="width: 80px; height: 80px; background: linear-gradient(135deg, #CD7F32, #B87333);">
-                            <i class="fas fa-award fa-2x text-white"></i>
-                        </div>
-                        <h6 style="color: #CD7F32;">Silver</h6>
-                        <p class="small opacity-75">$500+</p>
-                    </div>
-                </div>
-                <div class="col-6 col-md-3">
-                    <div class="p-3">
-                        <div class="rounded-circle mx-auto mb-2 d-flex align-items-center justify-content-center" style="width: 80px; height: 80px; background: linear-gradient(135deg, #8B4513, #A0522D);">
-                            <i class="fas fa-handshake fa-2x text-white"></i>
-                        </div>
-                        <h6 style="color: #CD853F;">Bronze</h6>
-                        <p class="small opacity-75">$250+</p>
+            
+            <!-- Sponsorship Tiers Overview -->
+            <div class="row justify-content-center mb-5">
+                <div class="col-lg-10">
+                    <div class="p-4 rounded-4 text-center" style="background: rgba(255,255,255,0.05); border: 2px solid var(--gold);">
+                        <h4 style="color: var(--gold);"><i class="fas fa-gem me-2"></i>Partner With BANF</h4>
+                        <p class="text-white-50 mb-0">Support cultural preservation and community building in Northeast Florida</p>
                     </div>
                 </div>
             </div>
-            <div class="text-center mt-4">
-                <p class="mb-3 opacity-75">Sponsor benefits: Magazine ads, food sponsorship, internet promotion, and event recognition</p>
-                <a href="#contact" class="btn-primary-custom">
-                    <i class="fas fa-handshake me-2"></i>Become a Sponsor
-                </a>
+            
+            <!-- Title Sponsor -->
+            <div class="row justify-content-center mb-4">
+                <div class="col-lg-8">
+                    <div class="p-4 rounded-4 text-center" style="background: linear-gradient(135deg, #FFD700, #FFA500); color: #1a1a2e;">
+                        <h4 class="mb-2"><i class="fas fa-trophy me-2"></i>Title Sponsor - $3,000</h4>
+                        <p class="mb-3"><strong>Event Naming Rights + All Platinum Benefits</strong></p>
+                        <div class="row g-2 justify-content-center text-start" style="font-size: 0.9rem;">
+                            <div class="col-md-6">
+                                <i class="fas fa-check me-2"></i>Name your sponsored event (e.g., "[Your Brand] Spandan")<br>
+                                <i class="fas fa-check me-2"></i>All Platinum-level benefits included<br>
+                                <i class="fas fa-check me-2"></i>8 complimentary passes
+                            </div>
+                            <div class="col-md-6">
+                                <i class="fas fa-check me-2"></i>Prime speaking opportunity at event<br>
+                                <i class="fas fa-check me-2"></i>Exclusive branding on all event materials<br>
+                                <i class="fas fa-check me-2"></i>Homepage banner + Monthly social media
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tier Cards Row -->
+            <div class="row g-4 justify-content-center mb-5">
+                <!-- Platinum -->
+                <div class="col-lg-3 col-md-6">
+                    <div class="h-100 p-4 rounded-4 text-center" style="background: linear-gradient(135deg, rgba(255,215,0,0.15), rgba(255,165,0,0.15)); border: 2px solid #FFD700;">
+                        <div class="mb-3" style="color: #FFD700;">
+                            <i class="fas fa-crown fa-3x"></i>
+                        </div>
+                        <h5 style="color: #FFD700;">Platinum</h5>
+                        <div class="display-6 mb-2" style="color: #fff;">$5,000<small style="font-size: 0.4em;">/year</small></div>
+                        <ul class="list-unstyled text-start small" style="color: rgba(255,255,255,0.85);">
+                            <li><i class="fas fa-check text-success me-2"></i>8 complimentary passes</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Homepage banner all year</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Banner at ALL events</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Prime booth location</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Monthly social media</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Logo on all marketing</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Gold -->
+                <div class="col-lg-3 col-md-6">
+                    <div class="h-100 p-4 rounded-4 text-center" style="background: rgba(192,192,192,0.1); border: 2px solid #C0C0C0;">
+                        <div class="mb-3" style="color: #C0C0C0;">
+                            <i class="fas fa-medal fa-3x"></i>
+                        </div>
+                        <h5 style="color: #C0C0C0;">Gold</h5>
+                        <div class="display-6 mb-2" style="color: #fff;">$2,000<small style="font-size: 0.4em;">/year</small></div>
+                        <ul class="list-unstyled text-start small" style="color: rgba(255,255,255,0.85);">
+                            <li><i class="fas fa-check text-success me-2"></i>4 complimentary passes</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Standard booth space</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Durga Puja + 2 events</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Quarterly social media</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Logo on event programs</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Silver -->
+                <div class="col-lg-3 col-md-6">
+                    <div class="h-100 p-4 rounded-4 text-center" style="background: rgba(205,127,50,0.1); border: 2px solid #CD7F32;">
+                        <div class="mb-3" style="color: #CD7F32;">
+                            <i class="fas fa-award fa-3x"></i>
+                        </div>
+                        <h5 style="color: #CD7F32;">Silver</h5>
+                        <div class="display-6 mb-2" style="color: #fff;">$1,000<small style="font-size: 0.4em;">/year</small></div>
+                        <ul class="list-unstyled text-start small" style="color: rgba(255,255,255,0.85);">
+                            <li><i class="fas fa-check text-success me-2"></i>2 complimentary passes</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Banner at Durga Puja</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Logo on materials</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Annual newsletter feature</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Bronze -->
+                <div class="col-lg-3 col-md-6">
+                    <div class="h-100 p-4 rounded-4 text-center" style="background: rgba(128,128,128,0.1); border: 2px solid #6c757d;">
+                        <div class="mb-3" style="color: #6c757d;">
+                            <i class="fas fa-handshake fa-3x"></i>
+                        </div>
+                        <h5 style="color: #adb5bd;">Bronze</h5>
+                        <div class="display-6 mb-2" style="color: #fff;">$500<small style="font-size: 0.4em;">/year</small></div>
+                        <ul class="list-unstyled text-start small" style="color: rgba(255,255,255,0.85);">
+                            <li><i class="fas fa-check text-success me-2"></i>1 complimentary pass</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Certificate of appreciation</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Name on sponsor board</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Logo in event program</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Call to Action -->
+            <div class="row justify-content-center">
+                <div class="col-lg-8 text-center">
+                    <div class="p-4 rounded-3" style="background: rgba(255,255,255,0.05); border: 1px dashed rgba(255,255,255,0.3);">
+                        <h5 style="color: #fff;"><i class="fas fa-star me-2" style="color: var(--gold);"></i>Ready to Partner With Us?</h5>
+                        <p class="text-white-50 mb-3">Contact us to discuss sponsorship opportunities for FY 2026-27</p>
+                        <a href="mailto:sponsors@jaxbengali.org" class="btn-primary-custom me-2">
+                            <i class="fas fa-envelope me-2"></i>Contact for Sponsorship
+                        </a>
+                        <a href="#contact" class="btn-outline-custom" style="border-color: var(--gold); color: var(--gold);">
+                            <i class="fas fa-phone me-2"></i>Get in Touch
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== ADMIN ADVERTISEMENT SECTION ========== -->
+    <section class="py-4" id="admin-ads" style="background: #f8f9fa;">
+        <div class="container">
+            <div class="row g-4" id="ad-carousel-container">
+                <!-- Ad Slot 1 - Business Ad -->
+                <div class="col-md-4" data-ad-slot="1">
+                    <div class="ad-card h-100 p-4 rounded-4 text-center shadow-sm" style="background: white; border: 2px dashed #ccc; min-height: 200px;">
+                        <div class="ad-content">
+                            <i class="fas fa-bullhorn fa-3x mb-3" style="color: #FF6B35;"></i>
+                            <h5>Advertise Here</h5>
+                            <p class="text-muted small">Promote your business to the Bengali community</p>
+                            <a href="mailto:ads@jaxbengali.org" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-ad me-1"></i>Place Ad
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Ad Slot 2 - Featured Sponsor -->
+                <div class="col-md-4" data-ad-slot="2">
+                    <div class="ad-card h-100 p-4 rounded-4 text-center shadow" style="background: linear-gradient(135deg, #006A4E, #00856F); color: white; min-height: 200px;">
+                        <div class="ad-content">
+                            <div style="font-size: 2rem; margin-bottom: 10px;">🍖</div>
+                            <h5>Fresh Meats</h5>
+                            <p class="small opacity-85">Quality Halal Meats & Indian Groceries</p>
+                            <p class="small"><i class="fas fa-map-marker-alt"></i> Jacksonville, FL</p>
+                            <span class="badge bg-warning text-dark">Proud Sponsor</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Ad Slot 3 - Community Announcement -->
+                <div class="col-md-4" data-ad-slot="3">
+                    <div class="ad-card h-100 p-4 rounded-4 text-center shadow" style="background: linear-gradient(135deg, #8B0000, #A52A2A); color: white; min-height: 200px;">
+                        <div class="ad-content">
+                            <i class="fas fa-newspaper fa-2x mb-2"></i>
+                            <h5>E-Magazine</h5>
+                            <p class="small opacity-85">Submit articles, poems & stories for our annual publication!</p>
+                            <a href="#" onclick="if(window.parent){window.parent.postMessage({type:'NAVIGATE',target:'/magazine'},'*');}" class="btn btn-sm btn-warning">
+                                <i class="fas fa-pen me-1"></i>Submit Article
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Admin controls (hidden for non-admin users) -->
+            <div id="ad-admin-controls" class="mt-3 text-center" style="display: none;">
+                <button class="btn btn-sm btn-outline-secondary" onclick="openAdManager()">
+                    <i class="fas fa-cog me-1"></i>Manage Advertisements (Admin)
+                </button>
             </div>
         </div>
     </section>
@@ -1800,7 +2323,17 @@
         <div class="container">
             <div class="section-header">
                 <h2>Membership Plans</h2>
-                <p style="color: rgba(255,255,255,0.8);">Join our community • 2025-2026 Season</p>
+                <p style="color: rgba(255,255,255,0.8);">Join our community • FY 2026-27 Season</p>
+            </div>
+            
+            <!-- Early Bird Alert Banner -->
+            <div class="row justify-content-center mb-4">
+                <div class="col-lg-10">
+                    <div class="alert-box p-3 rounded-3 text-center" style="background: linear-gradient(135deg, #28a745, #20c997); color: #fff;">
+                        <i class="fas fa-clock fa-lg me-2"></i>
+                        <strong>⏰ Early Bird Pricing!</strong> Family membership $375 (save $25) - Register by March 31, 2026
+                    </div>
+                </div>
             </div>
             
             <!-- Member Portal Access Box -->
@@ -1829,13 +2362,39 @@
             </div>
             
             <div class="row justify-content-center">
+                <!-- Student Plan -->
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="pricing-card">
+                        <div class="pricing-header" style="background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);">
+                            <h4><i class="fas fa-graduation-cap me-2"></i>Student</h4>
+                            <p class="mb-2 opacity-75">Full-time Students</p>
+                            <div class="pricing-price">
+                                $165<span>/year</span>
+                            </div>
+                            <small class="opacity-75"><i class="fas fa-id-card me-1"></i>Valid student ID required</small>
+                        </div>
+                        <div class="pricing-body">
+                            <div class="pricing-feature"><i class="fas fa-check-circle"></i>Access to all events</div>
+                            <div class="pricing-feature"><i class="fas fa-check-circle"></i>Newsletter subscription</div>
+                            <div class="pricing-feature"><i class="fas fa-check-circle"></i>Member directory access</div>
+                            <div class="pricing-feature"><i class="fas fa-check-circle"></i>Special programs</div>
+                        </div>
+                        <div class="pricing-footer">
+                            <a href="mailto:membership@jaxbengali.org" class="btn btn-outline-light w-100">Select Plan</a>
+                        </div>
+                    </div>
+                </div>
+                
                 <!-- Individual Plan -->
-                <div class="col-lg-4 col-md-6 mb-4">
+                <div class="col-lg-3 col-md-6 mb-4">
                     <div class="pricing-card">
                         <div class="pricing-header" style="background: linear-gradient(135deg, #6c757d 0%, #495057 100%);">
                             <h4><i class="fas fa-user me-2"></i>Individual</h4>
                             <p class="mb-2 opacity-75">Single Adult Member</p>
-                            <div class="pricing-price">$50<span>/year</span></div>
+                            <div class="pricing-price">
+                                $210<span>/year</span>
+                            </div>
+                            <small class="opacity-75"><i class="fas fa-star me-1"></i>Full membership benefits</small>
                         </div>
                         <div class="pricing-body">
                             <div class="pricing-feature"><i class="fas fa-check-circle"></i>Access to all events</div>
@@ -1849,18 +2408,44 @@
                     </div>
                 </div>
                 
+                <!-- Couple Plan -->
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="pricing-card">
+                        <div class="pricing-header" style="background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);">
+                            <h4><i class="fas fa-heart me-2"></i>Couple</h4>
+                            <p class="mb-2 opacity-75">2 Adults</p>
+                            <div class="pricing-price">
+                                $330<span>/year</span>
+                            </div>
+                            <small class="opacity-75"><i class="fas fa-users me-1"></i>Dual membership</small>
+                        </div>
+                        <div class="pricing-body">
+                            <div class="pricing-feature"><i class="fas fa-check-circle"></i>All Individual benefits</div>
+                            <div class="pricing-feature"><i class="fas fa-check-circle"></i>2 adult members</div>
+                            <div class="pricing-feature"><i class="fas fa-check-circle"></i>Priority registration</div>
+                            <div class="pricing-feature"><i class="fas fa-check-circle"></i>Event discounts</div>
+                        </div>
+                        <div class="pricing-footer">
+                            <a href="mailto:membership@jaxbengali.org" class="btn btn-outline-light w-100">Select Plan</a>
+                        </div>
+                    </div>
+                </div>
+                
                 <!-- Family Plan (Featured) -->
-                <div class="col-lg-4 col-md-6 mb-4">
+                <div class="col-lg-3 col-md-6 mb-4">
                     <div class="pricing-card featured">
                         <div class="pricing-header">
                             <span class="badge bg-warning text-dark mb-2"><i class="fas fa-star me-1"></i>Most Popular</span>
                             <h4 style="color: #fff;"><i class="fas fa-users me-2"></i>Family</h4>
-                            <p class="mb-2 opacity-75">Up to 4 Members</p>
-                            <div class="pricing-price">$100<span>/year</span></div>
+                            <p class="mb-2 opacity-75">2 Adults + Kids</p>
+                            <div class="pricing-price">
+                                $400<span>/year</span>
+                            </div>
+                            <small class="text-success"><i class="fas fa-tag me-1"></i>Early Bird: $375 (by Mar 31)</small>
                         </div>
                         <div class="pricing-body">
-                            <div class="pricing-feature"><i class="fas fa-check-circle"></i>All Individual benefits</div>
-                            <div class="pricing-feature"><i class="fas fa-check-circle"></i>2 adults + 2 children</div>
+                            <div class="pricing-feature"><i class="fas fa-check-circle"></i>All Couple benefits</div>
+                            <div class="pricing-feature"><i class="fas fa-check-circle"></i>2 adults + children</div>
                             <div class="pricing-feature"><i class="fas fa-check-circle"></i>Priority event registration</div>
                             <div class="pricing-feature"><i class="fas fa-check-circle"></i>Family discounts on events</div>
                         </div>
@@ -1869,23 +2454,27 @@
                         </div>
                     </div>
                 </div>
-                
-                <!-- Senior Plan -->
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="pricing-card">
-                        <div class="pricing-header" style="background: linear-gradient(135deg, #006A4E 0%, #00856F 100%);">
-                            <h4><i class="fas fa-heart me-2"></i>Senior</h4>
-                            <p class="mb-2 opacity-75">Age 65 and Above</p>
-                            <div class="pricing-price">$35<span>/year</span></div>
-                        </div>
-                        <div class="pricing-body">
-                            <div class="pricing-feature"><i class="fas fa-check-circle"></i>All Individual benefits</div>
-                            <div class="pricing-feature"><i class="fas fa-check-circle"></i>Discounted membership</div>
-                            <div class="pricing-feature"><i class="fas fa-check-circle"></i>Special seating at events</div>
-                            <div class="pricing-feature"><i class="fas fa-check-circle"></i>Senior community programs</div>
-                        </div>
-                        <div class="pricing-footer">
-                            <a href="mailto:membership@jaxbengali.org" class="btn btn-outline-light w-100">Select Plan</a>
+            </div>
+            
+            <!-- Special Membership Options -->
+            <div class="row justify-content-center mt-4">
+                <div class="col-lg-10">
+                    <div class="p-4 rounded-3 text-center" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);">
+                        <h5 style="color: var(--gold);"><i class="fas fa-theater-masks me-2"></i>NEW! Selective Membership Plans</h5>
+                        <p class="text-white opacity-85 mb-3">Can't attend all events? Choose the plan that fits your interests!</p>
+                        <div class="row g-3 justify-content-center">
+                            <div class="col-md-5">
+                                <div class="p-3 rounded-3" style="background: rgba(255,255,255,0.1);">
+                                    <h6 style="color: #FF69B4;"><i class="fas fa-music me-2"></i>Culture Special - $180</h6>
+                                    <p class="small text-white-50 mb-0">Access to: Spandan, Nabo Borsho, Summer Camp</p>
+                                </div>
+                            </div>
+                            <div class="col-md-5">
+                                <div class="p-3 rounded-3" style="background: rgba(255,255,255,0.1);">
+                                    <h6 style="color: #ffc107;"><i class="fas fa-om me-2"></i>Religious Special - $180</h6>
+                                    <p class="small text-white-50 mb-0">Access to: Durga Puja, Kali Puja, Saraswati Puja</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1926,6 +2515,115 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== PHOTO GALLERY SECTION ========== -->
+    <section class="py-5" id="photos" style="background: #f8f9fa;">
+        <div class="container">
+            <div class="section-header">
+                <h2>Photo Gallery</h2>
+                <p>Relive our cherished moments together</p>
+            </div>
+            
+            <!-- Featured Albums Grid -->
+            <div class="row g-4">
+                <!-- Durga Puja 2025 -->
+                <div class="col-md-4">
+                    <div class="photo-album-card position-relative overflow-hidden rounded-4 shadow" style="height: 250px; cursor: pointer;" onclick="PhotoGallery.openGallery('durga-puja-2025')">
+                        <div style="background: linear-gradient(135deg, #8B0000, #A52A2A); height: 100%; display: flex; align-items: center; justify-content: center;">
+                            <span style="font-size: 4rem;">🕉️</span>
+                        </div>
+                        <div class="position-absolute bottom-0 start-0 end-0 p-3" style="background: linear-gradient(transparent, rgba(0,0,0,0.8));">
+                            <h5 class="text-white mb-1">Durga Puja 2025</h5>
+                            <small class="text-white-50"><i class="fas fa-images me-1"></i>150+ Photos</small>
+                        </div>
+                        <span class="badge bg-success position-absolute top-0 end-0 m-2">Public</span>
+                    </div>
+                </div>
+                
+                <!-- Saraswati Puja 2026 -->
+                <div class="col-md-4">
+                    <div class="photo-album-card position-relative overflow-hidden rounded-4 shadow" style="height: 250px; cursor: pointer;" onclick="PhotoGallery.openGallery('saraswati-puja-2026')">
+                        <div style="background: linear-gradient(135deg, #ffc107, #ff9800); height: 100%; display: flex; align-items: center; justify-content: center;">
+                            <span style="font-size: 4rem;">📚</span>
+                        </div>
+                        <div class="position-absolute bottom-0 start-0 end-0 p-3" style="background: linear-gradient(transparent, rgba(0,0,0,0.8));">
+                            <h5 class="text-white mb-1">Saraswati Puja 2026</h5>
+                            <small class="text-white-50"><i class="fas fa-images me-1"></i>75+ Photos</small>
+                        </div>
+                        <span class="badge bg-success position-absolute top-0 end-0 m-2">Public</span>
+                    </div>
+                </div>
+                
+                <!-- Members Only Album -->
+                <div class="col-md-4">
+                    <div class="photo-album-card position-relative overflow-hidden rounded-4 shadow" style="height: 250px; cursor: pointer;" onclick="PhotoGallery.requestMemberAccess() && PhotoGallery.openGallery('members-collection')">
+                        <div style="background: linear-gradient(135deg, #1a1a2e, #16213e); height: 100%; display: flex; align-items: center; justify-content: center;">
+                            <span style="font-size: 4rem;">🔐</span>
+                        </div>
+                        <div class="position-absolute bottom-0 start-0 end-0 p-3" style="background: linear-gradient(transparent, rgba(0,0,0,0.8));">
+                            <h5 class="text-white mb-1">Member Photos</h5>
+                            <small class="text-white-50"><i class="fas fa-lock me-1"></i>Login Required</small>
+                        </div>
+                        <span class="badge bg-warning text-dark position-absolute top-0 end-0 m-2">
+                            <i class="fas fa-user-lock me-1"></i>Members Only
+                        </span>
+                    </div>
+                </div>
+                
+                <!-- Winter Picnic 2026 -->
+                <div class="col-md-4">
+                    <div class="photo-album-card position-relative overflow-hidden rounded-4 shadow" style="height: 250px; cursor: pointer;" onclick="PhotoGallery.openGallery('winter-picnic-2026')">
+                        <div style="background: linear-gradient(135deg, #2196F3, #03A9F4); height: 100%; display: flex; align-items: center; justify-content: center;">
+                            <span style="font-size: 4rem;">🧺</span>
+                        </div>
+                        <div class="position-absolute bottom-0 start-0 end-0 p-3" style="background: linear-gradient(transparent, rgba(0,0,0,0.8));">
+                            <h5 class="text-white mb-1">Winter Picnic 2026</h5>
+                            <small class="text-white-50"><i class="fas fa-images me-1"></i>50+ Photos</small>
+                        </div>
+                        <span class="badge bg-success position-absolute top-0 end-0 m-2">Public</span>
+                    </div>
+                </div>
+                
+                <!-- Spandan 2025 -->
+                <div class="col-md-4">
+                    <div class="photo-album-card position-relative overflow-hidden rounded-4 shadow" style="height: 250px; cursor: pointer;" onclick="PhotoGallery.openGallery('spandan-2025')">
+                        <div style="background: linear-gradient(135deg, #006A4E, #00856F); height: 100%; display: flex; align-items: center; justify-content: center;">
+                            <span style="font-size: 4rem;">🎭</span>
+                        </div>
+                        <div class="position-absolute bottom-0 start-0 end-0 p-3" style="background: linear-gradient(transparent, rgba(0,0,0,0.8));">
+                            <h5 class="text-white mb-1">Spandan 2025</h5>
+                            <small class="text-white-50"><i class="fas fa-images me-1"></i>100+ Photos</small>
+                        </div>
+                        <span class="badge bg-success position-absolute top-0 end-0 m-2">Public</span>
+                    </div>
+                </div>
+                
+                <!-- View All Albums -->
+                <div class="col-md-4">
+                    <div class="photo-album-card position-relative overflow-hidden rounded-4" style="height: 250px; cursor: pointer; border: 3px dashed #dee2e6; background: white; display: flex; align-items: center; justify-content: center;" onclick="if(window.parent){window.parent.postMessage({type:'NAVIGATE',target:'/photos'},'*');}">
+                        <div class="text-center">
+                            <i class="fas fa-photo-video fa-4x mb-3" style="color: #6c757d;"></i>
+                            <h5 style="color: #333;">View All Albums</h5>
+                            <p class="text-muted small mb-0">Browse complete photo collection</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Photo Submission CTA -->
+            <div class="row mt-5">
+                <div class="col-12">
+                    <div class="p-4 rounded-4 text-center" style="background: linear-gradient(135deg, var(--banf-saffron), var(--banf-orange));">
+                        <h5 class="text-white mb-2"><i class="fas fa-upload me-2"></i>Share Your Photos!</h5>
+                        <p class="text-white opacity-85 mb-3">Members can submit photos from events for the community gallery</p>
+                        <button class="btn btn-light" onclick="openMemberPortal('login')">
+                            <i class="fas fa-cloud-upload-alt me-2"></i>Submit Photos
+                        </button>
                     </div>
                 </div>
             </div>
@@ -2196,11 +2894,41 @@
         // ========== RADIO PLAYER FUNCTIONALITY ==========
         let radioAudio = null;
         let isRadioPlaying = false;
+        let currentSchedule = [];
+        let currentProgramIndex = 0;
+        let currentProgram = null;
         
-        const radioStations = [
-            { name: 'Rabindra Sangeet', url: 'https://stream.zeno.fm/vnhbh2utdxquv' },
-            { name: 'Bengali Classics', url: 'https://stream.zeno.fm/1c6y5h8v0mruv' },
-            { name: 'Modern Bangla', url: 'https://stream.zeno.fm/vvwwnbnc2mquv' }
+        // Radio API endpoints (using the autonomous radio system)
+        const RADIO_API_BASE = 'http://127.0.0.1:5000/api/radio';
+        const RADIO_ENDPOINTS = {
+            schedule: `${RADIO_API_BASE}/autonomous/schedule`,
+            currentStatus: `${RADIO_API_BASE}/current-status`,
+            startCurrent: `${RADIO_API_BASE}/autonomous/start-current`,
+            nextTrack: `${RADIO_API_BASE}/autonomous/next-track`,
+            previousTrack: `${RADIO_API_BASE}/autonomous/previous-track`
+        };
+        
+        // Program categories with display info
+        const PROGRAM_CATEGORIES = {
+            'Classical_Music': { name: 'Classical Music', icon: '🎻', color: '#8B4513' },
+            'Folk_Music': { name: 'Folk Music', icon: '🪘', color: '#228B22' },
+            'Modern_Music': { name: 'Modern Music', icon: '🎵', color: '#4169E1' },
+            'Literature': { name: 'Literature', icon: '📚', color: '#800080' },
+            'Philosophy': { name: 'Philosophy', icon: '🧘', color: '#DAA520' },
+            'Devotional': { name: 'Devotional', icon: '🙏', color: '#FF6347' },
+            'Children': { name: 'Children\'s Hour', icon: '👶', color: '#FF69B4' },
+            'Health_Wellness': { name: 'Health & Wellness', icon: '💪', color: '#32CD32' },
+            'Cultural_Arts': { name: 'Cultural Arts', icon: '🎨', color: '#FF8C00' },
+            'Family_Entertainment': { name: 'Family Entertainment', icon: '👨‍👩‍👧‍👦', color: '#9932CC' },
+            'News_Current': { name: 'News & Current Affairs', icon: '📰', color: '#4682B4' },
+            'Traditional_Music': { name: 'Traditional Music', icon: '🎼', color: '#CD853F' }
+        };
+        
+        // Fallback local stations (when API unavailable)
+        const fallbackStations = [
+            { name: 'BANF Radio - Classical', url: '/static/audio/classical_mix.mp3', category: 'Classical_Music' },
+            { name: 'BANF Radio - Folk', url: '/static/audio/folk_mix.mp3', category: 'Folk_Music' },
+            { name: 'BANF Radio - Modern', url: '/static/audio/modern_mix.mp3', category: 'Modern_Music' }
         ];
         let currentStationIndex = 0;
 
@@ -2240,9 +2968,9 @@
         }
 
         /**
-         * Toggle Radio Play/Pause
+         * Toggle Radio Play/Pause - Uses existing API
          */
-        function toggleRadio() {
+        async function toggleRadio() {
             if (!radioAudio) {
                 radioAudio = new Audio();
             }
@@ -2250,8 +2978,29 @@
             if (isRadioPlaying) {
                 radioAudio.pause();
                 radioAudio.src = '';
+                isRadioPlaying = false;
+                updatePlayButton(false);
             } else {
-                radioAudio.src = radioStations[currentStationIndex].url;
+                try {
+                    // Try to start from API first
+                    const response = await fetch(RADIO_ENDPOINTS.startCurrent, { method: 'POST' });
+                    const data = await response.json();
+                    
+                    if (data.stream_url) {
+                        radioAudio.src = data.stream_url;
+                        currentProgram = data;
+                        updateNowPlayingFromAPI(data);
+                    } else {
+                        // Fallback to local stations
+                        radioAudio.src = fallbackStations[currentStationIndex].url;
+                        updateNowPlaying();
+                    }
+                } catch (error) {
+                    console.warn('API unavailable, using fallback:', error);
+                    radioAudio.src = fallbackStations[currentStationIndex].url;
+                    updateNowPlaying();
+                }
+                
                 radioAudio.play().catch(err => {
                     console.warn('Auto-play blocked:', err);
                     updateNowPlaying('Click play again to start');
@@ -2260,16 +3009,61 @@
         }
 
         /**
-         * Skip to Next/Previous Station
+         * Skip to Next/Previous Track - Uses existing API
          */
-        function skipStation(direction) {
-            currentStationIndex = (currentStationIndex + direction + radioStations.length) % radioStations.length;
+        async function skipStation(direction) {
+            try {
+                const endpoint = direction > 0 ? RADIO_ENDPOINTS.nextTrack : RADIO_ENDPOINTS.previousTrack;
+                const response = await fetch(endpoint, { method: 'POST' });
+                const data = await response.json();
+                
+                if (data.stream_url) {
+                    if (isRadioPlaying) {
+                        radioAudio.src = data.stream_url;
+                        radioAudio.play();
+                    }
+                    currentProgram = data;
+                    updateNowPlayingFromAPI(data);
+                    return;
+                }
+            } catch (error) {
+                console.warn('API skip failed, using fallback:', error);
+            }
             
+            // Fallback to local stations
+            currentStationIndex = (currentStationIndex + direction + fallbackStations.length) % fallbackStations.length;
             if (isRadioPlaying) {
-                radioAudio.src = radioStations[currentStationIndex].url;
+                radioAudio.src = fallbackStations[currentStationIndex].url;
                 radioAudio.play();
             }
             updateNowPlaying();
+        }
+        
+        /**
+         * Update Now Playing from API response
+         */
+        function updateNowPlayingFromAPI(data) {
+            const nowPlaying = document.querySelector('.now-playing');
+            if (nowPlaying && data) {
+                const category = PROGRAM_CATEGORIES[data.category] || { icon: '🎵', name: data.category };
+                nowPlaying.innerHTML = `${category.icon} ${data.program_name || data.title} — ${category.name}`;
+            }
+        }
+        
+        /**
+         * Fetch current schedule from API
+         */
+        async function fetchCurrentSchedule() {
+            try {
+                const response = await fetch(RADIO_ENDPOINTS.currentStatus);
+                const data = await response.json();
+                if (data && data.current_program) {
+                    currentProgram = data.current_program;
+                    updateNowPlayingFromAPI(data.current_program);
+                }
+            } catch (error) {
+                console.warn('Could not fetch schedule:', error);
+            }
         }
 
         /**
@@ -2283,17 +3077,20 @@
         }
 
         /**
-         * Update Now Playing Display
+         * Update Now Playing Display (fallback mode)
          */
         function updateNowPlaying(customText = null) {
             const nowPlaying = document.querySelector('.now-playing');
             if (nowPlaying) {
-                nowPlaying.innerHTML = customText || `🎵 ${radioStations[currentStationIndex].name} — BANF Radio Live`;
+                nowPlaying.innerHTML = customText || `🎵 ${fallbackStations[currentStationIndex].name} — BANF Radio Live`;
             }
         }
 
-        // Initialize radio on page load
-        document.addEventListener('DOMContentLoaded', initRadioPlayer);
+        // Initialize radio on page load and fetch schedule
+        document.addEventListener('DOMContentLoaded', () => {
+            initRadioPlayer();
+            fetchCurrentSchedule();
+        });
 
         // Language Toggle for President's Message
         function toggleLanguage(lang) {
@@ -3406,6 +4203,68 @@
             document.getElementById('portalStatusMessage').style.display = 'none';
         }
 
+        // ========== PORTAL NAVIGATION FUNCTIONS ==========
+        
+        /**
+         * Scroll to a specific section
+         */
+        function scrollToSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            if (section) {
+                section.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+        
+        /**
+         * Open Member Login Modal
+         */
+        function openMemberLoginModal() {
+            // Check if we're in Wix embed mode
+            if (window.parent !== window) {
+                // Send message to Wix parent to handle login
+                window.parent.postMessage({ 
+                    type: 'NAVIGATE', 
+                    target: '/member-login' 
+                }, '*');
+            } else {
+                // Standalone mode - redirect to Flask login
+                window.location.href = '/member-login';
+            }
+        }
+        
+        /**
+         * Open Admin Login Modal
+         */
+        function openAdminLoginModal() {
+            // Check if we're in Wix embed mode
+            if (window.parent !== window) {
+                // Send message to Wix parent to handle admin login
+                window.parent.postMessage({ 
+                    type: 'NAVIGATE', 
+                    target: '/admin-login' 
+                }, '*');
+            } else {
+                // Standalone mode - redirect to Flask admin login
+                window.location.href = '/admin-login';
+            }
+        }
+        
+        /**
+         * Open Survey Section
+         */
+        function openSurveySection() {
+            // Navigate to surveys
+            scrollToSection('surveys');
+        }
+        
+        /**
+         * Open Anonymous Complaint Form
+         */
+        function openComplaintForm() {
+            // Navigate to complaints section
+            scrollToSection('complaints');
+        }
+
         // ========== WIX EMBED INTEGRATION ==========
         
         /**
@@ -3413,64 +4272,242 @@
          */
         function isWixEmbed() {
             try {
-                return window.self !== window.top && 
-                       (document.referrer.includes('wix.com') || 
-                        document.referrer.includes('wixsite.com') ||
-                        window.location.search.includes('wix-embed=true'));
+                return window.self !== window.top;
             } catch (e) {
                 return true; // Blocked by CORS = we're in an iframe
             }
         }
 
         /**
+         * Calculate actual document height including all content
+         */
+        function getDocumentHeight() {
+            const body = document.body;
+            const html = document.documentElement;
+            
+            // Get the maximum of all possible height values
+            const height = Math.max(
+                body.scrollHeight,
+                body.offsetHeight,
+                html.clientHeight,
+                html.scrollHeight,
+                html.offsetHeight
+            );
+            
+            // Add some padding to ensure no content is cut off
+            return height + 100;
+        }
+
+        /**
          * Send height to parent Wix page for auto-resize
          */
         function sendHeightToWix() {
-            if (isWixEmbed()) {
-                const height = document.documentElement.scrollHeight;
-                window.parent.postMessage({
-                    type: 'BANF_EMBED_HEIGHT',
-                    height: height
+            const height = getDocumentHeight();
+            
+            // Send to all possible parent origins
+            const origins = ['*', 'https://www.jaxbengali.org', 'https://banfwix.wixsite.com'];
+            origins.forEach(origin => {
+                try {
+                    window.parent.postMessage({
+                        type: 'BANF_EMBED_HEIGHT',
+                        height: height
+                    }, origin);
+                    
+                    // Also send Wix-specific message format
+                    window.parent.postMessage({
+                        type: 'set-height',
+                        data: height
+                    }, origin);
+                    
+                    // Wix HtmlComponent message format
+                    window.parent.postMessage(JSON.stringify({
+                        height: height,
+                        type: 'ready'
+                    }), origin);
+                } catch (e) {
+                    console.log('[BANF] PostMessage error:', e);
+                }
+            });
+            
+            console.log('[BANF Embed] Sent height:', height);
+        }
+
+        /**
+         * ========== ADMIN ADVERTISEMENT MANAGEMENT ==========
+         */
+        
+        // Store ad configurations (loaded from Wix CMS or backend)
+        const AdManager = {
+            ads: [],
+            isAdmin: false,
+            
+            /**
+             * Initialize ad system
+             */
+            init: function() {
+                // Check if user is admin (message from Wix parent)
+                window.addEventListener('message', (event) => {
+                    if (event.data && event.data.type === 'ADMIN_STATUS') {
+                        this.isAdmin = event.data.isAdmin;
+                        this.updateAdminControls();
+                    }
+                    if (event.data && event.data.type === 'AD_DATA') {
+                        this.ads = event.data.ads;
+                        this.renderAds();
+                    }
+                });
+                
+                // Request admin status from Wix parent
+                if (window.parent !== window) {
+                    window.parent.postMessage({ type: 'GET_ADMIN_STATUS' }, '*');
+                    window.parent.postMessage({ type: 'GET_ADS' }, '*');
+                }
+            },
+            
+            /**
+             * Show/hide admin controls based on user role
+             */
+            updateAdminControls: function() {
+                const adminControls = document.getElementById('ad-admin-controls');
+                if (adminControls) {
+                    adminControls.style.display = this.isAdmin ? 'block' : 'none';
+                }
+            },
+            
+            /**
+             * Render ads from CMS data
+             */
+            renderAds: function() {
+                const container = document.getElementById('ad-carousel-container');
+                if (!container || !this.ads.length) return;
+                
+                // Clear existing ads
+                container.innerHTML = '';
+                
+                this.ads.forEach((ad, index) => {
+                    const adHtml = `
+                        <div class="col-md-4" data-ad-slot="${index + 1}" data-ad-id="${ad.id}">
+                            <div class="ad-card h-100 p-4 rounded-4 text-center shadow" style="${ad.style}">
+                                <div class="ad-content">
+                                    ${ad.icon ? `<i class="${ad.icon} fa-3x mb-3"></i>` : ''}
+                                    ${ad.image ? `<img src="${ad.image}" alt="${ad.title}" class="mb-3" style="max-width: 100%; border-radius: 10px;">` : ''}
+                                    <h5>${ad.title}</h5>
+                                    <p class="small opacity-85">${ad.description}</p>
+                                    ${ad.link ? `<a href="${ad.link}" target="_blank" class="btn btn-sm ${ad.buttonClass || 'btn-outline-light'}">${ad.buttonText || 'Learn More'}</a>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    container.innerHTML += adHtml;
+                });
+            }
+        };
+        
+        /**
+         * Open Ad Manager (Admin only)
+         */
+        function openAdManager() {
+            if (window.parent !== window) {
+                window.parent.postMessage({ 
+                    type: 'NAVIGATE', 
+                    target: '/admin/ads' 
                 }, '*');
+            } else {
+                alert('Ad Manager is available in the admin portal.');
             }
         }
 
         /**
-         * Initialize embed mode
+         * ========== PHOTO GALLERY ACCESS FOR MEMBERS ==========
+         */
+        
+        const PhotoGallery = {
+            albums: [],
+            isLoggedIn: false,
+            
+            /**
+             * Load photo albums (public or member-only)
+             */
+            loadAlbums: async function(memberOnly = false) {
+                try {
+                    const endpoint = memberOnly 
+                        ? '/_functions/getMemberPhotos'
+                        : '/_functions/getPublicPhotos';
+                    
+                    const response = await fetch(MemberPortal.apiBase + endpoint);
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        this.albums = data.albums;
+                        return this.albums;
+                    }
+                } catch (error) {
+                    console.error('Error loading photos:', error);
+                }
+                return [];
+            },
+            
+            /**
+             * Open photo gallery for specific event
+             */
+            openGallery: function(eventId) {
+                if (window.parent !== window) {
+                    window.parent.postMessage({ 
+                        type: 'NAVIGATE', 
+                        target: `/photos/${eventId}` 
+                    }, '*');
+                } else {
+                    window.location.href = `/photos?event=${eventId}`;
+                }
+            },
+            
+            /**
+             * Request member photos access
+             */
+            requestMemberAccess: function() {
+                if (!this.isLoggedIn) {
+                    openMemberPortal('login');
+                    showStatusMessage('info', 'Please log in to access member-only photos');
+                    return false;
+                }
+                return true;
+            }
+        };
+
+        /**
+         * Initialize embed mode - with internal scrolling
          */
         function initEmbedMode() {
-            if (isWixEmbed()) {
-                document.body.classList.add('wix-embed-mode');
-                
-                // Send initial height
-                sendHeightToWix();
-                
-                // Send height on resize
-                window.addEventListener('resize', sendHeightToWix);
-                
-                // Send height after images load
-                window.addEventListener('load', () => {
-                    setTimeout(sendHeightToWix, 500);
-                });
-                
-                // Observe DOM changes for dynamic content
-                const observer = new MutationObserver(() => {
-                    setTimeout(sendHeightToWix, 100);
-                });
-                observer.observe(document.body, { childList: true, subtree: true });
-                
-                // Listen for messages from Wix parent
-                window.addEventListener('message', (event) => {
-                    if (event.data && event.data.type === 'WIX_SCROLL_TO') {
-                        const section = document.querySelector(event.data.target);
-                        if (section) {
-                            section.scrollIntoView({ behavior: 'smooth' });
-                        }
+            document.body.classList.add('wix-embed-mode');
+            
+            // Enable smooth scrolling within the iframe
+            document.documentElement.style.scrollBehavior = 'smooth';
+            
+            // Initialize ad manager
+            AdManager.init();
+            
+            // Still send height for reference (Wix may use it)
+            setTimeout(sendHeightToWix, 100);
+            window.addEventListener('resize', sendHeightToWix);
+            window.addEventListener('load', () => {
+                setTimeout(sendHeightToWix, 500);
+            });
+            
+            // Listen for messages from Wix parent
+            window.addEventListener('message', (event) => {
+                if (event.data && event.data.type === 'WIX_SCROLL_TO') {
+                    const section = document.querySelector(event.data.target);
+                    if (section) {
+                        section.scrollIntoView({ behavior: 'smooth' });
                     }
-                });
-                
-                console.log('[BANF Embed] Running in Wix iframe mode');
-            }
+                }
+                // Handle member login status
+                if (event.data && event.data.type === 'MEMBER_STATUS') {
+                    PhotoGallery.isLoggedIn = event.data.isLoggedIn;
+                }
+            });
+            
+            console.log('[BANF Embed] Running in embed mode with internal scrolling');
         }
 
         // Initialize when DOM is ready
