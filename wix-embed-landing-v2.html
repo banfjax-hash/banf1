@@ -2887,41 +2887,25 @@
         let currentProgram = null;
         
         // ========== API CONFIGURATION ==========
-        // Auto-detect environment: Wix production vs local development
-        // Production: calls Wix Velo HTTP Functions at /_functions/
-        // Local dev: falls back to localhost Flask services
+        // All API calls route through Wix Velo HTTP Functions at /_functions/
         const WIX_SITE_URL = 'https://www.jaxbengali.org';
-        const IS_PRODUCTION = (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1');
-        
-        // Email/Evite API — Wix Velo backend (no local dependency)
         const WIX_API_BASE = WIX_SITE_URL + '/_functions';
-        const GMAIL_API_BASE = IS_PRODUCTION ? WIX_API_BASE : 'http://127.0.0.1:5001/api/gmail';
-        
-        // Radio API — still requires streaming server (graceful degradation)
-        const RADIO_API_BASE = IS_PRODUCTION ? (WIX_API_BASE) : 'http://127.0.0.1:5000/api/radio';
-        const RADIO_ENDPOINTS = IS_PRODUCTION ? {
+        const GMAIL_API_BASE = WIX_API_BASE;
+        const RADIO_API_BASE = WIX_API_BASE;
+        const RADIO_ENDPOINTS = {
             schedule: `${WIX_API_BASE}/radio_schedule`,
             currentStatus: `${WIX_API_BASE}/radio_status`,
             startCurrent: `${WIX_API_BASE}/radio_start`,
             nextTrack: `${WIX_API_BASE}/radio_next`,
             previousTrack: `${WIX_API_BASE}/radio_previous`
-        } : {
-            schedule: `${RADIO_API_BASE}/autonomous/schedule`,
-            currentStatus: `${RADIO_API_BASE}/current-status`,
-            startCurrent: `${RADIO_API_BASE}/autonomous/start-current`,
-            nextTrack: `${RADIO_API_BASE}/autonomous/next-track`,
-            previousTrack: `${RADIO_API_BASE}/autonomous/previous-track`
         };
         
         /**
-         * API endpoint mapper - translates local Flask paths to Wix Velo HTTP Function paths
-         * Local:  GMAIL_API_BASE + '/send-evite'  → http://127.0.0.1:5001/api/gmail/send-evite
-         * Prod:   WIX_API_BASE + '/send_evite'    → https://www.jaxbengali.org/_functions/send_evite
+         * API endpoint mapper - translates REST paths to Wix Velo HTTP Function paths
+         * e.g. '/send-evite' → https://www.jaxbengali.org/_functions/send_evite
          */
         function apiUrl(endpoint) {
-            if (!IS_PRODUCTION) return GMAIL_API_BASE + endpoint;
-            
-            // Map Flask REST paths → Wix flat function names
+            // Map REST paths → Wix flat function names
             const routeMap = {
                 '/status':          '/email_status',
                 '/unread':          '/email_unread',
@@ -2958,43 +2942,38 @@
             let url = apiUrl(endpoint);
             let opts = { ...options };
             
-            if (IS_PRODUCTION) {
-                // Wix only supports GET and POST - convert DELETE to POST
-                if (opts.method === 'DELETE') {
-                    opts.method = 'POST';
-                    // Ensure body has the ID if it was in the URL
-                    const deleteIdMatch = endpoint.match(/\/delete\/(.+)/);
-                    if (deleteIdMatch) {
-                        opts.headers = opts.headers || { 'Content-Type': 'application/json' };
-                        opts.body = JSON.stringify({ id: deleteIdMatch[1] });
-                    }
-                }
-                
-                // For mark-read, extract ID from URL into body
-                const markReadMatch = endpoint.match(/\/mark-read\/(.+)/);
-                if (markReadMatch) {
-                    opts.method = 'POST';
-                    opts.headers = { 'Content-Type': 'application/json' };
-                    opts.body = JSON.stringify({ id: markReadMatch[1] });
-                }
-                
-                // For contact group operations, extract group name from URL into body
-                const groupMatch = endpoint.match(/\/contacts\/group\/([^/]+)/);
-                if (groupMatch) {
-                    const groupName = decodeURIComponent(groupMatch[1]);
-                    opts.method = opts.method || 'POST';
+            // Wix only supports GET and POST - convert DELETE to POST
+            if (opts.method === 'DELETE') {
+                opts.method = 'POST';
+                const deleteIdMatch = endpoint.match(/\/delete\/(.+)/);
+                if (deleteIdMatch) {
                     opts.headers = opts.headers || { 'Content-Type': 'application/json' };
-                    
-                    if (endpoint.includes('/add') || endpoint.includes('/remove')) {
-                        // Merge group_name into existing body
-                        let existingBody = {};
-                        try { existingBody = JSON.parse(opts.body || '{}'); } catch(e) {}
-                        existingBody.group_name = groupName;
-                        opts.body = JSON.stringify(existingBody);
-                    } else if (opts.method === 'POST' && !endpoint.includes('/add') && !endpoint.includes('/remove')) {
-                        // Delete group - send group_name in body
-                        opts.body = JSON.stringify({ group_name: groupName });
-                    }
+                    opts.body = JSON.stringify({ id: deleteIdMatch[1] });
+                }
+            }
+            
+            // For mark-read, extract ID from URL into body
+            const markReadMatch = endpoint.match(/\/mark-read\/(.+)/);
+            if (markReadMatch) {
+                opts.method = 'POST';
+                opts.headers = { 'Content-Type': 'application/json' };
+                opts.body = JSON.stringify({ id: markReadMatch[1] });
+            }
+            
+            // For contact group operations, extract group name from URL into body
+            const groupMatch = endpoint.match(/\/contacts\/group\/([^/]+)/);
+            if (groupMatch) {
+                const groupName = decodeURIComponent(groupMatch[1]);
+                opts.method = opts.method || 'POST';
+                opts.headers = opts.headers || { 'Content-Type': 'application/json' };
+                
+                if (endpoint.includes('/add') || endpoint.includes('/remove')) {
+                    let existingBody = {};
+                    try { existingBody = JSON.parse(opts.body || '{}'); } catch(e) {}
+                    existingBody.group_name = groupName;
+                    opts.body = JSON.stringify(existingBody);
+                } else if (opts.method === 'POST' && !endpoint.includes('/add') && !endpoint.includes('/remove')) {
+                    opts.body = JSON.stringify({ group_name: groupName });
                 }
             }
             
@@ -4627,6 +4606,15 @@
                 </div>
 
                 <div class="admin-sidebar-section">
+                    <h6>Email</h6>
+                    <a href="#" class="admin-nav-item" onclick="showAdminSection('gmail', this); return false;">
+                        <i class="fas fa-envelope"></i>
+                        <span>Email Management</span>
+                        <span class="admin-badge" id="gmailUnreadBadge" style="display:none">0</span>
+                    </a>
+                </div>
+
+                <div class="admin-sidebar-section">
                     <h6>Events</h6>
                     <a href="#" class="admin-nav-item" onclick="showAdminSection('events', this); return false;">
                         <i class="fas fa-calendar-alt"></i>
@@ -4656,11 +4644,6 @@
                     <a href="#" class="admin-nav-item" onclick="showAdminSection('announcements', this); return false;">
                         <i class="fas fa-bullhorn"></i>
                         <span>Announcements</span>
-                    </a>
-                    <a href="#" class="admin-nav-item" onclick="showAdminSection('gmail', this); return false;">
-                        <i class="fas fa-envelope"></i>
-                        <span>Email (Gmail)</span>
-                        <span class="admin-badge" id="gmailUnreadBadge" style="display:none">0</span>
                     </a>
                 </div>
 
@@ -4758,6 +4741,21 @@
                             <div class="admin-actions">
                                 <button class="admin-secondary" onclick="showAdminSection('payments')"><i class="fas fa-check"></i> Review</button>
                                 <button class="admin-secondary"><i class="fas fa-list"></i> View All</button>
+                            </div>
+                        </div>
+
+                        <div class="admin-card">
+                            <div class="admin-card-header">
+                                <div class="admin-card-icon" style="background:rgba(33,150,243,0.1);color:#2196F3"><i class="fas fa-envelope"></i></div>
+                                <div>
+                                    <h4>Email Management</h4>
+                                    <span class="status-badge active">Connected</span>
+                                </div>
+                            </div>
+                            <p>Full inbox, compose, contact groups, search — manage all emails from <strong>banfjax@gmail.com</strong>.</p>
+                            <div class="admin-actions">
+                                <button class="admin-secondary" onclick="showAdminSection('gmail')"><i class="fas fa-inbox"></i> Open Inbox</button>
+                                <button class="admin-secondary" onclick="showAdminSection('gmail'); setTimeout(()=>gmailShowTab('compose'),300)"><i class="fas fa-pen"></i> Compose</button>
                             </div>
                         </div>
 
@@ -7993,22 +7991,22 @@
             const text = document.getElementById('gmailStatusText');
             const detail = document.getElementById('gmailStatusDetail');
             const bar = document.getElementById('gmailConnectionStatus');
-            icon.style.color = '#ff9800'; text.textContent = 'Connecting...'; detail.textContent = IS_PRODUCTION ? 'Connecting to BANF Email Service...' : 'Verifying Gmail IMAP/SMTP access...';
+            icon.style.color = '#ff9800'; text.textContent = 'Connecting...'; detail.textContent = 'Connecting to BANF Email Service...';
             try {
                 const r = await apiFetch('/status');
                 const d = await r.json();
                 if (d.status === 'connected') {
                     icon.style.color = '#4CAF50'; text.textContent = '✅ Connected to BANF Email Service';
-                    detail.textContent = IS_PRODUCTION ? `Service: ${d.service_type || 'Wix'} | Sent Today: ${d.sent_today || 0}` : `IMAP: ${d.imap ? 'OK' : 'FAIL'} | SMTP: ${d.smtp ? 'OK' : 'FAIL'}`;
+                    detail.textContent = `Service: ${d.service_type || 'Wix'} | Sent Today: ${d.sent_today || 0}`;
                     bar.style.borderLeftColor = '#4CAF50'; gmailState.connected = true;
                     gmailLoadUnreadCount();
                 } else {
                     icon.style.color = '#f44336'; text.textContent = '❌ Connection Failed';
-                    detail.textContent = d.error || (IS_PRODUCTION ? 'Email service temporarily unavailable' : 'Check Gmail service is running on port 5001'); bar.style.borderLeftColor = '#f44336';
+                    detail.textContent = d.error || 'Email service temporarily unavailable'; bar.style.borderLeftColor = '#f44336';
                 }
             } catch(e) {
                 icon.style.color = '#f44336'; text.textContent = '❌ Email Service Unreachable';
-                detail.textContent = IS_PRODUCTION ? 'Email service temporarily unavailable. Please try again later.' : 'Start gmail_service.py (python gmail_service.py) on port 5001'; bar.style.borderLeftColor = '#f44336';
+                detail.textContent = 'Email service temporarily unavailable. Please try again later.'; bar.style.borderLeftColor = '#f44336';
             }
         }
 
@@ -8082,7 +8080,7 @@
                     }
                 }
             } catch(e) {
-                tbody.innerHTML = `<tr><td colspan="5" class="text-center text-danger">❌ Failed to load: ${e.message}<br><small>${IS_PRODUCTION ? 'Email service temporarily unavailable' : 'Ensure gmail_service.py is running'}</small></td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center text-danger">❌ Failed to load: ${e.message}<br><small>Email service temporarily unavailable</small></td></tr>`;
             }
         }
 
