@@ -2887,6 +2887,7 @@
         let currentProgram = null;
         
         // Radio API endpoints (using the autonomous radio system)
+        const GMAIL_API_BASE = 'http://127.0.0.1:5001/api/gmail';
         const RADIO_API_BASE = 'http://127.0.0.1:5000/api/radio';
         const RADIO_ENDPOINTS = {
             schedule: `${RADIO_API_BASE}/autonomous/schedule`,
@@ -4552,6 +4553,11 @@
                         <i class="fas fa-bullhorn"></i>
                         <span>Announcements</span>
                     </a>
+                    <a href="#" class="admin-nav-item" onclick="showAdminSection('gmail', this); return false;">
+                        <i class="fas fa-envelope"></i>
+                        <span>Email (Gmail)</span>
+                        <span class="admin-badge" id="gmailUnreadBadge" style="display:none">0</span>
+                    </a>
                 </div>
 
                 <div class="admin-sidebar-section">
@@ -5332,6 +5338,184 @@
                             <p>Upload and manage EC meeting minutes</p>
                         </div>
                         <button class="admin-primary"><i class="fas fa-upload"></i> Upload Minutes</button>
+                    </div>
+                </section>
+
+                <!-- ========== GMAIL / EMAIL SECTION ========== -->
+                <section id="adminGmail" class="admin-section">
+                    <div class="admin-page-header">
+                        <div>
+                            <h2><i class="fas fa-envelope me-2"></i>Email Management (Gmail)</h2>
+                            <p>Read, send, and manage emails from <strong>banfjax@gmail.com</strong></p>
+                        </div>
+                        <div style="display:flex;gap:0.5rem;">
+                            <button class="admin-secondary" onclick="gmailCheckConnection()"><i class="fas fa-plug me-1"></i> Check Connection</button>
+                            <button class="admin-primary" onclick="gmailOpenCompose()"><i class="fas fa-pen me-1"></i> Compose Email</button>
+                        </div>
+                    </div>
+
+                    <!-- Connection Status -->
+                    <div id="gmailConnectionStatus" class="admin-card" style="border-left:4px solid #ccc;margin-bottom:1rem;">
+                        <div style="display:flex;align-items:center;gap:1rem;">
+                            <i class="fas fa-circle" id="gmailStatusIcon" style="color:#ccc;font-size:1.2rem;"></i>
+                            <div>
+                                <strong id="gmailStatusText">Checking connection...</strong>
+                                <p class="mb-0 text-muted" id="gmailStatusDetail">Click "Check Connection" to verify Gmail access</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Stats Row -->
+                    <div class="admin-stats-grid" id="gmailStatsRow" style="margin-bottom:1.5rem;">
+                        <div class="admin-stat-card"><div class="admin-stat-value" id="gmailStatInbox">--</div><div class="admin-stat-label">Inbox</div></div>
+                        <div class="admin-stat-card"><div class="admin-stat-value" id="gmailStatUnread" style="color:#f44336">--</div><div class="admin-stat-label">Unread</div></div>
+                        <div class="admin-stat-card"><div class="admin-stat-value" id="gmailStatSent">--</div><div class="admin-stat-label">Sent Today</div></div>
+                        <div class="admin-stat-card"><div class="admin-stat-value" id="gmailStatGroups">--</div><div class="admin-stat-label">Contact Groups</div></div>
+                    </div>
+
+                    <!-- Tab Navigation -->
+                    <ul class="nav nav-tabs mb-3" id="gmailTabs">
+                        <li class="nav-item"><a class="nav-link active" href="#" onclick="gmailShowTab('inbox');return false;"><i class="fas fa-inbox me-1"></i> Inbox</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#" onclick="gmailShowTab('compose');return false;"><i class="fas fa-pen me-1"></i> Compose</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#" onclick="gmailShowTab('contacts');return false;"><i class="fas fa-address-book me-1"></i> Contact Groups</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#" onclick="gmailShowTab('search');return false;"><i class="fas fa-search me-1"></i> Search</a></li>
+                    </ul>
+
+                    <!-- INBOX TAB -->
+                    <div id="gmailTabInbox" class="gmail-tab-content">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+                            <h4><i class="fas fa-inbox me-2"></i>Inbox</h4>
+                            <div style="display:flex;gap:0.5rem;">
+                                <select class="form-control" id="gmailFolderSelect" style="width:auto" onchange="gmailLoadInbox()">
+                                    <option value="INBOX">Inbox</option>
+                                    <option value="[Gmail]/Sent Mail">Sent</option>
+                                    <option value="[Gmail]/Drafts">Drafts</option>
+                                    <option value="[Gmail]/Starred">Starred</option>
+                                    <option value="[Gmail]/Spam">Spam</option>
+                                    <option value="[Gmail]/Trash">Trash</option>
+                                </select>
+                                <button class="admin-secondary" onclick="gmailLoadInbox()"><i class="fas fa-sync-alt"></i> Refresh</button>
+                            </div>
+                        </div>
+                        <div class="admin-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th style="width:25%">From</th>
+                                        <th style="width:40%">Subject</th>
+                                        <th style="width:15%">Date</th>
+                                        <th style="width:5%"><i class="fas fa-paperclip"></i></th>
+                                        <th style="width:15%">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="gmailInboxTableBody">
+                                    <tr><td colspan="5" class="text-center text-muted"><i class="fas fa-spinner fa-spin me-2"></i>Loading emails...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div style="display:flex;justify-content:center;gap:0.5rem;margin-top:1rem;" id="gmailPagination"></div>
+                    </div>
+
+                    <!-- COMPOSE TAB -->
+                    <div id="gmailTabCompose" class="gmail-tab-content" style="display:none">
+                        <div class="admin-card" style="border:2px solid var(--gold);">
+                            <h4><i class="fas fa-pen-fancy me-2"></i>Compose Email</h4>
+                            <form id="gmailComposeForm" onsubmit="return gmailSendEmail(event)">
+                                <div class="row g-3">
+                                    <div class="col-12">
+                                        <label class="form-label fw-bold">To *</label>
+                                        <input type="text" class="form-control" id="gmailComposeTo" required placeholder="recipient@email.com (comma-separated for multiple)">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">CC</label>
+                                        <input type="text" class="form-control" id="gmailComposeCc" placeholder="cc@email.com">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">BCC</label>
+                                        <input type="text" class="form-control" id="gmailComposeBcc" placeholder="bcc@email.com">
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label fw-bold">Subject *</label>
+                                        <input type="text" class="form-control" id="gmailComposeSubject" required placeholder="Email subject">
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label fw-bold">Message</label>
+                                        <textarea class="form-control" id="gmailComposeBody" rows="10" placeholder="Write your message here..."></textarea>
+                                    </div>
+                                </div>
+                                <div class="mt-3" style="display:flex;gap:0.5rem;">
+                                    <button type="submit" class="admin-primary"><i class="fas fa-paper-plane me-1"></i> Send Email</button>
+                                    <button type="button" class="admin-secondary" onclick="gmailShowTab('inbox')"><i class="fas fa-times me-1"></i> Cancel</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- CONTACT GROUPS TAB -->
+                    <div id="gmailTabContacts" class="gmail-tab-content" style="display:none">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+                            <h4><i class="fas fa-address-book me-2"></i>Contact Groups</h4>
+                            <button class="admin-primary" onclick="gmailCreateGroupPrompt()"><i class="fas fa-plus me-1"></i> New Group</button>
+                        </div>
+                        <div id="gmailContactGroupsList" class="admin-card-grid">
+                            <div class="text-muted"><i class="fas fa-spinner fa-spin me-2"></i>Loading groups...</div>
+                        </div>
+
+                        <!-- Add Contact Form (hidden) -->
+                        <div id="gmailAddContactForm" style="display:none;margin-top:1.5rem;">
+                            <div class="admin-card" style="border:2px solid var(--gold);">
+                                <h5><i class="fas fa-user-plus me-2"></i>Add Contact to <span id="gmailAddContactGroupName"></span></h5>
+                                <div class="row g-3">
+                                    <div class="col-md-5">
+                                        <input type="text" class="form-control" id="gmailAddContactName" placeholder="Full Name">
+                                    </div>
+                                    <div class="col-md-5">
+                                        <input type="email" class="form-control" id="gmailAddContactEmail" placeholder="email@example.com">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <button class="admin-primary w-100" onclick="gmailAddContactToGroup()"><i class="fas fa-plus"></i> Add</button>
+                                    </div>
+                                </div>
+                                <button class="admin-secondary mt-2" onclick="document.getElementById('gmailAddContactForm').style.display='none'"><i class="fas fa-times me-1"></i> Close</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SEARCH TAB -->
+                    <div id="gmailTabSearch" class="gmail-tab-content" style="display:none">
+                        <div class="admin-card">
+                            <h4><i class="fas fa-search me-2"></i>Search Emails</h4>
+                            <div class="row g-3">
+                                <div class="col-md-10">
+                                    <input type="text" class="form-control" id="gmailSearchQuery" placeholder="Search by subject, sender, or content..." onkeydown="if(event.key==='Enter')gmailSearchEmails()">
+                                </div>
+                                <div class="col-md-2">
+                                    <button class="admin-primary w-100" onclick="gmailSearchEmails()"><i class="fas fa-search"></i> Search</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="gmailSearchResults" style="margin-top:1rem;"></div>
+                    </div>
+
+                    <!-- EMAIL READER MODAL -->
+                    <div id="gmailReaderArea" style="display:none;margin-top:1.5rem;">
+                        <div class="admin-card" style="border-left:4px solid var(--gold);">
+                            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1rem;">
+                                <div>
+                                    <h4 id="gmailReaderSubject" style="margin-bottom:0.25rem;"></h4>
+                                    <p class="text-muted mb-1" id="gmailReaderFrom"></p>
+                                    <small class="text-muted" id="gmailReaderDate"></small>
+                                </div>
+                                <div style="display:flex;gap:0.5rem;">
+                                    <button class="admin-secondary" onclick="gmailReplyTo()"><i class="fas fa-reply me-1"></i> Reply</button>
+                                    <button class="admin-secondary" onclick="gmailForwardEmail()"><i class="fas fa-share me-1"></i> Forward</button>
+                                    <button class="admin-secondary" onclick="document.getElementById('gmailReaderArea').style.display='none'"><i class="fas fa-times"></i></button>
+                                </div>
+                            </div>
+                            <hr>
+                            <div id="gmailReaderBody" style="white-space:pre-wrap;line-height:1.6;max-height:500px;overflow-y:auto;"></div>
+                            <div id="gmailReaderAttachments" style="margin-top:1rem;"></div>
+                        </div>
                     </div>
                 </section>
             </main>
@@ -7365,7 +7549,45 @@
             DemoData.eviteData.invitations.push(newInvite);
             document.getElementById('sendEviteFormContainer').style.display = 'none';
             renderEviteHistory();
-            alert(`✅ Evite sent successfully!\n\nEvent: ${eventName}\nRecipients: ${recipientCount} members\nDate: ${date}`);
+
+            // === SEND REAL EMAIL VIA GMAIL BACKEND ===
+            (async function sendRealEviteEmail() {
+                try {
+                    // Build recipient list from member directory (use test email for now)
+                    const testRecipient = 'ranadhir.ghosh@gmail.com';
+                    let recipientEmails = [testRecipient];
+
+                    // In production, gather all member emails from DemoData.memberDirectory
+                    // For now we use the test recipient
+                    const time = document.getElementById('eviteTime') ? document.getElementById('eviteTime').value : '';
+
+                    const evitePayload = {
+                        recipients: recipientEmails.map(em => ({ name: em.split('@')[0], email: em })),
+                        event_name: eventName,
+                        event_date: date,
+                        event_time: time || '6:00 PM',
+                        venue: venue,
+                        message: message || subject,
+                        rsvp_deadline: date
+                    };
+
+                    const r = await fetch(GMAIL_API_BASE + '/send-evite', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(evitePayload)
+                    });
+                    const d = await r.json();
+                    if (d.success) {
+                        alert(`✅ Evite sent successfully!\n\n📧 Real email delivered via Gmail!\nEvent: ${eventName}\nRecipients: ${recipientEmails.join(', ')}\nDate: ${date}\n\nSent ${d.sent_count} email(s) from banfjax@gmail.com`);
+                    } else {
+                        alert(`⚠️ Evite recorded but email delivery failed:\n${d.error || 'Unknown error'}\n\nNote: The evite was saved locally. Fix Gmail connection to resend.`);
+                    }
+                } catch(emailErr) {
+                    console.error('Gmail send error:', emailErr);
+                    alert(`✅ Evite recorded locally!\n\n⚠️ Could not send real email (Gmail service may be offline).\nEvent: ${eventName}\nRecipients: ${recipientCount} members\nDate: ${date}`);
+                }
+            })();
+
             return false;
         }
 
@@ -7657,6 +7879,302 @@
         }
 
         /* ================================================================
+         *  GMAIL / EMAIL MANAGEMENT FUNCTIONS
+         * ================================================================ */
+
+        let gmailState = { connected: false, currentPage: 1, perPage: 15, currentEmail: null, contactGroups: {} };
+
+        async function gmailCheckConnection() {
+            const icon = document.getElementById('gmailStatusIcon');
+            const text = document.getElementById('gmailStatusText');
+            const detail = document.getElementById('gmailStatusDetail');
+            const bar = document.getElementById('gmailConnectionStatus');
+            icon.style.color = '#ff9800'; text.textContent = 'Connecting...'; detail.textContent = 'Verifying Gmail IMAP/SMTP access...';
+            try {
+                const r = await fetch(GMAIL_API_BASE + '/status');
+                const d = await r.json();
+                if (d.status === 'connected') {
+                    icon.style.color = '#4CAF50'; text.textContent = '✅ Connected to banfjax@gmail.com';
+                    detail.textContent = `IMAP: ${d.imap ? 'OK' : 'FAIL'} | SMTP: ${d.smtp ? 'OK' : 'FAIL'}`;
+                    bar.style.borderLeftColor = '#4CAF50'; gmailState.connected = true;
+                    gmailLoadUnreadCount();
+                } else {
+                    icon.style.color = '#f44336'; text.textContent = '❌ Connection Failed';
+                    detail.textContent = d.error || 'Check Gmail service is running on port 5001'; bar.style.borderLeftColor = '#f44336';
+                }
+            } catch(e) {
+                icon.style.color = '#f44336'; text.textContent = '❌ Gmail Service Unreachable';
+                detail.textContent = 'Start gmail_service.py (python gmail_service.py) on port 5001'; bar.style.borderLeftColor = '#f44336';
+            }
+        }
+
+        async function gmailLoadUnreadCount() {
+            try {
+                const r = await fetch(GMAIL_API_BASE + '/unread'); const d = await r.json();
+                const badge = document.getElementById('gmailUnreadBadge');
+                const stat = document.getElementById('gmailStatUnread');
+                if (d.unread_count > 0) { badge.style.display = 'inline-block'; badge.textContent = d.unread_count; }
+                else { badge.style.display = 'none'; }
+                stat.textContent = d.unread_count || 0;
+            } catch(e) { console.log('Gmail unread check failed'); }
+        }
+
+        function gmailShowTab(tab) {
+            ['inbox','compose','contacts','search'].forEach(t => {
+                const el = document.getElementById('gmailTab' + t.charAt(0).toUpperCase() + t.slice(1));
+                if (el) el.style.display = (t === tab) ? 'block' : 'none';
+            });
+            document.querySelectorAll('#gmailTabs .nav-link').forEach(a => a.classList.remove('active'));
+            event.target.classList.add('active');
+            if (tab === 'inbox') gmailLoadInbox();
+            if (tab === 'contacts') gmailLoadContactGroups();
+        }
+
+        function gmailOpenCompose(to, subject, body) {
+            gmailShowTab('compose');
+            document.querySelectorAll('#gmailTabs .nav-link').forEach(a => a.classList.remove('active'));
+            document.querySelectorAll('#gmailTabs .nav-link')[1].classList.add('active');
+            if (to) document.getElementById('gmailComposeTo').value = to;
+            if (subject) document.getElementById('gmailComposeSubject').value = subject;
+            if (body) document.getElementById('gmailComposeBody').value = body;
+        }
+
+        async function gmailLoadInbox() {
+            const tbody = document.getElementById('gmailInboxTableBody');
+            const folder = document.getElementById('gmailFolderSelect').value;
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center"><i class="fas fa-spinner fa-spin me-2"></i>Loading...</td></tr>';
+            try {
+                const r = await fetch(`${GMAIL_API_BASE}/inbox?page=${gmailState.currentPage}&per_page=${gmailState.perPage}&folder=${encodeURIComponent(folder)}`);
+                const d = await r.json();
+                if (!d.emails || d.emails.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No emails found</td></tr>';
+                    document.getElementById('gmailStatInbox').textContent = '0'; return;
+                }
+                document.getElementById('gmailStatInbox').textContent = d.total || d.emails.length;
+                tbody.innerHTML = d.emails.map(em => {
+                    const unread = !em.seen;
+                    const fw = unread ? 'fw-bold' : '';
+                    const bg = unread ? 'background:#fff8e1;' : '';
+                    const fromShort = (em.from || 'Unknown').replace(/<.*>/,'').trim().substring(0,30);
+                    const subjShort = (em.subject || '(no subject)').substring(0,60);
+                    const dateShort = em.date ? new Date(em.date).toLocaleDateString() : '';
+                    return `<tr style="${bg}" onclick="gmailViewEmail('${em.id}','${encodeURIComponent(folder)}')" class="cursor-pointer">
+                        <td class="${fw}">${escapeHtml(fromShort)}</td>
+                        <td class="${fw}">${escapeHtml(subjShort)}</td>
+                        <td>${dateShort}</td>
+                        <td>${em.has_attachments ? '<i class="fas fa-paperclip text-muted"></i>' : ''}</td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary" onclick="event.stopPropagation();gmailReplyToId('${em.id}','${encodeURIComponent(folder)}')"><i class="fas fa-reply"></i></button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="event.stopPropagation();gmailDeleteEmail('${em.id}','${encodeURIComponent(folder)}')"><i class="fas fa-trash"></i></button>
+                        </td></tr>`;
+                }).join('');
+                // Pagination
+                const totalPages = Math.ceil((d.total || d.emails.length) / gmailState.perPage);
+                const pag = document.getElementById('gmailPagination');
+                pag.innerHTML = '';
+                if (totalPages > 1) {
+                    for (let p = 1; p <= Math.min(totalPages, 10); p++) {
+                        pag.innerHTML += `<button class="btn btn-sm ${p===gmailState.currentPage?'btn-primary':'btn-outline-secondary'}" onclick="gmailState.currentPage=${p};gmailLoadInbox()">${p}</button>`;
+                    }
+                }
+            } catch(e) {
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center text-danger">❌ Failed to load: ${e.message}<br><small>Ensure gmail_service.py is running</small></td></tr>`;
+            }
+        }
+
+        async function gmailViewEmail(emailId, folder) {
+            document.getElementById('gmailReaderArea').style.display = 'block';
+            document.getElementById('gmailReaderBody').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+            try {
+                const r = await fetch(`${GMAIL_API_BASE}/email/${emailId}?folder=${folder || 'INBOX'}`);
+                const em = await r.json();
+                gmailState.currentEmail = em;
+                document.getElementById('gmailReaderSubject').textContent = em.subject || '(no subject)';
+                document.getElementById('gmailReaderFrom').textContent = `From: ${em.from || 'Unknown'}`;
+                document.getElementById('gmailReaderDate').textContent = em.date || '';
+                const body = em.body_html || escapeHtml(em.body || 'No content');
+                document.getElementById('gmailReaderBody').innerHTML = em.body_html ? body : `<pre style="white-space:pre-wrap">${body}</pre>`;
+                // Mark as read
+                fetch(`${GMAIL_API_BASE}/mark-read/${emailId}`, { method: 'POST' }).catch(()=>{});
+                gmailLoadUnreadCount();
+            } catch(e) {
+                document.getElementById('gmailReaderBody').innerHTML = `<div class="text-danger">Error loading email: ${e.message}</div>`;
+            }
+        }
+
+        function gmailReplyTo() {
+            if (!gmailState.currentEmail) return;
+            const em = gmailState.currentEmail;
+            const fromEmail = (em.from || '').match(/<([^>]+)>/);
+            const to = fromEmail ? fromEmail[1] : em.from;
+            gmailOpenCompose(to, 'Re: ' + (em.subject || ''), `\n\n--- Original Message ---\nFrom: ${em.from}\nDate: ${em.date}\n\n${em.body || ''}`);
+        }
+
+        async function gmailReplyToId(emailId, folder) {
+            try {
+                const r = await fetch(`${GMAIL_API_BASE}/email/${emailId}?folder=${decodeURIComponent(folder)}`);
+                const em = await r.json();
+                const fromEmail = (em.from || '').match(/<([^>]+)>/);
+                const to = fromEmail ? fromEmail[1] : em.from;
+                gmailOpenCompose(to, 'Re: ' + (em.subject || ''), `\n\n--- Original Message ---\nFrom: ${em.from}\nDate: ${em.date}\n\n${em.body || ''}`);
+            } catch(e) { alert('Error loading email for reply'); }
+        }
+
+        function gmailForwardEmail() {
+            if (!gmailState.currentEmail) return;
+            const em = gmailState.currentEmail;
+            gmailOpenCompose('', 'Fwd: ' + (em.subject || ''), `\n\n--- Forwarded Message ---\nFrom: ${em.from}\nDate: ${em.date}\nSubject: ${em.subject}\n\n${em.body || ''}`);
+        }
+
+        async function gmailSendEmail(e) {
+            e.preventDefault();
+            const to = document.getElementById('gmailComposeTo').value;
+            const cc = document.getElementById('gmailComposeCc').value;
+            const bcc = document.getElementById('gmailComposeBcc').value;
+            const subject = document.getElementById('gmailComposeSubject').value;
+            const body = document.getElementById('gmailComposeBody').value;
+            if (!to || !subject) { alert('Please fill in To and Subject fields'); return false; }
+            try {
+                const r = await fetch(GMAIL_API_BASE + '/send', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ to, cc: cc || undefined, bcc: bcc || undefined, subject, body })
+                });
+                const d = await r.json();
+                if (d.success) {
+                    alert('✅ Email sent successfully!');
+                    document.getElementById('gmailComposeForm').reset();
+                    gmailShowTab('inbox');
+                } else { alert('❌ Failed to send: ' + (d.error || 'Unknown error')); }
+            } catch(e) { alert('❌ Error sending email: ' + e.message); }
+            return false;
+        }
+
+        async function gmailDeleteEmail(emailId, folder) {
+            if (!confirm('Move this email to Trash?')) return;
+            try {
+                await fetch(`${GMAIL_API_BASE}/delete/${emailId}`, { method: 'DELETE' });
+                gmailLoadInbox();
+            } catch(e) { alert('Error deleting email'); }
+        }
+
+        async function gmailSearchEmails() {
+            const q = document.getElementById('gmailSearchQuery').value;
+            if (!q) return;
+            const results = document.getElementById('gmailSearchResults');
+            results.innerHTML = '<div class="text-center"><i class="fas fa-spinner fa-spin me-2"></i>Searching...</div>';
+            try {
+                const r = await fetch(`${GMAIL_API_BASE}/search?q=${encodeURIComponent(q)}`);
+                const d = await r.json();
+                if (!d.results || d.results.length === 0) {
+                    results.innerHTML = '<div class="admin-card text-muted">No results found</div>'; return;
+                }
+                results.innerHTML = '<div class="admin-card"><h5>Found ' + d.results.length + ' results</h5><div class="admin-table"><table><thead><tr><th>From</th><th>Subject</th><th>Date</th></tr></thead><tbody>' +
+                    d.results.map(em => `<tr style="cursor:pointer" onclick="gmailViewEmail('${em.id}','INBOX')"><td>${escapeHtml((em.from||'').substring(0,30))}</td><td>${escapeHtml((em.subject||'').substring(0,50))}</td><td>${em.date?new Date(em.date).toLocaleDateString():''}</td></tr>`).join('') +
+                    '</tbody></table></div></div>';
+            } catch(e) { results.innerHTML = `<div class="admin-card text-danger">Search failed: ${e.message}</div>`; }
+        }
+
+        // === CONTACT GROUPS ===
+
+        async function gmailLoadContactGroups() {
+            const container = document.getElementById('gmailContactGroupsList');
+            try {
+                const r = await fetch(GMAIL_API_BASE + '/contacts');
+                const d = await r.json();
+                gmailState.contactGroups = d.groups || {};
+                const groupNames = Object.keys(gmailState.contactGroups);
+                document.getElementById('gmailStatGroups').textContent = groupNames.length;
+                if (groupNames.length === 0) {
+                    container.innerHTML = '<div class="admin-card text-muted"><i class="fas fa-address-book me-2"></i>No contact groups yet. Click "New Group" to create one.</div>';
+                    return;
+                }
+                container.innerHTML = groupNames.map(name => {
+                    const contacts = gmailState.contactGroups[name];
+                    return `<div class="admin-card" style="border-left:4px solid var(--gold);">
+                        <div style="display:flex;justify-content:space-between;align-items:center;">
+                            <h5><i class="fas fa-users me-2"></i>${escapeHtml(name)} <span class="badge bg-primary">${contacts.length}</span></h5>
+                            <div style="display:flex;gap:0.3rem;">
+                                <button class="btn btn-sm btn-outline-primary" onclick="gmailShowAddContact('${escapeHtml(name)}')" title="Add contact"><i class="fas fa-user-plus"></i></button>
+                                <button class="btn btn-sm btn-outline-success" onclick="gmailSendToGroup('${escapeHtml(name)}')" title="Send email to group"><i class="fas fa-paper-plane"></i></button>
+                                <button class="btn btn-sm btn-outline-danger" onclick="gmailDeleteGroup('${escapeHtml(name)}')" title="Delete group"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </div>
+                        ${contacts.length > 0 ? '<div class="mt-2">' + contacts.map((c,i) =>
+                            `<span class="badge bg-secondary me-1 mb-1" style="font-size:0.8rem;">${escapeHtml(c.name || c.email)} &lt;${escapeHtml(c.email)}&gt; <i class="fas fa-times ms-1" style="cursor:pointer" onclick="gmailRemoveFromGroup('${escapeHtml(name)}','${escapeHtml(c.email)}')"></i></span>`
+                        ).join('') + '</div>' : '<p class="text-muted mb-0 mt-2">No contacts in this group</p>'}
+                    </div>`;
+                }).join('');
+            } catch(e) {
+                container.innerHTML = `<div class="admin-card text-danger">Error loading groups: ${e.message}</div>`;
+            }
+        }
+
+        async function gmailCreateGroupPrompt() {
+            const name = prompt('Enter group name (e.g., "EC Members", "All Members", "Volunteers"):');
+            if (!name) return;
+            try {
+                const r = await fetch(GMAIL_API_BASE + '/contacts/group', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ group_name: name })
+                });
+                const d = await r.json();
+                if (d.success) { alert('✅ Group "' + name + '" created!'); gmailLoadContactGroups(); }
+                else { alert('❌ ' + (d.error || 'Failed to create group')); }
+            } catch(e) { alert('Error: ' + e.message); }
+        }
+
+        function gmailShowAddContact(groupName) {
+            document.getElementById('gmailAddContactForm').style.display = 'block';
+            document.getElementById('gmailAddContactGroupName').textContent = groupName;
+            document.getElementById('gmailAddContactForm').dataset.group = groupName;
+            document.getElementById('gmailAddContactName').value = '';
+            document.getElementById('gmailAddContactEmail').value = '';
+        }
+
+        async function gmailAddContactToGroup() {
+            const group = document.getElementById('gmailAddContactForm').dataset.group;
+            const name = document.getElementById('gmailAddContactName').value;
+            const email = document.getElementById('gmailAddContactEmail').value;
+            if (!email) { alert('Email is required'); return; }
+            try {
+                const r = await fetch(`${GMAIL_API_BASE}/contacts/group/${encodeURIComponent(group)}/add`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contacts: [{ name: name || email, email }] })
+                });
+                const d = await r.json();
+                if (d.success) { gmailLoadContactGroups(); document.getElementById('gmailAddContactName').value = ''; document.getElementById('gmailAddContactEmail').value = ''; }
+                else { alert('❌ ' + (d.error || 'Failed')); }
+            } catch(e) { alert('Error: ' + e.message); }
+        }
+
+        async function gmailRemoveFromGroup(groupName, email) {
+            if (!confirm(`Remove ${email} from "${groupName}"?`)) return;
+            try {
+                await fetch(`${GMAIL_API_BASE}/contacts/group/${encodeURIComponent(groupName)}/remove`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ emails: [email] })
+                });
+                gmailLoadContactGroups();
+            } catch(e) { alert('Error: ' + e.message); }
+        }
+
+        async function gmailDeleteGroup(name) {
+            if (!confirm(`Delete group "${name}" and all its contacts?`)) return;
+            try {
+                await fetch(`${GMAIL_API_BASE}/contacts/group/${encodeURIComponent(name)}`, { method: 'DELETE' });
+                gmailLoadContactGroups();
+            } catch(e) { alert('Error: ' + e.message); }
+        }
+
+        function gmailSendToGroup(groupName) {
+            const contacts = gmailState.contactGroups[groupName] || [];
+            if (contacts.length === 0) { alert('No contacts in this group'); return; }
+            const emails = contacts.map(c => c.email).join(', ');
+            gmailOpenCompose(emails, '', '');
+        }
+
+        /* ================================================================
          *  ENHANCED ADMIN SECTION LOADER
          * ================================================================ */
         (function patchShowAdminSection() {
@@ -7665,6 +8183,7 @@
                 orig(sectionId, clickedNav);
                 if (sectionId === 'evite') renderEviteHistory();
                 if (sectionId === 'rsvps') renderRsvpDashboard();
+                if (sectionId === 'gmail') { gmailCheckConnection(); gmailLoadInbox(); gmailLoadContactGroups(); }
             };
         })();
 
@@ -7676,7 +8195,7 @@
             const addCheck = (name, status, details) => results.push({ name, status, details });
 
             const memberSections = ['portalDashboard', 'portalProfile', 'portalFamily', 'portalPayments', 'portalBudget', 'portalMeetings', 'portalEvents', 'portalSurveys', 'portalDirectory', 'portalRadio', 'portalMagazine'];
-            const adminSections = ['adminDashboard', 'adminMembers', 'adminPayments', 'adminEvents', 'adminRsvps', 'adminEvite', 'adminDataImport', 'adminComplaints', 'adminSurveys', 'adminAnnouncements', 'adminRadio', 'adminMagazine', 'adminBudget', 'adminVendors', 'adminVolunteers', 'adminMeetings'];
+            const adminSections = ['adminDashboard', 'adminMembers', 'adminPayments', 'adminEvents', 'adminRsvps', 'adminEvite', 'adminDataImport', 'adminComplaints', 'adminSurveys', 'adminAnnouncements', 'adminRadio', 'adminMagazine', 'adminBudget', 'adminVendors', 'adminVolunteers', 'adminMeetings', 'adminGmail'];
 
             if (scope === 'all' || scope === 'member') {
                 addCheck('Member portal overlay', !!document.getElementById('memberPortalOverlay'), 'Member full-screen overlay available');
