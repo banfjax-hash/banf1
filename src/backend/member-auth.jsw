@@ -4,12 +4,29 @@
  * 
  * File: backend/member-auth.jsw
  * Deploy to: Wix Velo Backend
+ * 
+ * NOTE: This module is integrated with member-registration-flow.jsw
+ * for the complete registration flow with fee verification and registration codes.
  */
 
 import wixData from 'wix-data';
 import wixUsersBackend from 'wix-users-backend';
 import { authentication } from 'wix-members-backend';
 import { triggeredEmails } from 'wix-crm-backend';
+
+// Re-export functions from registration flow for convenience
+export { 
+    initiateSignUp,
+    verifyRegistrationCode,
+    completeRegistration,
+    loginMember as loginWithCode,
+    getCurrentProfile,
+    updateProfile,
+    requestPasswordReset as resetPassword,
+    getVisitorNotice,
+    MEMBER_ROLES,
+    ROLE_COLORS
+} from 'backend/member-registration-flow.jsw';
 
 /**
  * Register a new member
