@@ -2979,6 +2979,36 @@
             
             return fetch(url, opts);
         }
+
+        /**
+         * Safe API fetch — checks HTTP status and parses JSON safely.
+         * Returns { ok, status, data } instead of raw Response.
+         * Handles 404 (endpoint not deployed) and non-JSON responses gracefully.
+         */
+        async function safeApiFetch(endpoint, options = {}) {
+            try {
+                const r = await apiFetch(endpoint, options);
+                if (r.status === 404) {
+                    return { ok: false, status: 404, data: { error: 'API endpoint not found. Wix Velo backend may not be published yet.' } };
+                }
+                if (!r.ok) {
+                    const txt = await r.text().catch(() => '');
+                    return { ok: false, status: r.status, data: { error: txt || `HTTP ${r.status}` } };
+                }
+                const contentType = r.headers.get('content-type') || '';
+                if (!contentType.includes('application/json')) {
+                    const txt = await r.text().catch(() => '');
+                    if (txt.startsWith('{') || txt.startsWith('[')) {
+                        try { return { ok: true, status: r.status, data: JSON.parse(txt) }; } catch(e) {}
+                    }
+                    return { ok: false, status: r.status, data: { error: 'Non-JSON response from server' } };
+                }
+                const d = await r.json();
+                return { ok: true, status: r.status, data: d };
+            } catch(e) {
+                return { ok: false, status: 0, data: { error: e.message || 'Network error' } };
+            }
+        }
         
         // Program categories with display info
         const PROGRAM_CATEGORIES = {
@@ -7992,33 +8022,31 @@
             const detail = document.getElementById('gmailStatusDetail');
             const bar = document.getElementById('gmailConnectionStatus');
             icon.style.color = '#ff9800'; text.textContent = 'Connecting...'; detail.textContent = 'Connecting to BANF Email Service...';
-            try {
-                const r = await apiFetch('/status');
-                const d = await r.json();
-                if (d.status === 'connected') {
-                    icon.style.color = '#4CAF50'; text.textContent = '✅ Connected to BANF Email Service';
-                    detail.textContent = `Service: ${d.service_type || 'Wix'} | Sent Today: ${d.sent_today || 0}`;
-                    bar.style.borderLeftColor = '#4CAF50'; gmailState.connected = true;
-                    gmailLoadUnreadCount();
-                } else {
-                    icon.style.color = '#f44336'; text.textContent = '❌ Connection Failed';
-                    detail.textContent = d.error || 'Email service temporarily unavailable'; bar.style.borderLeftColor = '#f44336';
-                }
-            } catch(e) {
-                icon.style.color = '#f44336'; text.textContent = '❌ Email Service Unreachable';
-                detail.textContent = 'Email service temporarily unavailable. Please try again later.'; bar.style.borderLeftColor = '#f44336';
+            const { ok, status, data } = await safeApiFetch('/status');
+            if (ok && data.status === 'connected') {
+                icon.style.color = '#4CAF50'; text.textContent = '✅ Connected to BANF Email Service';
+                detail.textContent = `Service: ${data.service_type || data.service || 'Wix'} | Sent Today: ${data.sentToday || data.sent_today || 0}`;
+                bar.style.borderLeftColor = '#4CAF50'; gmailState.connected = true;
+                gmailLoadUnreadCount();
+            } else if (status === 404) {
+                icon.style.color = '#ff9800'; text.textContent = '⚠️ Email Backend Not Yet Deployed';
+                detail.innerHTML = 'The Wix Velo email backend needs to be published. '
+                    + '<strong>Steps:</strong> Open Wix Editor → Dev Mode → publish <code>email-gateway.jsw</code> + <code>http-functions.js</code> → Publish Site. '
+                    + '<br><small class="text-muted">Endpoint: ' + WIX_API_BASE + '/email_status → 404</small>';
+                bar.style.borderLeftColor = '#ff9800';
+            } else {
+                icon.style.color = '#f44336'; text.textContent = '❌ Connection Failed';
+                detail.textContent = data.error || 'Email service temporarily unavailable';
+                bar.style.borderLeftColor = '#f44336';
             }
         }
 
         async function gmailLoadUnreadCount() {
-            try {
-                const r = await apiFetch('/unread'); const d = await r.json();
-                const badge = document.getElementById('gmailUnreadBadge');
-                const stat = document.getElementById('gmailStatUnread');
-                if (d.unread_count > 0) { badge.style.display = 'inline-block'; badge.textContent = d.unread_count; }
-                else { badge.style.display = 'none'; }
-                stat.textContent = d.unread_count || 0;
-            } catch(e) { console.log('Gmail unread check failed'); }
+            const { ok, data } = await safeApiFetch('/unread');
+            const badge = document.getElementById('gmailUnreadBadge');
+            const stat = document.getElementById('gmailStatUnread');
+            if (ok && data.unread_count > 0) { badge.style.display = 'inline-block'; badge.textContent = data.unread_count; stat.textContent = data.unread_count; }
+            else { badge.style.display = 'none'; stat.textContent = '0'; }
         }
 
         function gmailShowTab(tab) {
@@ -8045,63 +8073,68 @@
             const tbody = document.getElementById('gmailInboxTableBody');
             const folder = document.getElementById('gmailFolderSelect').value;
             tbody.innerHTML = '<tr><td colspan="5" class="text-center"><i class="fas fa-spinner fa-spin me-2"></i>Loading...</td></tr>';
-            try {
-                const r = await apiFetch(`/inbox?page=${gmailState.currentPage}&per_page=${gmailState.perPage}&folder=${encodeURIComponent(folder)}`);
-                const d = await r.json();
-                if (!d.emails || d.emails.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No emails found</td></tr>';
-                    document.getElementById('gmailStatInbox').textContent = '0'; return;
+            const { ok, status, data } = await safeApiFetch(`/inbox?page=${gmailState.currentPage}&per_page=${gmailState.perPage}&folder=${encodeURIComponent(folder)}`);
+            if (!ok) {
+                const msg = status === 404
+                    ? '⚠️ Email backend not deployed yet. Publish Wix Velo code to enable inbox.'
+                    : `❌ Failed to load inbox: ${data.error || 'Service unavailable'}`;
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted">${msg}</td></tr>`;
+                document.getElementById('gmailStatInbox').textContent = '--'; return;
+            }
+            const d = data;
+            if (!d.emails || d.emails.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No emails found</td></tr>';
+                document.getElementById('gmailStatInbox').textContent = '0'; return;
+            }
+            document.getElementById('gmailStatInbox').textContent = d.total || d.emails.length;
+            tbody.innerHTML = d.emails.map(em => {
+                const unread = !em.seen;
+                const fw = unread ? 'fw-bold' : '';
+                const bg = unread ? 'background:#fff8e1;' : '';
+                const fromShort = (em.from || 'Unknown').replace(/<.*>/,'').trim().substring(0,30);
+                const subjShort = (em.subject || '(no subject)').substring(0,60);
+                const dateShort = em.date ? new Date(em.date).toLocaleDateString() : '';
+                return `<tr style="${bg}" onclick="gmailViewEmail('${em.id}','${encodeURIComponent(folder)}')" class="cursor-pointer">
+                    <td class="${fw}">${escapeHtml(fromShort)}</td>
+                    <td class="${fw}">${escapeHtml(subjShort)}</td>
+                    <td>${dateShort}</td>
+                    <td>${em.has_attachments ? '<i class="fas fa-paperclip text-muted"></i>' : ''}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary" onclick="event.stopPropagation();gmailReplyToId('${em.id}','${encodeURIComponent(folder)}')"><i class="fas fa-reply"></i></button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="event.stopPropagation();gmailDeleteEmail('${em.id}','${encodeURIComponent(folder)}')"><i class="fas fa-trash"></i></button>
+                    </td></tr>`;
+            }).join('');
+            // Pagination
+            const totalPages = Math.ceil((d.total || d.emails.length) / gmailState.perPage);
+            const pag = document.getElementById('gmailPagination');
+            pag.innerHTML = '';
+            if (totalPages > 1) {
+                for (let p = 1; p <= Math.min(totalPages, 10); p++) {
+                    pag.innerHTML += `<button class="btn btn-sm ${p===gmailState.currentPage?'btn-primary':'btn-outline-secondary'}" onclick="gmailState.currentPage=${p};gmailLoadInbox()">${p}</button>`;
                 }
-                document.getElementById('gmailStatInbox').textContent = d.total || d.emails.length;
-                tbody.innerHTML = d.emails.map(em => {
-                    const unread = !em.seen;
-                    const fw = unread ? 'fw-bold' : '';
-                    const bg = unread ? 'background:#fff8e1;' : '';
-                    const fromShort = (em.from || 'Unknown').replace(/<.*>/,'').trim().substring(0,30);
-                    const subjShort = (em.subject || '(no subject)').substring(0,60);
-                    const dateShort = em.date ? new Date(em.date).toLocaleDateString() : '';
-                    return `<tr style="${bg}" onclick="gmailViewEmail('${em.id}','${encodeURIComponent(folder)}')" class="cursor-pointer">
-                        <td class="${fw}">${escapeHtml(fromShort)}</td>
-                        <td class="${fw}">${escapeHtml(subjShort)}</td>
-                        <td>${dateShort}</td>
-                        <td>${em.has_attachments ? '<i class="fas fa-paperclip text-muted"></i>' : ''}</td>
-                        <td>
-                            <button class="btn btn-sm btn-outline-primary" onclick="event.stopPropagation();gmailReplyToId('${em.id}','${encodeURIComponent(folder)}')"><i class="fas fa-reply"></i></button>
-                            <button class="btn btn-sm btn-outline-danger" onclick="event.stopPropagation();gmailDeleteEmail('${em.id}','${encodeURIComponent(folder)}')"><i class="fas fa-trash"></i></button>
-                        </td></tr>`;
-                }).join('');
-                // Pagination
-                const totalPages = Math.ceil((d.total || d.emails.length) / gmailState.perPage);
-                const pag = document.getElementById('gmailPagination');
-                pag.innerHTML = '';
-                if (totalPages > 1) {
-                    for (let p = 1; p <= Math.min(totalPages, 10); p++) {
-                        pag.innerHTML += `<button class="btn btn-sm ${p===gmailState.currentPage?'btn-primary':'btn-outline-secondary'}" onclick="gmailState.currentPage=${p};gmailLoadInbox()">${p}</button>`;
-                    }
-                }
-            } catch(e) {
-                tbody.innerHTML = `<tr><td colspan="5" class="text-center text-danger">❌ Failed to load: ${e.message}<br><small>Email service temporarily unavailable</small></td></tr>`;
             }
         }
 
         async function gmailViewEmail(emailId, folder) {
             document.getElementById('gmailReaderArea').style.display = 'block';
             document.getElementById('gmailReaderBody').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
-            try {
-                const r = await apiFetch(`/email/${emailId}?folder=${folder || 'INBOX'}`);
-                const em = await r.json();
-                gmailState.currentEmail = em;
-                document.getElementById('gmailReaderSubject').textContent = em.subject || '(no subject)';
-                document.getElementById('gmailReaderFrom').textContent = `From: ${em.from || 'Unknown'}`;
-                document.getElementById('gmailReaderDate').textContent = em.date || '';
-                const body = em.body_html || escapeHtml(em.body || 'No content');
-                document.getElementById('gmailReaderBody').innerHTML = em.body_html ? body : `<pre style="white-space:pre-wrap">${body}</pre>`;
-                // Mark as read
-                apiFetch(`/mark-read/${emailId}`, { method: 'POST' }).catch(()=>{});
-                gmailLoadUnreadCount();
-            } catch(e) {
-                document.getElementById('gmailReaderBody').innerHTML = `<div class="text-danger">Error loading email: ${e.message}</div>`;
+            const { ok, status, data } = await safeApiFetch(`/email/${emailId}?folder=${folder || 'INBOX'}`);
+            if (!ok) {
+                document.getElementById('gmailReaderBody').innerHTML = status === 404
+                    ? '<div class="text-warning">⚠️ Email backend not deployed yet.</div>'
+                    : `<div class="text-danger">Error loading email: ${data.error}</div>`;
+                return;
             }
+            const em = data;
+            gmailState.currentEmail = em;
+            document.getElementById('gmailReaderSubject').textContent = em.subject || '(no subject)';
+            document.getElementById('gmailReaderFrom').textContent = `From: ${em.from || 'Unknown'}`;
+            document.getElementById('gmailReaderDate').textContent = em.date || '';
+            const body = em.body_html || escapeHtml(em.body || 'No content');
+            document.getElementById('gmailReaderBody').innerHTML = em.body_html ? body : `<pre style="white-space:pre-wrap">${body}</pre>`;
+            // Mark as read
+            safeApiFetch(`/mark-read/${emailId}`, { method: 'POST' });
+            gmailLoadUnreadCount();
         }
 
         function gmailReplyTo() {
@@ -8113,13 +8146,12 @@
         }
 
         async function gmailReplyToId(emailId, folder) {
-            try {
-                const r = await apiFetch(`/email/${emailId}?folder=${decodeURIComponent(folder)}`);
-                const em = await r.json();
-                const fromEmail = (em.from || '').match(/<([^>]+)>/);
-                const to = fromEmail ? fromEmail[1] : em.from;
-                gmailOpenCompose(to, 'Re: ' + (em.subject || ''), `\n\n--- Original Message ---\nFrom: ${em.from}\nDate: ${em.date}\n\n${em.body || ''}`);
-            } catch(e) { alert('Error loading email for reply'); }
+            const { ok, data } = await safeApiFetch(`/email/${emailId}?folder=${decodeURIComponent(folder)}`);
+            if (!ok) { alert('Could not load email for reply'); return; }
+            const em = data;
+            const fromEmail = (em.from || '').match(/<([^>]+)>/);
+            const to = fromEmail ? fromEmail[1] : em.from;
+            gmailOpenCompose(to, 'Re: ' + (em.subject || ''), `\n\n--- Original Message ---\nFrom: ${em.from}\nDate: ${em.date}\n\n${em.body || ''}`);
         }
 
         function gmailForwardEmail() {
@@ -8136,28 +8168,28 @@
             const subject = document.getElementById('gmailComposeSubject').value;
             const body = document.getElementById('gmailComposeBody').value;
             if (!to || !subject) { alert('Please fill in To and Subject fields'); return false; }
-            try {
-                const r = await apiFetch('/send', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ to, cc: cc || undefined, bcc: bcc || undefined, subject, body })
-                });
-                const d = await r.json();
-                if (d.success) {
-                    alert('✅ Email sent successfully!');
-                    document.getElementById('gmailComposeForm').reset();
-                    gmailShowTab('inbox');
-                } else { alert('❌ Failed to send: ' + (d.error || 'Unknown error')); }
-            } catch(e) { alert('❌ Error sending email: ' + e.message); }
+            const { ok, status, data } = await safeApiFetch('/send', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ to, cc: cc || undefined, bcc: bcc || undefined, subject, body })
+            });
+            if (ok && data.success) {
+                alert('✅ Email sent successfully!');
+                document.getElementById('gmailComposeForm').reset();
+                gmailShowTab('inbox');
+            } else if (status === 404) {
+                alert('⚠️ Email backend not deployed yet. Please publish the Wix Velo code first.');
+            } else {
+                alert('❌ Failed to send: ' + (data.error || 'Unknown error'));
+            }
             return false;
         }
 
         async function gmailDeleteEmail(emailId, folder) {
             if (!confirm('Move this email to Trash?')) return;
-            try {
-                await apiFetch(`/delete/${emailId}`, { method: 'DELETE' });
-                gmailLoadInbox();
-            } catch(e) { alert('Error deleting email'); }
+            const { ok, status, data } = await safeApiFetch(`/delete/${emailId}`, { method: 'DELETE' });
+            if (!ok && status === 404) { alert('⚠️ Email backend not deployed yet.'); return; }
+            gmailLoadInbox();
         }
 
         async function gmailSearchEmails() {
@@ -8165,32 +8197,40 @@
             if (!q) return;
             const results = document.getElementById('gmailSearchResults');
             results.innerHTML = '<div class="text-center"><i class="fas fa-spinner fa-spin me-2"></i>Searching...</div>';
-            try {
-                const r = await apiFetch(`/search?q=${encodeURIComponent(q)}`);
-                const d = await r.json();
-                if (!d.results || d.results.length === 0) {
-                    results.innerHTML = '<div class="admin-card text-muted">No results found</div>'; return;
-                }
-                results.innerHTML = '<div class="admin-card"><h5>Found ' + d.results.length + ' results</h5><div class="admin-table"><table><thead><tr><th>From</th><th>Subject</th><th>Date</th></tr></thead><tbody>' +
-                    d.results.map(em => `<tr style="cursor:pointer" onclick="gmailViewEmail('${em.id}','INBOX')"><td>${escapeHtml((em.from||'').substring(0,30))}</td><td>${escapeHtml((em.subject||'').substring(0,50))}</td><td>${em.date?new Date(em.date).toLocaleDateString():''}</td></tr>`).join('') +
-                    '</tbody></table></div></div>';
-            } catch(e) { results.innerHTML = `<div class="admin-card text-danger">Search failed: ${e.message}</div>`; }
+            const { ok, status, data } = await safeApiFetch(`/search?q=${encodeURIComponent(q)}`);
+            if (!ok) {
+                results.innerHTML = status === 404
+                    ? '<div class="admin-card text-warning">⚠️ Search unavailable — email backend not deployed yet.</div>'
+                    : `<div class="admin-card text-danger">Search failed: ${data.error}</div>`;
+                return;
+            }
+            if (!data.results || data.results.length === 0) {
+                results.innerHTML = '<div class="admin-card text-muted">No results found</div>'; return;
+            }
+            results.innerHTML = '<div class="admin-card"><h5>Found ' + data.results.length + ' results</h5><div class="admin-table"><table><thead><tr><th>From</th><th>Subject</th><th>Date</th></tr></thead><tbody>' +
+                data.results.map(em => `<tr style="cursor:pointer" onclick="gmailViewEmail('${em.id}','INBOX')"><td>${escapeHtml((em.from||'').substring(0,30))}</td><td>${escapeHtml((em.subject||'').substring(0,50))}</td><td>${em.date?new Date(em.date).toLocaleDateString():''}</td></tr>`).join('') +
+                '</tbody></table></div></div>';
         }
 
         // === CONTACT GROUPS ===
 
         async function gmailLoadContactGroups() {
             const container = document.getElementById('gmailContactGroupsList');
-            try {
-                const r = await apiFetch('/contacts');
-                const d = await r.json();
-                gmailState.contactGroups = d.groups || {};
-                const groupNames = Object.keys(gmailState.contactGroups);
-                document.getElementById('gmailStatGroups').textContent = groupNames.length;
-                if (groupNames.length === 0) {
-                    container.innerHTML = '<div class="admin-card text-muted"><i class="fas fa-address-book me-2"></i>No contact groups yet. Click "New Group" to create one.</div>';
-                    return;
-                }
+            const { ok, status, data } = await safeApiFetch('/contacts');
+            if (!ok) {
+                const msg = status === 404
+                    ? '<div class="admin-card" style="border-left:4px solid #ff9800;"><i class="fas fa-info-circle me-2 text-warning"></i>Contact groups will be available after the Wix Velo backend is published.</div>'
+                    : `<div class="admin-card text-danger"><i class="fas fa-exclamation-circle me-2"></i>Error loading groups: ${data.error}</div>`;
+                container.innerHTML = msg;
+                document.getElementById('gmailStatGroups').textContent = '--'; return;
+            }
+            gmailState.contactGroups = data.groups || {};
+            const groupNames = Object.keys(gmailState.contactGroups);
+            document.getElementById('gmailStatGroups').textContent = groupNames.length;
+            if (groupNames.length === 0) {
+                container.innerHTML = '<div class="admin-card text-muted"><i class="fas fa-address-book me-2"></i>No contact groups yet. Click "New Group" to create one.</div>';
+                return;
+            }
                 container.innerHTML = groupNames.map(name => {
                     const contacts = gmailState.contactGroups[name];
                     return `<div class="admin-card" style="border-left:4px solid var(--gold);">
@@ -8207,23 +8247,18 @@
                         ).join('') + '</div>' : '<p class="text-muted mb-0 mt-2">No contacts in this group</p>'}
                     </div>`;
                 }).join('');
-            } catch(e) {
-                container.innerHTML = `<div class="admin-card text-danger">Error loading groups: ${e.message}</div>`;
-            }
         }
 
         async function gmailCreateGroupPrompt() {
             const name = prompt('Enter group name (e.g., "EC Members", "All Members", "Volunteers"):');
             if (!name) return;
-            try {
-                const r = await apiFetch('/contacts/group', {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ group_name: name })
-                });
-                const d = await r.json();
-                if (d.success) { alert('✅ Group "' + name + '" created!'); gmailLoadContactGroups(); }
-                else { alert('❌ ' + (d.error || 'Failed to create group')); }
-            } catch(e) { alert('Error: ' + e.message); }
+            const { ok, status, data } = await safeApiFetch('/contacts/group', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ group_name: name })
+            });
+            if (ok && data.success) { alert('✅ Group "' + name + '" created!'); gmailLoadContactGroups(); }
+            else if (status === 404) { alert('⚠️ Contact groups unavailable — email backend not deployed yet.'); }
+            else { alert('❌ ' + (data.error || 'Failed to create group')); }
         }
 
         function gmailShowAddContact(groupName) {
@@ -8239,34 +8274,30 @@
             const name = document.getElementById('gmailAddContactName').value;
             const email = document.getElementById('gmailAddContactEmail').value;
             if (!email) { alert('Email is required'); return; }
-            try {
-                const r = await apiFetch(`/contacts/group/${encodeURIComponent(group)}/add`, {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ contacts: [{ name: name || email, email }] })
-                });
-                const d = await r.json();
-                if (d.success) { gmailLoadContactGroups(); document.getElementById('gmailAddContactName').value = ''; document.getElementById('gmailAddContactEmail').value = ''; }
-                else { alert('❌ ' + (d.error || 'Failed')); }
-            } catch(e) { alert('Error: ' + e.message); }
+            const { ok, status, data } = await safeApiFetch(`/contacts/group/${encodeURIComponent(group)}/add`, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ contacts: [{ name: name || email, email }] })
+            });
+            if (ok && data.success) { gmailLoadContactGroups(); document.getElementById('gmailAddContactName').value = ''; document.getElementById('gmailAddContactEmail').value = ''; }
+            else if (status === 404) { alert('⚠️ Email backend not deployed yet.'); }
+            else { alert('❌ ' + (data.error || 'Failed')); }
         }
 
         async function gmailRemoveFromGroup(groupName, email) {
             if (!confirm(`Remove ${email} from "${groupName}"?`)) return;
-            try {
-                await apiFetch(`/contacts/group/${encodeURIComponent(groupName)}/remove`, {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ emails: [email] })
-                });
-                gmailLoadContactGroups();
-            } catch(e) { alert('Error: ' + e.message); }
+            const { ok, status } = await safeApiFetch(`/contacts/group/${encodeURIComponent(groupName)}/remove`, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ emails: [email] })
+            });
+            if (!ok && status === 404) { alert('⚠️ Email backend not deployed yet.'); return; }
+            gmailLoadContactGroups();
         }
 
         async function gmailDeleteGroup(name) {
             if (!confirm(`Delete group "${name}" and all its contacts?`)) return;
-            try {
-                await apiFetch(`/contacts/group/${encodeURIComponent(name)}`, { method: 'DELETE' });
-                gmailLoadContactGroups();
-            } catch(e) { alert('Error: ' + e.message); }
+            const { ok, status } = await safeApiFetch(`/contacts/group/${encodeURIComponent(name)}`, { method: 'DELETE' });
+            if (!ok && status === 404) { alert('⚠️ Email backend not deployed yet.'); return; }
+            gmailLoadContactGroups();
         }
 
         function gmailSendToGroup(groupName) {
