@@ -7,7 +7,7 @@
  */
 
 import wixData from 'wix-data';
-import { authentication, authorization } from 'wix-members-backend';
+import { authentication, authorization, currentMember } from 'wix-members-backend';
 import { elevate } from 'wix-auth';
 
 // Admin Roles
@@ -31,6 +31,38 @@ const ROLE_PERMISSIONS = {
     ec_member: ['events', 'meetings_readonly', 'members_readonly'],
     moderator: ['complaints', 'content']
 };
+
+/**
+ * Verify if the current logged-in user is an admin
+ * Called from masterPage.js to show/hide admin UI elements
+ * @returns {object} - { isAdmin: boolean, role: string|null }
+ */
+export async function verifyAdmin() {
+    try {
+        const member = await currentMember.getMember();
+        if (!member) {
+            return { isAdmin: false, role: null };
+        }
+
+        const admins = await wixData.query('Admins')
+            .eq('email', member.loginEmail)
+            .eq('isActive', true)
+            .find({ suppressAuth: true });
+
+        if (admins.items.length === 0) {
+            return { isAdmin: false, role: null };
+        }
+
+        return {
+            isAdmin: true,
+            role: admins.items[0].role,
+            permissions: getPermissionsForRole(admins.items[0].role)
+        };
+    } catch (error) {
+        console.error('verifyAdmin error:', error);
+        return { isAdmin: false, role: null };
+    }
+}
 
 /**
  * Login admin user
@@ -285,7 +317,7 @@ export async function getAllAdmins(requesterId) {
  * @param {string} action - Action performed
  * @param {string} details - Action details
  */
-async function logAdminActivity(adminId, action, details) {
+export async function logAdminActivity(adminId, action, details) {
     try {
         await wixData.insert('AdminActivityLog', {
             adminId,

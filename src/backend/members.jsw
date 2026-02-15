@@ -4,7 +4,7 @@
 import wixData from 'wix-data';
 import wixMembers from 'wix-members-backend';
 import { currentMember } from 'wix-members-backend';
-import { sendEmail } from 'backend/email.jsw';
+import { sendEmail } from 'backend/email-gateway.jsw';
 
 const COLLECTION = 'Members';
 

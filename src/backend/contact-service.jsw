@@ -1,0 +1,39 @@
+// backend/contact-service.jsw
+// BANF Contact Form Service
+
+import wixData from 'wix-data';
+
+/**
+ * Submit a contact form message
+ * @param {object} formData - { name, email, message, source }
+ * @returns {object} - { success: boolean, message: string }
+ */
+export async function submitContactForm(formData) {
+    try {
+        const { name, email, message, source } = formData;
+
+        await wixData.insert('ContactMessages', {
+            name: name || 'Anonymous',
+            email: email,
+            message: message,
+            source: source || 'website',
+            status: 'new',
+            submittedAt: new Date()
+        });
+
+        return { success: true, message: 'Message sent successfully' };
+    } catch (error) {
+        console.error('Contact form submission error:', error);
+        return { success: false, message: 'Failed to send message' };
+    }
+}
+
+/**
+ * Submit contact (alias for submitContactForm)
+ * Used by Home.js quick contact form
+ * @param {object} contactData - { name, email, message, source }
+ * @returns {object} - { success: boolean }
+ */
+export async function submitContact(contactData) {
+    return submitContactForm(contactData);
+}

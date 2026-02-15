@@ -9,8 +9,7 @@
     "preview": "wix preview",
     "publish": "wix publish"
   },
-  "dependencies": {},
   "devDependencies": {
-    "@wix/cli": "latest"
+    "@wix/cli": "^1.1.90"
   }
 }

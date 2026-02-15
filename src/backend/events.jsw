@@ -2,7 +2,7 @@
 // BANF Event Management - Wix Velo Backend
 
 import wixData from 'wix-data';
-import { sendEmail } from 'backend/email.jsw';
+import { sendEmail } from 'backend/email-gateway.jsw';
 
 const EVENTS_COLLECTION = 'Events';
 const REGISTRATIONS_COLLECTION = 'EventRegistrations';

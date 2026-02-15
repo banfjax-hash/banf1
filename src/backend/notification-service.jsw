@@ -1,0 +1,69 @@
+// backend/notification-service.jsw
+// BANF Notification Service - Re-exports email functionality
+// Provides email templates and notification dispatch
+
+import { sendEmail as _sendEmail } from 'backend/email-gateway.jsw';
+
+/**
+ * Email template definitions
+ */
+export const EMAIL_TEMPLATES = {
+    WELCOME: 'welcome',
+    EVENT_REMINDER: 'event_reminder',
+    MEMBERSHIP_RENEWAL: 'membership_renewal',
+    COMMUNITY_UPDATE: 'community_update',
+    VOLUNTEER_REQUEST: 'volunteer_request',
+    FEEDBACK_THANK_YOU: 'feedback_thank_you',
+    COMPLAINT_RECEIVED: 'complaint_received',
+    PAYMENT_CONFIRMATION: 'payment_confirmation'
+};
+
+/**
+ * Send email using email-gateway
+ * @param {object} emailData - { to, subject, body, templateId }
+ * @returns {object} - Send result
+ */
+export async function sendEmail(emailData) {
+    return _sendEmail(emailData);
+}
+
+/**
+ * Send notification based on template
+ * @param {string} templateId - Template ID from EMAIL_TEMPLATES
+ * @param {object} recipientData - { email, name }
+ * @param {object} templateData - Template-specific data
+ */
+export async function sendNotification(templateId, recipientData, templateData) {
+    try {
+        const subject = getSubjectForTemplate(templateId, templateData);
+        const body = getBodyForTemplate(templateId, templateData);
+
+        return await _sendEmail({
+            to: recipientData.email,
+            subject,
+            body,
+            type: templateId
+        });
+    } catch (error) {
+        console.error('Notification send error:', error);
+        return { success: false, error: error.message };
+    }
+}
+
+function getSubjectForTemplate(templateId, data) {
+    const subjects = {
+        [EMAIL_TEMPLATES.WELCOME]: 'Welcome to BANF!',
+        [EMAIL_TEMPLATES.EVENT_REMINDER]: `Reminder: ${data?.eventName || 'Upcoming Event'}`,
+        [EMAIL_TEMPLATES.MEMBERSHIP_RENEWAL]: 'BANF Membership Renewal',
+        [EMAIL_TEMPLATES.COMMUNITY_UPDATE]: 'BANF Community Update',
+        [EMAIL_TEMPLATES.VOLUNTEER_REQUEST]: 'Volunteer Opportunity at BANF',
+        [EMAIL_TEMPLATES.FEEDBACK_THANK_YOU]: 'Thank you for your feedback',
+        [EMAIL_TEMPLATES.COMPLAINT_RECEIVED]: 'We received your concern',
+        [EMAIL_TEMPLATES.PAYMENT_CONFIRMATION]: 'Payment Confirmation'
+    };
+    return subjects[templateId] || 'BANF Notification';
+}
+
+function getBodyForTemplate(templateId, data) {
+    return data?.body || data?.message || `BANF Notification: ${templateId}`;
+}
