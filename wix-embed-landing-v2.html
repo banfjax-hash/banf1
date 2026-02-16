@@ -3211,13 +3211,51 @@
             'Traditional_Music': { name: 'Traditional Music', icon: '🎼', color: '#CD853F' }
         };
         
-        // Fallback internet radio streams (working public streams)
+        // Fallback internet radio streams (verified working public streams - HTTPS)
         const fallbackStations = [
-            { name: 'BANF Radio - Rabindra Sangeet', url: 'https://stream.zeno.fm/0r0xa792kwzuv', category: 'Classical_Music' },
-            { name: 'BANF Radio - Bengali Hits', url: 'https://stream.zeno.fm/f3wvbbqmdg8uv', category: 'Modern_Music' },
-            { name: 'BANF Radio - Bollywood Mix', url: 'https://stream.zeno.fm/4d02mpe83m8uv', category: 'Folk_Music' }
+            { name: 'Bengali Hits - Mixify', url: 'https://stream.zeno.fm/cz2f2gahap8uv', category: 'Modern_Music' },
+            { name: 'My 90s Bengali', url: 'https://stream.zeno.fm/m5a9r5xaqhquv', category: 'Classical_Music' },
+            { name: 'Radio GoonGoon Bengali', url: 'https://stream.zeno.fm/2r9nrge0y98uv', category: 'Folk_Music' },
+            { name: 'Bollywood Hits', url: 'https://stream.zeno.fm/bwf0y73m5v8uv', category: 'Modern_Music' },
+            { name: 'Radio Udaan Hindi', url: 'https://stream.zeno.fm/3n9rsknp5v8uv', category: 'Family_Entertainment' },
+            { name: 'Bollywood 2000s', url: 'https://radio.uber.space/hindi2000/hindi2000.aac', category: 'Modern_Music' },
+            { name: 'Radio Aashiqanaa 90s', url: 'https://stream.zeno.fm/hra04frnp18uv', category: 'Traditional_Music' }
         ];
         let currentStationIndex = 0;
+        
+        /**
+         * Discover live Bengali/Indian radio streams from RadioBrowser API
+         * Runs once on page load to supplement fallback stations with live data
+         */
+        async function discoverLiveStations() {
+            try {
+                const controller = new AbortController();
+                setTimeout(() => controller.abort(), 5000);
+                const response = await fetch(
+                    'https://de1.api.radio-browser.info/json/stations/search?tag=bengali&limit=10&order=clickcount&reverse=true&hidebroken=true&has_extended_info=true',
+                    { signal: controller.signal }
+                );
+                const stations = await response.json();
+                const httpsStations = stations.filter(s => s.url_resolved && s.url_resolved.startsWith('https://'));
+                httpsStations.forEach(s => {
+                    // Don't add duplicates
+                    if (!fallbackStations.some(fs => fs.url === s.url_resolved)) {
+                        fallbackStations.push({
+                            name: s.name || 'Bengali Radio',
+                            url: s.url_resolved,
+                            category: 'Modern_Music'
+                        });
+                    }
+                });
+                if (httpsStations.length > 0) {
+                    console.log(`📻 Discovered ${httpsStations.length} live Bengali radio streams`);
+                }
+            } catch (e) {
+                console.warn('RadioBrowser API unavailable:', e.message);
+            }
+        }
+        // Discover live stations on page load (non-blocking)
+        discoverLiveStations();
 
         /**
          * Initialize Radio Player
@@ -3238,6 +3276,7 @@
             
             radioAudio.addEventListener('playing', () => {
                 isRadioPlaying = true;
+                radioAudio._retryCount = 0; // Reset retries on success
                 updatePlayButton(true);
                 updateNowPlaying();
             });
@@ -3249,7 +3288,24 @@
             
             radioAudio.addEventListener('error', (e) => {
                 console.warn('Radio stream error:', e);
-                updateNowPlaying('Stream unavailable - try another station');
+                // Auto-try next station on error (up to 3 attempts)
+                if (!radioAudio._retryCount) radioAudio._retryCount = 0;
+                radioAudio._retryCount++;
+                if (radioAudio._retryCount <= 3 && isRadioPlaying) {
+                    currentStationIndex = (currentStationIndex + 1) % fallbackStations.length;
+                    updateNowPlaying('Trying next station...');
+                    radioAudio.src = fallbackStations[currentStationIndex].url;
+                    radioAudio.play().catch(() => {
+                        updateNowPlaying('No stations available — try again later');
+                        isRadioPlaying = false;
+                        updatePlayButton(false);
+                    });
+                } else {
+                    radioAudio._retryCount = 0;
+                    updateNowPlaying('Stream unavailable — click ▶ to retry');
+                    isRadioPlaying = false;
+                    updatePlayButton(false);
+                }
             });
         }
 
