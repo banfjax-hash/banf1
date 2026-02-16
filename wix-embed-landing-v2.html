@@ -57,13 +57,14 @@
             margin: 0;
             padding: 0;
             overflow-x: hidden;
+            overflow-y: auto;
             /* Content flows naturally - no fixed height constraint */
         }
         
         /* Fix for Wix iframe embedding - make content visible */
         .wix-embed-mode {
-            min-height: 100vh !important;
-            /* Removed height: 100% which was causing the compression */
+            min-height: auto !important;
+            /* Let actual content determine height — removes phantom scrollbar space */
         }
         
         /* Ensure all content sections have proper display */
@@ -170,15 +171,15 @@
 
         /* ========== HERO SECTION ========== */
         .hero {
-            min-height: 55vh; /* Compact for Wix embed */
+            min-height: auto;
             display: flex;
             align-items: center;
             justify-content: center;
             position: relative;
             background: var(--gradient-hero);
             padding-top: 80px;
-            padding-bottom: 2rem;
-            overflow: visible; /* Changed from hidden to allow content flow */
+            padding-bottom: 1.5rem;
+            overflow: visible;
         }
         .hero::before {
             content: '';
@@ -193,7 +194,7 @@
             bottom: 0;
             left: 0;
             right: 0;
-            height: 150px;
+            height: 60px;
             background: linear-gradient(to top, #f8f9fa, transparent);
         }
         .hero-content {
@@ -214,13 +215,13 @@
             font-size: 1.15rem;
             color: rgba(255,255,255,0.92);
             max-width: 700px;
-            margin: 0 auto 1.5rem;
-            line-height: 1.8;
+            margin: 0 auto 0.75rem;
+            line-height: 1.7;
         }
         .hero-bengali {
             font-size: 1.7rem;
             color: #E5C158;
-            margin-bottom: 1.5rem;
+            margin-bottom: 0.75rem;
             text-shadow: 1px 2px 10px rgba(0,0,0,0.2);
         }
         .hero-badge {
@@ -232,15 +233,15 @@
             padding: 0.6rem 1.5rem;
             border-radius: 50px;
             font-size: 0.9rem;
-            margin-bottom: 1.5rem;
+            margin-bottom: 0.75rem;
         }
         .hero-badge i { color: var(--gold); }
         .hero-buttons {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            gap: 1rem;
-            margin-top: 1.5rem;
+            gap: 0.75rem;
+            margin-top: 0.75rem;
         }
         .btn-primary-custom {
             background: var(--gradient-primary);
@@ -282,9 +283,9 @@
         /* ========== STATS SECTION ========== */
         .stats-section {
             background: var(--gradient-primary);
-            padding: 1.5rem 0;
-            margin-top: -40px;
-            margin-bottom: 2rem;
+            padding: 1rem 0;
+            margin-top: -30px;
+            margin-bottom: 0.5rem;
             position: relative;
             z-index: 3;
         }
@@ -307,33 +308,36 @@
         }
 
         /* ========== SECTION STYLES ========== */
-        section { padding: 5rem 0; }
+        section { padding: 2.5rem 0; }
+        section.py-5 { padding-top: 2.5rem !important; padding-bottom: 2.5rem !important; }
+        section.py-4 { padding-top: 2rem !important; padding-bottom: 2rem !important; }
+        .py-5 { padding-top: 2.5rem !important; padding-bottom: 2.5rem !important; }
         .section-header {
             text-align: center;
-            margin-bottom: 3rem;
+            margin-bottom: 1.5rem;
         }
         .section-header h2 {
             font-size: 2.2rem;
-            margin-bottom: 1rem;
+            margin-bottom: 0.75rem;
             position: relative;
             display: inline-block;
         }
         .section-header h2::after {
             content: '';
             position: absolute;
-            bottom: -12px;
+            bottom: -8px;
             left: 50%;
             transform: translateX(-50%);
-            width: 80px;
-            height: 4px;
+            width: 60px;
+            height: 3px;
             background: var(--gradient-primary);
             border-radius: 2px;
         }
         .section-header p {
             color: #6c757d;
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             max-width: 600px;
-            margin: 1.5rem auto 0;
+            margin: 0.75rem auto 0;
         }
 
         /* ========== QUICK ACCESS BAR ========== */
@@ -341,14 +345,14 @@
             background: #fff;
             border-radius: 20px;
             box-shadow: 0 15px 50px rgba(0,0,0,0.1);
-            padding: 1.5rem;
-            margin-top: 1rem;
+            padding: 1rem;
+            margin-top: 0;
             position: relative;
             z-index: 10;
         }
         .quick-item {
             text-align: center;
-            padding: 1.5rem 1rem;
+            padding: 0.75rem 0.5rem;
             border-radius: 15px;
             transition: all 0.3s;
             text-decoration: none;
@@ -361,9 +365,9 @@
             color: var(--banf-orange);
         }
         .quick-item i {
-            font-size: 2rem;
+            font-size: 1.5rem;
             color: var(--banf-orange);
-            margin-bottom: 0.75rem;
+            margin-bottom: 0.4rem;
             display: block;
         }
         .quick-item span {
@@ -380,7 +384,7 @@
         }
         .president-header {
             background: linear-gradient(135deg, var(--banf-deep-red) 0%, #a52a2a 100%);
-            padding: 2rem;
+            padding: 1.25rem 1.5rem;
             color: #fff;
         }
         .president-photo {
@@ -392,11 +396,11 @@
             background: linear-gradient(135deg, var(--banf-orange), var(--banf-yellow));
         }
         .president-body {
-            padding: 2.5rem;
-            line-height: 1.9;
+            padding: 1.5rem 2rem;
+            line-height: 1.75;
             color: #2c3e50;
         }
-        .president-body p { margin-bottom: 1.25rem; }
+        .president-body p { margin-bottom: 0.75rem; }
         .president-body .lead {
             font-size: 1.2rem;
             color: var(--banf-deep-red);
@@ -427,8 +431,8 @@
         }
         .signature-block {
             text-align: right;
-            margin-top: 2rem;
-            padding-top: 1.5rem;
+            margin-top: 1rem;
+            padding-top: 1rem;
             border-top: 2px solid #dee2e6;
         }
 
@@ -437,7 +441,7 @@
         .ec-card {
             background: #fff;
             border-radius: 20px;
-            padding: 2rem 1.5rem;
+            padding: 1.25rem 1rem;
             text-align: center;
             box-shadow: 0 10px 30px rgba(0,0,0,0.08);
             transition: all 0.4s;
@@ -527,15 +531,15 @@
         .portal-hub {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 2rem;
-            margin-bottom: 3rem;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
         }
         
         /* Portal Cards - Main Entry Points */
         .portal-card {
             background: #fff;
             border-radius: 24px;
-            padding: 2.5rem;
+            padding: 1.5rem;
             text-align: center;
             transition: all 0.4s ease;
             border: 3px solid transparent;
@@ -562,14 +566,14 @@
         }
         
         .portal-icon {
-            width: 100px;
-            height: 100px;
-            border-radius: 30px;
+            width: 80px;
+            height: 80px;
+            border-radius: 24px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 1.5rem;
-            font-size: 2.5rem;
+            margin: 0 auto 1rem;
+            font-size: 2rem;
             color: #fff;
         }
         .visitor-portal .portal-icon { background: linear-gradient(135deg, #673AB7, #9C27B0); }
@@ -713,8 +717,8 @@
         .quick-access {
             background: linear-gradient(135deg, var(--banf-charcoal), #3d3d3d);
             border-radius: 20px;
-            padding: 2rem;
-            margin-bottom: 3rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
         }
         .quick-access h4 {
             color: #fff;
@@ -810,7 +814,7 @@
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255,255,255,0.15);
             border-radius: 20px;
-            padding: 3rem;
+            padding: 2rem;
             max-width: 700px;
             margin: 0 auto;
             text-align: center;
@@ -1071,13 +1075,13 @@
         .footer {
             background: linear-gradient(135deg, #1a1a2e, #2d2d44);
             color: #fff;
-            padding: 4rem 0 2rem;
+            padding: 2.5rem 0 1.5rem;
         }
         .footer-content {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 3rem;
-            margin-bottom: 3rem;
+            gap: 2rem;
+            margin-bottom: 2rem;
         }
         .footer-section h5 {
             color: var(--gold);
@@ -1131,7 +1135,7 @@
         @media (max-width: 768px) {
             .hero h1 { font-size: 2.2rem; }
             .hero-bengali { font-size: 1.4rem; }
-            .hero { padding: 2rem 1rem; }
+            .hero { padding: 80px 1rem 2rem 1rem; }
             .hero-subtitle { font-size: 1rem; }
             .hero-buttons { flex-direction: column; gap: 0.5rem; }
             .hero-buttons .btn-primary-custom,
@@ -1141,7 +1145,9 @@
             .president-header .d-flex { flex-direction: column; text-align: center; }
             .pricing-card.featured { transform: scale(1); }
             .pricing-card.featured:hover { transform: scale(1); }
-            section { padding: 3.5rem 0; }
+            section { padding: 2rem 0; }
+            section.py-5, .py-5 { padding-top: 1.5rem !important; padding-bottom: 1.5rem !important; }
+            .section-header { margin-bottom: 1rem; }
             .section-header h2 { font-size: 1.8rem; }
             /* Quick Access Bar — horizontal scroll on mobile */
             .quick-access .row { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; scroll-snap-type: x mandatory; padding-bottom: 0.5rem; }
@@ -1160,6 +1166,9 @@
             .hero-bengali { font-size: 1.1rem; }
             .stat-number { font-size: 2rem; }
             .stat-label { font-size: 0.7rem; }
+            section { padding: 1.5rem 0; }
+            section.py-5, .py-5 { padding-top: 1rem !important; padding-bottom: 1rem !important; }
+            .section-header { margin-bottom: 0.75rem; }
             .section-header h2 { font-size: 1.4rem; }
             .section-header p { font-size: 0.85rem; }
             .ec-card h6 { font-size: 0.8rem; }
@@ -1169,7 +1178,7 @@
         /* ===== iPhone SE / very small phones (375px and below) ===== */
         @media (max-width: 375px) {
             /* Hero — tighter fit */
-            .hero { min-height: 55vh; padding: 2rem 0.5rem; }
+            .hero { min-height: 55vh; padding: 80px 0.5rem 2rem 0.5rem; }
             .hero h1 { font-size: 1.35rem; line-height: 1.3; }
             .hero-subtitle { font-size: 0.8rem; line-height: 1.4; padding: 0 0.25rem; }
             .hero-bengali { font-size: 0.95rem; }
@@ -1351,13 +1360,13 @@
                     </a>
                 </div>
                 <div class="col">
-                    <a href="#magazine" class="quick-item" data-action="magazine" title="magazine.jsw → getPublishedMagazines()">
+                    <a href="#magazine" class="quick-item" data-action="magazine" title="magazine.jsw → getPublishedMagazines()" onclick="scrollToSection('magazine'); return false;">
                         <i class="fas fa-book-open"></i>
                         <span>Magazine</span>
                     </a>
                 </div>
                 <div class="col">
-                    <a href="#guide" class="quick-item" data-action="guide" title="guide.jsw → getGuideByCategory()">
+                    <a href="#guide" class="quick-item" data-action="guide" title="guide.jsw → getGuideByCategory()" onclick="scrollToSection('guide'); return false;">
                         <i class="fas fa-map-marked-alt"></i>
                         <span>Jax Guide</span>
                     </a>
@@ -1375,7 +1384,7 @@
                     </a>
                 </div>
                 <div class="col">
-                    <a href="#sponsors" class="quick-item" data-action="sponsors" title="sponsorship.jsw → getSponsors()">
+                    <a href="#sponsors" class="quick-item" data-action="sponsors" title="sponsorship.jsw → getSponsors()" onclick="scrollToSection('sponsors'); return false;">
                         <i class="fas fa-handshake"></i>
                         <span>Sponsors</span>
                     </a>
@@ -1520,11 +1529,11 @@
                 <div class="quick-links">
                     <a href="#radio" class="quick-link"><i class="fas fa-broadcast-tower"></i> BANF Radio</a>
                     <a href="#events" class="quick-link"><i class="fas fa-calendar"></i> Events</a>
-                    <a href="#surveys" class="quick-link" onclick="openSurveySection()"><i class="fas fa-poll"></i> Surveys</a>
-                    <a href="#complaints" class="quick-link" onclick="openComplaintForm()"><i class="fas fa-shield-alt"></i> Complaints</a>
-                    <a href="#guide" class="quick-link"><i class="fas fa-map-marked-alt"></i> Jax Guide</a>
-                    <a href="#magazine" class="quick-link"><i class="fas fa-book-open"></i> E-Magazine</a>
-                    <a href="#sponsors" class="quick-link"><i class="fas fa-handshake"></i> Sponsors</a>
+                    <a href="#surveys" class="quick-link" onclick="openSurveySection(); return false;"><i class="fas fa-poll"></i> Surveys</a>
+                    <a href="#complaints" class="quick-link" onclick="openComplaintForm(); return false;"><i class="fas fa-shield-alt"></i> Complaints</a>
+                    <a href="#guide" class="quick-link" onclick="scrollToSection('guide'); return false;"><i class="fas fa-map-marked-alt"></i> Jax Guide</a>
+                    <a href="#magazine" class="quick-link" onclick="scrollToSection('magazine'); return false;"><i class="fas fa-book-open"></i> E-Magazine</a>
+                    <a href="#sponsors" class="quick-link" onclick="scrollToSection('sponsors'); return false;"><i class="fas fa-handshake"></i> Sponsors</a>
                 </div>
             </div>
             
@@ -1582,7 +1591,7 @@
             </div>
             
             <!-- Individual Services Grid -->
-            <div class="section-header" style="margin-top: 3rem;">
+            <div class="section-header" style="margin-top: 1.5rem;">
                 <h3 style="font-size: 1.5rem;">All Services</h3>
                 <p>Detailed access to all BANF digital services</p>
             </div>
@@ -1623,7 +1632,7 @@
                     <div class="service-icon" style="background: linear-gradient(135deg, #E91E63, #FF5722);"><i class="fas fa-book-open"></i></div>
                     <h5>E-Magazine</h5>
                     <p>Browse issues, read articles by category, search content, and submit your own literary works.</p>
-                    <a href="#magazine" class="service-link" data-action="magazine">
+                    <a href="#magazine" class="service-link" data-action="magazine" onclick="scrollToSection('magazine'); return false;">
                         Read Now <i class="fas fa-arrow-right"></i>
                     </a>
                 </div>
@@ -1633,7 +1642,7 @@
                     <div class="service-icon" style="background: linear-gradient(135deg, #00BCD4, #009688);"><i class="fas fa-map-marked-alt"></i></div>
                     <h5>Jacksonville Guide</h5>
                     <p>Find Bengali restaurants, grocery stores, doctors, schools. Read reviews and submit new listings.</p>
-                    <a href="#guide" class="service-link" data-action="guide">
+                    <a href="#guide" class="service-link" data-action="guide" onclick="scrollToSection('guide'); return false;">
                         Explore Guide <i class="fas fa-arrow-right"></i>
                     </a>
                 </div>
@@ -1673,7 +1682,7 @@
                     <div class="service-icon" style="background: linear-gradient(135deg, #D4AF37, #FFD700);"><i class="fas fa-handshake"></i></div>
                     <h5>Become a Sponsor</h5>
                     <p>Support BANF as a Platinum, Gold, Silver, or Bronze sponsor. Magazine ads & food sponsorships.</p>
-                    <a href="#sponsors" class="service-link" data-action="sponsors">
+                    <a href="#sponsors" class="service-link" data-action="sponsors" onclick="scrollToSection('sponsors'); return false;">
                         Learn More <i class="fas fa-arrow-right"></i>
                     </a>
                 </div>
@@ -3202,11 +3211,11 @@
             'Traditional_Music': { name: 'Traditional Music', icon: '🎼', color: '#CD853F' }
         };
         
-        // Fallback local stations (when API unavailable)
+        // Fallback internet radio streams (working public streams)
         const fallbackStations = [
-            { name: 'BANF Radio - Classical', url: '/static/audio/classical_mix.mp3', category: 'Classical_Music' },
-            { name: 'BANF Radio - Folk', url: '/static/audio/folk_mix.mp3', category: 'Folk_Music' },
-            { name: 'BANF Radio - Modern', url: '/static/audio/modern_mix.mp3', category: 'Modern_Music' }
+            { name: 'BANF Radio - Rabindra Sangeet', url: 'https://stream.zeno.fm/0r0xa792kwzuv', category: 'Classical_Music' },
+            { name: 'BANF Radio - Bengali Hits', url: 'https://stream.zeno.fm/f3wvbbqmdg8uv', category: 'Modern_Music' },
+            { name: 'BANF Radio - Bollywood Mix', url: 'https://stream.zeno.fm/4d02mpe83m8uv', category: 'Folk_Music' }
         ];
         let currentStationIndex = 0;
 
@@ -3226,7 +3235,6 @@
             
             // Create audio element
             radioAudio = new Audio();
-            radioAudio.crossOrigin = 'anonymous';
             
             radioAudio.addEventListener('playing', () => {
                 isRadioPlaying = true;
@@ -3246,11 +3254,23 @@
         }
 
         /**
-         * Toggle Radio Play/Pause - Uses existing API
+         * Toggle Radio Play/Pause - Uses existing API with robust fallback
          */
         async function toggleRadio() {
             if (!radioAudio) {
                 radioAudio = new Audio();
+                radioAudio.addEventListener('error', () => {
+                    console.warn('Radio stream error, trying next station...');
+                    // Try next fallback station on error
+                    currentStationIndex = (currentStationIndex + 1) % fallbackStations.length;
+                    radioAudio.src = fallbackStations[currentStationIndex].url;
+                    updateNowPlaying();
+                    radioAudio.play().catch(() => {
+                        updateNowPlaying('Unable to play - please try again');
+                        isRadioPlaying = false;
+                        updatePlayButton(false);
+                    });
+                });
             }
             
             if (isRadioPlaying) {
@@ -3258,61 +3278,87 @@
                 radioAudio.src = '';
                 isRadioPlaying = false;
                 updatePlayButton(false);
+                updateNowPlaying('Paused — Click play to resume');
             } else {
+                updateNowPlaying('Connecting to stream...');
+                updatePlayButton(true);
+                
+                let streamStarted = false;
+                
                 try {
-                    // Try to start from API first
-                    const response = await fetch(RADIO_ENDPOINTS.startCurrent, { method: 'POST' });
+                    // Try to start from API first (with short timeout)
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 3000);
+                    
+                    const response = await fetch(RADIO_ENDPOINTS.startCurrent, { 
+                        method: 'POST',
+                        signal: controller.signal
+                    });
+                    clearTimeout(timeoutId);
                     const data = await response.json();
                     
                     if (data.stream_url) {
                         radioAudio.src = data.stream_url;
                         currentProgram = data;
                         updateNowPlayingFromAPI(data);
-                    } else {
-                        // Fallback to local stations
-                        radioAudio.src = fallbackStations[currentStationIndex].url;
-                        updateNowPlaying();
+                        streamStarted = true;
                     }
                 } catch (error) {
-                    console.warn('API unavailable, using fallback:', error);
+                    console.warn('API unavailable, using fallback streams:', error.message);
+                }
+                
+                if (!streamStarted) {
+                    // Use fallback internet radio streams
                     radioAudio.src = fallbackStations[currentStationIndex].url;
                     updateNowPlaying();
                 }
                 
-                radioAudio.play().catch(err => {
-                    console.warn('Auto-play blocked:', err);
+                try {
+                    await radioAudio.play();
+                    isRadioPlaying = true;
+                    updatePlayButton(true);
+                } catch (err) {
+                    console.warn('Play failed:', err);
                     updateNowPlaying('Click play again to start');
-                });
+                    isRadioPlaying = false;
+                    updatePlayButton(false);
+                }
             }
         }
 
         /**
-         * Skip to Next/Previous Track - Uses existing API
+         * Skip to Next/Previous Track - Uses existing API with fallback
          */
         async function skipStation(direction) {
             try {
                 const endpoint = direction > 0 ? RADIO_ENDPOINTS.nextTrack : RADIO_ENDPOINTS.previousTrack;
-                const response = await fetch(endpoint, { method: 'POST' });
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 3000);
+                
+                const response = await fetch(endpoint, { method: 'POST', signal: controller.signal });
+                clearTimeout(timeoutId);
                 const data = await response.json();
                 
                 if (data.stream_url) {
                     if (isRadioPlaying) {
                         radioAudio.src = data.stream_url;
-                        radioAudio.play();
+                        radioAudio.play().catch(() => {});
                     }
                     currentProgram = data;
                     updateNowPlayingFromAPI(data);
                     return;
                 }
             } catch (error) {
-                console.warn('API skip failed, using fallback:', error);
+                console.warn('API skip unavailable, using fallback:', error.message);
             }
             
-            // Fallback to local stations
+            // Fallback to internet radio streams
             currentStationIndex = (currentStationIndex + direction + fallbackStations.length) % fallbackStations.length;
             if (isRadioPlaying) {
                 radioAudio.src = fallbackStations[currentStationIndex].url;
-                radioAudio.play();
+                radioAudio.play().catch(() => {
+                    updateNowPlaying('Stream unavailable — try another station');
+                });
             }
             updateNowPlaying();
         }
@@ -3329,18 +3375,23 @@
         }
         
         /**
-         * Fetch current schedule from API
+         * Fetch current schedule from API (with timeout)
          */
         async function fetchCurrentSchedule() {
             try {
-                const response = await fetch(RADIO_ENDPOINTS.currentStatus);
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 3000);
+                
+                const response = await fetch(RADIO_ENDPOINTS.currentStatus, { signal: controller.signal });
+                clearTimeout(timeoutId);
                 const data = await response.json();
                 if (data && data.current_program) {
                     currentProgram = data.current_program;
                     updateNowPlayingFromAPI(data.current_program);
                 }
             } catch (error) {
-                console.warn('Could not fetch schedule:', error);
+                console.warn('Schedule API unavailable — using fallback display');
+                updateNowPlaying('🎵 BANF Radio — Click play to start');
             }
         }
 
@@ -3482,11 +3533,13 @@
             }
         }
 
-        // Smooth scroll for anchor links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        // Smooth scroll for anchor links (skip links with onclick handlers to avoid conflicts)
+        document.querySelectorAll('a[href^="#"]:not([onclick])').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
+                const href = this.getAttribute('href');
+                if (!href || href === '#') return; // Skip bare # links
                 e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
+                const target = document.querySelector(href);
                 if (target) {
                     target.scrollIntoView({
                         behavior: 'smooth',
@@ -3506,19 +3559,7 @@
             }
         });
 
-        // Radio play button simulation
-        document.querySelectorAll('.radio-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const icon = this.querySelector('i');
-                if (icon.classList.contains('fa-play')) {
-                    icon.classList.remove('fa-play');
-                    icon.classList.add('fa-pause');
-                } else if (icon.classList.contains('fa-pause')) {
-                    icon.classList.remove('fa-pause');
-                    icon.classList.add('fa-play');
-                }
-            });
-        });
+        // Radio play button icon toggling is handled by initRadioPlayer() → updatePlayButton()
 
         // Form submission (prevent default for demo)
         document.querySelector('.contact-form')?.addEventListener('submit', function(e) {
@@ -7740,27 +7781,31 @@
                 case 'login':
                     document.getElementById('loginForm').style.display = 'block';
                     document.getElementById('login-tab').classList.add('active');
+                    hideStatusMessage();
                     break;
                 case 'signup':
                     document.getElementById('signupForm').style.display = 'block';
                     document.getElementById('signup-tab').classList.add('active');
+                    hideStatusMessage();
                     break;
                 case 'code':
                     document.getElementById('codeForm').style.display = 'block';
                     document.getElementById('code-tab').classList.add('active');
+                    // Don't hide status - user needs to see the registration code
                     break;
                 case 'setup':
                     document.getElementById('setupForm').style.display = 'block';
+                    // Don't hide status - user needs to see "Code verified" message
                     break;
                 case 'forgot':
                     document.getElementById('forgotForm').style.display = 'block';
+                    hideStatusMessage();
                     break;
                 case 'profile':
                     document.getElementById('profileSection').style.display = 'block';
+                    hideStatusMessage();
                     break;
             }
-            
-            hideStatusMessage();
         }
 
         // ========== DEMO/TEST MODE DATA ==========
@@ -8163,6 +8208,20 @@
             }
             console.log('✅ Portal closed');
         }
+
+        // Safety: Escape key closes portal and restores scrolling
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const overlay = document.getElementById('memberPortalOverlay');
+                if (overlay && overlay.style.display === 'block') {
+                    closeFullPortal();
+                }
+                // Always restore body overflow as safety net
+                if (document.body.style.overflow === 'hidden') {
+                    document.body.style.overflow = '';
+                }
+            }
+        });
         
         /**
          * Toggle portal sidebar drawer on mobile (≤576px)
@@ -8455,10 +8514,14 @@
                 if (sectionId === 'careers') {
                     renderAdminCareerTable();
                 }
-                // Zelle: Load payment data when payments section is activated (cloud service — always available)
+                // Zelle: Check service availability and load payment data when payments section is activated
                 if (sectionId === 'payments') {
-                    zelleLoadPayments();
-                    zelleLoadStats();
+                    zelleCheckService().then(available => {
+                        if (available) {
+                            zelleLoadPayments();
+                            zelleLoadStats();
+                        }
+                    });
                 }
             } else {
                 document.getElementById('adminDashboard')?.classList.add('active');
@@ -9746,13 +9809,19 @@
                 return false;
             }
             
-            // Validate username
-            if (!username) {
-                showStatusMessage('error', '<i class="fas fa-exclamation-circle me-2"></i>Please choose a username.');
-                return false;
-            }
-            
+            // If username is empty, use email from registration
             const registrationId = document.getElementById('setupRegistrationId').value;
+            let finalUsername = username;
+            if (!finalUsername) {
+                // Auto-fill from registration email
+                const reg = DemoData.pendingRegistrations[registrationId];
+                if (reg && reg.email) {
+                    finalUsername = reg.email.toLowerCase();
+                } else {
+                    showStatusMessage('error', '<i class="fas fa-exclamation-circle me-2"></i>Please choose a username.');
+                    return false;
+                }
+            }
             
             showStatusMessage('info', '<i class="fas fa-spinner fa-spin me-2"></i>Creating your account...');
             
@@ -9762,7 +9831,7 @@
             // Demo mode - complete registration
             const registration = DemoData.pendingRegistrations[registrationId];
             if (registration) {
-                registration.username = username.toLowerCase();
+                registration.username = finalUsername.toLowerCase();
                 registration.password = password;
                 registration.completed = true;
                 registration.memberData = {
@@ -9792,7 +9861,7 @@
                 showStatusMessage('success', 
                     `<i class="fas fa-party-horn me-2"></i><strong>Account created successfully!</strong>
                     <br>Welcome to BANF, ${registration.firstName}!
-                    <br><br><small class="text-warning">Your login: <code>${username}</code> / your chosen password</small>
+                    <br><br><small class="text-warning">Your login: <code>${finalUsername}</code> / your chosen password</small>
                     <br><small class="text-muted">(Demo Mode)</small>`);
                 
                 updateProfileDisplay(MemberPortal.member);
@@ -11035,27 +11104,53 @@
         })();
 
         // ========== ZELLE PAYMENT AUTOMATION ==========
-        // Zelle runs via Wix Velo backend — cloud-native, no localhost required
-        const ZELLE_API = WIX_API_BASE;
+        // Zelle runs via Flask microservice - detect if available or show setup instructions
+        const ZELLE_API_DEFAULT = 'http://localhost:5002/api/zelle';
+        let ZELLE_API = ZELLE_API_DEFAULT;
+        let _zelleServiceAvailable = false;
         let _zelleCurrentFilter = 'all';
         let _zelleMatchPaymentId = null;
 
-        async function zelleApiFetch(endpoint, options = {}) {
+        // Check Zelle service availability on load
+        async function zelleCheckService() {
             try {
-                const url = `${ZELLE_API}/zelle_${endpoint}`;
-                const resp = await fetch(url, {
+                const resp = await fetch(`${ZELLE_API}/health`, { method: 'GET', signal: AbortSignal.timeout(3000) });
+                if (resp.ok) { _zelleServiceAvailable = true; return true; }
+            } catch (e) { /* service not running */ }
+            _zelleServiceAvailable = false;
+            // Show offline banner in the Zelle section
+            const banner = document.getElementById('zelleScanBanner');
+            if (banner) {
+                banner.style.display = 'block';
+                banner.style.background = '#fff3e0'; banner.style.borderColor = '#ff9800';
+                document.getElementById('zelleScanMessage').innerHTML =
+                    '<i class="fas fa-info-circle"></i> <strong>Zelle service offline.</strong> The Zelle Payment Automation requires the local admin service (port 5002). ' +
+                    'Contact your admin to start the service for payment processing. All other features work normally.';
+            }
+            return false;
+        }
+
+        async function zelleApiFetch(path, options = {}) {
+            if (!_zelleServiceAvailable) {
+                // Re-check once before failing
+                const alive = await zelleCheckService();
+                if (!alive) return null;
+            }
+            try {
+                const resp = await fetch(`${ZELLE_API}${path}`, {
                     headers: { 'Content-Type': 'application/json' },
                     ...options
                 });
                 return await resp.json();
             } catch (err) {
                 console.error('[Zelle API]', err);
+                _zelleServiceAvailable = false;
                 return null;
             }
         }
 
         async function zelleLoadStats() {
-            const data = await zelleApiFetch('stats');
+            const data = await zelleApiFetch('/stats');
             if (!data) return;
             document.getElementById('zelleTotalDetected').textContent = data.total_payments || 0;
             document.getElementById('zellePendingCount').textContent = (data.by_status?.pending?.count || 0);
@@ -11080,7 +11175,7 @@
 
         async function zelleLoadPayments() {
             const statusParam = _zelleCurrentFilter === 'all' ? '' : `?status=${_zelleCurrentFilter}`;
-            const data = await zelleApiFetch(`payments${statusParam}`);
+            const data = await zelleApiFetch(`/payments${statusParam}`);
             if (!data || !data.payments) return;
             const tbody = document.getElementById('zellePaymentsBody');
             if (data.payments.length === 0) {
@@ -11125,7 +11220,7 @@
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Scanning...';
             const banner = document.getElementById('zelleScanBanner');
             banner.style.display = 'none';
-            const result = await zelleApiFetch('scan', { method: 'POST', body: JSON.stringify({ days_back: 90 }) });
+            const result = await zelleApiFetch('/scan', { method: 'POST', body: JSON.stringify({ days_back: 90 }) });
             btn.disabled = false;
             btn.innerHTML = '<i class="fas fa-search"></i> Scan Gmail Now';
             if (result) {
@@ -11133,25 +11228,25 @@
                 if (result.new_payments > 0) {
                     banner.style.background = '#e8f5e9'; banner.style.borderColor = '#4caf50';
                     document.getElementById('zelleScanMessage').innerHTML =
-                        `<strong>${result.new_payments}</strong> new Zelle payment(s) detected! (${result.auto_matched} auto-matched) • ${result.emails_checked} emails scanned`;
+                        `<strong>${result.new_payments}</strong> new Zelle payment(s) detected! (${result.auto_matched} auto-matched) • ${result.emails_checked} emails scanned in ${result.duration_ms}ms`;
                 } else {
                     banner.style.background = '#fff3e0'; banner.style.borderColor = '#ff9800';
                     document.getElementById('zelleScanMessage').innerHTML =
-                        `No new payments found. ${result.emails_checked} emails scanned`;
+                        `No new payments found. ${result.emails_checked} emails scanned in ${result.duration_ms}ms`;
                 }
                 zelleLoadPayments();
             } else {
                 banner.style.display = 'block';
                 banner.style.background = '#ffebee'; banner.style.borderColor = '#f44336';
                 document.getElementById('zelleScanMessage').innerHTML =
-                    '❌ Scan failed. Please try again in a moment.';
+                    '❌ Scan failed. Make sure the Zelle service is running on port 5002.';
             }
         }
 
         async function zelleTogglePoller() {
             const btn = document.getElementById('btnZelleAutoToggle');
             const isOn = btn.textContent.includes('ON');
-            const result = await zelleApiFetch('poller', { method: 'POST', body: JSON.stringify({ action: isOn ? 'stop' : 'start' }) });
+            const result = await zelleApiFetch(isOn ? '/poller/stop' : '/poller/start', { method: 'POST' });
             if (result?.success) zelleLoadStats();
         }
 
@@ -11169,13 +11264,13 @@
 
         async function zelleVerifyPayment(id) {
             if (!confirm('Verify this payment?')) return;
-            await zelleApiFetch('verify', { method: 'POST', body: JSON.stringify({ paymentId: id, verifiedBy: 'admin' }) });
+            await zelleApiFetch(`/payments/${id}/verify`, { method: 'POST', body: JSON.stringify({ verified_by: 'admin' }) });
             zelleLoadPayments();
         }
 
         async function zelleRejectPayment(id) {
             const reason = prompt('Reason for rejection (optional):') || '';
-            await zelleApiFetch('reject', { method: 'POST', body: JSON.stringify({ paymentId: id, reason }) });
+            await zelleApiFetch(`/payments/${id}/reject`, { method: 'POST', body: JSON.stringify({ reason }) });
             zelleLoadPayments();
         }
 
@@ -11183,7 +11278,7 @@
             _zelleMatchPaymentId = paymentId;
             document.getElementById('zelleMatchPaymentInfo').textContent = info;
             // Load members
-            const data = await zelleApiFetch('members');
+            const data = await zelleApiFetch('/members');
             const sel = document.getElementById('zelleMatchMemberSelect');
             sel.innerHTML = '<option value="">-- Select a member --</option>';
             if (data?.members) {
@@ -11202,15 +11297,15 @@
         async function zelleConfirmMatch() {
             const memberId = document.getElementById('zelleMatchMemberSelect').value;
             if (!memberId) { alert('Please select a member'); return; }
-            await zelleApiFetch('match', {
-                method: 'POST', body: JSON.stringify({ paymentId: _zelleMatchPaymentId, memberId })
+            await zelleApiFetch(`/payments/${_zelleMatchPaymentId}/match`, {
+                method: 'POST', body: JSON.stringify({ member_id: memberId })
             });
             zelleCloseMatchModal();
             zelleLoadPayments();
         }
 
         async function zelleSeedTestData() {
-            const result = await zelleApiFetch('seed', { method: 'POST' });
+            const result = await zelleApiFetch('/test/seed', { method: 'POST' });
             if (result?.success) {
                 const banner = document.getElementById('zelleScanBanner');
                 banner.style.display = 'block';
@@ -11223,7 +11318,7 @@
 
         function portalRefreshPayments() {
             // Refresh member portal payment view from Zelle service
-            zelleApiFetch('history').then(data => {
+            zelleApiFetch('/history').then(data => {
                 if (!data?.history?.length) return;
                 const tbody = document.getElementById('portalPaymentHistoryBody');
                 tbody.innerHTML = data.history.map(h => {
