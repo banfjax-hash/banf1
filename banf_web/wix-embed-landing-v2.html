@@ -22,6 +22,22 @@
     <!-- Font Awesome Icons -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
+        /* ========== SOURCE PROTECTION ========== */
+        body, html {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            -webkit-touch-callout: none;
+        }
+        /* Allow selection inside form inputs and textareas */
+        input, textarea, select, [contenteditable="true"] {
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
+            user-select: text;
+        }
+
         /* ========== CSS VARIABLES ========== */
         :root {
             --banf-orange: #ff6b35;
@@ -1349,7 +1365,7 @@
         }
     </style>
 </head>
-<body>
+<body oncontextmenu="return false;" ondragstart="return false;" onselectstart="return false;">
     <!-- ========== NAVIGATION ========== -->
     <nav class="navbar navbar-expand-lg">
         <div class="container">
@@ -11770,6 +11786,85 @@
             });
         }
         // ========== END ZELLE PAYMENT AUTOMATION ==========
+    </script>
+
+    <!-- ========== SOURCE CODE PROTECTION ========== -->
+    <script>
+    (function() {
+        'use strict';
+
+        // Block keyboard shortcuts for viewing source / DevTools
+        document.addEventListener('keydown', function(e) {
+            // F12 — DevTools
+            if (e.key === 'F12' || e.keyCode === 123) {
+                e.preventDefault(); e.stopPropagation(); return false;
+            }
+            // Ctrl+U — View Source
+            if (e.ctrlKey && e.key === 'u') {
+                e.preventDefault(); e.stopPropagation(); return false;
+            }
+            // Ctrl+Shift+I — DevTools Inspector
+            if (e.ctrlKey && e.shiftKey && e.key === 'I') {
+                e.preventDefault(); e.stopPropagation(); return false;
+            }
+            // Ctrl+Shift+J — DevTools Console
+            if (e.ctrlKey && e.shiftKey && e.key === 'J') {
+                e.preventDefault(); e.stopPropagation(); return false;
+            }
+            // Ctrl+Shift+C — DevTools Inspect Element
+            if (e.ctrlKey && e.shiftKey && e.key === 'C') {
+                e.preventDefault(); e.stopPropagation(); return false;
+            }
+            // Ctrl+S — Save page
+            if (e.ctrlKey && e.key === 's') {
+                e.preventDefault(); e.stopPropagation(); return false;
+            }
+            // Ctrl+A — Select all
+            if (e.ctrlKey && e.key === 'a') {
+                e.preventDefault(); e.stopPropagation(); return false;
+            }
+            // Ctrl+P — Print (can reveal source)
+            if (e.ctrlKey && e.key === 'p') {
+                e.preventDefault(); e.stopPropagation(); return false;
+            }
+        }, true);
+
+        // Block right-click context menu
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault(); return false;
+        }, true);
+
+        // Block drag
+        document.addEventListener('dragstart', function(e) {
+            e.preventDefault(); return false;
+        }, true);
+
+        // DevTools detection — console warning + clear
+        var devtoolsWarning = function() {
+            console.clear();
+            console.log('%c⛔ STOP!', 'color: red; font-size: 48px; font-weight: bold;');
+            console.log('%cThis is a protected website. Unauthorized access or inspection of source code is not permitted.', 'color: #333; font-size: 16px;');
+            console.log('%c© BANF Jacksonville — Bengali Association of North Florida', 'color: #006A4E; font-size: 14px;');
+        };
+        devtoolsWarning();
+
+        // Periodic console clear to deter DevTools browsing
+        setInterval(devtoolsWarning, 5000);
+
+        // Disable view-source protocol
+        if (window.location.protocol === 'view-source:') {
+            window.location.href = window.location.href.replace('view-source:', '');
+        }
+
+        // Disable image dragging
+        document.addEventListener('DOMContentLoaded', function() {
+            var images = document.querySelectorAll('img');
+            images.forEach(function(img) {
+                img.setAttribute('draggable', 'false');
+                img.style.pointerEvents = 'auto';
+            });
+        });
+    })();
     </script>
 </body>
 </html>
