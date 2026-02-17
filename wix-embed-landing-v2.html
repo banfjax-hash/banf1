@@ -814,31 +814,81 @@
 
         /* ========== RADIO SECTION ========== */
         .radio-section {
-            background: linear-gradient(135deg, #1a1a2e, #2d2d44);
+            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
             color: #fff;
+            position: relative;
+            overflow: hidden;
+        }
+        .radio-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,107,53,0.05) 0%, transparent 60%);
+            animation: radioGlow 8s ease-in-out infinite;
+        }
+        @keyframes radioGlow {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(5%, 5%); }
         }
         .radio-player {
-            background: rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.15);
-            border-radius: 20px;
-            padding: 2rem;
-            max-width: 700px;
+            background: rgba(255,255,255,0.08);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 24px;
+            padding: 2rem 2rem 1.5rem;
+            max-width: 800px;
             margin: 0 auto;
             text-align: center;
+            position: relative;
         }
+        /* Source tabs */
+        .radio-source-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .radio-source-tab {
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: transparent;
+            color: rgba(255,255,255,0.7);
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .radio-source-tab:hover {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+        }
+        .radio-source-tab.active {
+            background: var(--gradient-primary);
+            color: #fff;
+            border-color: transparent;
+            font-weight: 600;
+        }
+        .radio-source-tab i { font-size: 0.9rem; }
         .radio-status {
             display: inline-flex;
             align-items: center;
             gap: 0.75rem;
             background: rgba(255, 107, 53, 0.2);
-            padding: 0.5rem 1.5rem;
+            padding: 0.4rem 1.2rem;
             border-radius: 50px;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
+            font-size: 0.85rem;
         }
         .live-dot {
-            width: 12px;
-            height: 12px;
+            width: 10px;
+            height: 10px;
             background: var(--banf-orange);
             border-radius: 50%;
             animation: pulse 1.5s infinite;
@@ -848,42 +898,109 @@
             50% { opacity: 0.5; transform: scale(1.3); }
         }
         .now-playing {
-            font-size: 1.4rem;
-            margin-bottom: 2rem;
-            color: rgba(255,255,255,0.9);
+            font-size: 1.25rem;
+            margin-bottom: 0.3rem;
+            color: rgba(255,255,255,0.95);
+            min-height: 1.5em;
+        }
+        .now-playing-sub {
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.5);
+            margin-bottom: 1.5rem;
+        }
+        /* Progress bar for Archive.org tracks */
+        .radio-progress {
+            width: 100%;
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+            margin-bottom: 1.5rem;
+            cursor: pointer;
+            display: none;
+        }
+        .radio-progress-fill {
+            height: 100%;
+            background: var(--gradient-primary);
+            border-radius: 2px;
+            width: 0%;
+            transition: width 0.3s linear;
         }
         .radio-btn {
-            width: 70px;
-            height: 70px;
+            width: 60px;
+            height: 60px;
             border-radius: 50%;
             border: none;
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             cursor: pointer;
             background: var(--gradient-primary);
             color: #fff;
             transition: all 0.3s;
-            margin: 0 0.5rem;
+            margin: 0 0.4rem;
         }
         .radio-btn:hover {
             transform: scale(1.1);
-            box-shadow: 0 0 30px rgba(255,107,53,0.4);
+            box-shadow: 0 0 25px rgba(255,107,53,0.4);
         }
+        .radio-btn.play-btn {
+            width: 70px;
+            height: 70px;
+            font-size: 1.5rem;
+        }
+        /* Schedule strip */
+        .radio-schedule-strip {
+            display: flex;
+            justify-content: center;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .schedule-chip {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.3rem 0.8rem;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.06);
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.6);
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid transparent;
+        }
+        .schedule-chip:hover { background: rgba(255,255,255,0.12); color: #fff; }
+        .schedule-chip.active {
+            background: rgba(255,107,53,0.2);
+            border-color: rgba(255,107,53,0.4);
+            color: #fff;
+        }
+        .schedule-chip .chip-time { font-weight: 600; }
         .radio-features {
             display: flex;
             justify-content: center;
-            gap: 2rem;
-            margin-top: 2rem;
+            gap: 1.5rem;
+            margin-top: 1.25rem;
             flex-wrap: wrap;
         }
         .radio-feature {
             text-align: center;
-            opacity: 0.9;
+            opacity: 0.85;
+            font-size: 0.8rem;
         }
         .radio-feature i {
-            font-size: 1.5rem;
+            font-size: 1.2rem;
             color: var(--gold);
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.3rem;
             display: block;
+        }
+        @media (max-width: 576px) {
+            .radio-player { padding: 1.25rem 1rem 1rem; }
+            .radio-source-tabs { gap: 0.35rem; }
+            .radio-source-tab { padding: 0.3rem 0.7rem; font-size: 0.78rem; }
+            .radio-btn { width: 50px; height: 50px; font-size: 1.1rem; }
+            .radio-btn.play-btn { width: 60px; height: 60px; font-size: 1.3rem; }
+            .now-playing { font-size: 1.05rem; }
+            .radio-schedule-strip { gap: 0.4rem; }
+            .schedule-chip { font-size: 0.7rem; padding: 0.25rem 0.6rem; }
         }
 
         /* ========== MEMBERSHIP SECTION ========== */
@@ -1926,37 +2043,63 @@
         <div class="container">
             <div class="section-header">
                 <h2 style="color: #fff;">BANF Radio</h2>
-                <p style="color: rgba(255,255,255,0.8);">24/7 Bengali Music & Cultural Programs</p>
+                <p style="color: rgba(255,255,255,0.8);">24/7 Bengali & English Music • Live Streams • Archive.org Collections</p>
             </div>
             <div class="radio-player">
+                <!-- Source Tabs -->
+                <div class="radio-source-tabs">
+                    <button class="radio-source-tab active" data-source="live" onclick="switchRadioSource('live')">
+                        <i class="fas fa-broadcast-tower"></i> Live Radio
+                    </button>
+                    <button class="radio-source-tab" data-source="archive" onclick="switchRadioSource('archive')">
+                        <i class="fas fa-archive"></i> Archive.org
+                    </button>
+                    <button class="radio-source-tab" data-source="youtube" onclick="switchRadioSource('youtube')">
+                        <i class="fab fa-youtube"></i> YouTube
+                    </button>
+                    <button class="radio-source-tab" data-source="spotify" onclick="switchRadioSource('spotify')">
+                        <i class="fab fa-spotify"></i> Spotify
+                    </button>
+                </div>
+                <!-- Status -->
                 <div class="radio-status">
                     <div class="live-dot"></div>
-                    <span>LIVE NOW</span>
+                    <span id="radioSourceLabel">LIVE RADIO</span>
                 </div>
-                <h3 class="now-playing bengali-text">
-                    🎵 Bengali Music Hour — Rabindra Sangeet Special
+                <!-- Now Playing -->
+                <h3 class="now-playing bengali-text" id="nowPlaying">
+                    🎵 Bengali Music — Click play to start
                 </h3>
-                <div class="radio-controls">
-                    <button class="radio-btn" title="Previous"><i class="fas fa-backward"></i></button>
-                    <button class="radio-btn" title="Play/Pause"><i class="fas fa-play"></i></button>
-                    <button class="radio-btn" title="Next"><i class="fas fa-forward"></i></button>
+                <div class="now-playing-sub" id="nowPlayingSub">Rabindra Sangeet • Folk • Modern Bengali • Classical</div>
+                <!-- Progress bar (for Archive.org tracks) -->
+                <div class="radio-progress" id="radioProgress" onclick="seekRadio(event)">
+                    <div class="radio-progress-fill" id="radioProgressFill"></div>
                 </div>
+                <!-- Controls -->
+                <div class="radio-controls">
+                    <button class="radio-btn" title="Previous" onclick="skipStation(-1)"><i class="fas fa-backward"></i></button>
+                    <button class="radio-btn play-btn" title="Play/Pause" onclick="toggleRadio()"><i class="fas fa-play" id="radioPlayIcon"></i></button>
+                    <button class="radio-btn" title="Next" onclick="skipStation(1)"><i class="fas fa-forward"></i></button>
+                </div>
+                <!-- Schedule Strip -->
+                <div class="radio-schedule-strip" id="scheduleStrip"></div>
+                <!-- Features -->
                 <div class="radio-features">
                     <div class="radio-feature">
                         <i class="fas fa-music"></i>
-                        <span>1000+ Songs</span>
+                        <span>Bengali & English</span>
                     </div>
                     <div class="radio-feature">
-                        <i class="fas fa-microphone"></i>
-                        <span>Live Shows</span>
+                        <i class="fas fa-broadcast-tower"></i>
+                        <span>22 Live Streams</span>
                     </div>
                     <div class="radio-feature">
-                        <i class="fas fa-heart"></i>
-                        <span>Request Songs</span>
+                        <i class="fas fa-archive"></i>
+                        <span>Archive.org</span>
                     </div>
                     <div class="radio-feature">
-                        <i class="fas fa-podcast"></i>
-                        <span>Podcasts</span>
+                        <i class="fas fa-clock"></i>
+                        <span>Auto Schedule</span>
                     </div>
                 </div>
             </div>
@@ -3219,109 +3362,317 @@
             'Traditional_Music': { name: 'Traditional Music', icon: '🎼', color: '#CD853F' }
         };
         
-        // Fallback internet radio streams (verified working HTTPS - tested Feb 2026)
-        const fallbackStations = [
-            { name: 'SomaFM Suburbs of Goa', url: 'https://ice4.somafm.com/suburbsofgoa-128-aac', category: 'Modern_Music' },
-            { name: 'Bombay Beats Radio', url: 'https://strmreg.1.fm/bombaybeats_mobile_mp3', category: 'Modern_Music' },
-            { name: 'Monocle World Radio', url: 'https://playerservices.streamtheworld.com/api/livestream-redirect/MONOCLE_24.mp3', category: 'Modern_Music' },
-            { name: 'Radio Mirchi USA', url: 'https://streams.radio.co/s8d06d0298/listen', category: 'Modern_Music' },
-            { name: 'Mixify Bollywood', url: 'https://server.mixify.in/listen/listen/radio.mp3', category: 'Modern_Music' },
-            { name: 'MixiFy Hindi Hits', url: 'https://server.mixify.in/listen/new_hits/radio.mp3', category: 'Modern_Music' },
-            { name: 'Radio Udaan 256kbps', url: 'https://stream.radioudaan.com/listen/radio_udaan/radio.mp3', category: 'Family_Entertainment' },
-            { name: 'Himal Hindi Classic', url: 'https://streaming.webhostnepal.com/8012/stream', category: 'Classical_Music' },
-            { name: 'SomaFM Goa Lounge', url: 'https://ice5.somafm.com/suburbsofgoa-64-aac', category: 'Traditional_Music' },
-            { name: 'Radio Digital Indian', url: 'https://radio.digitalmalayali.in/listen/stream/radio.mp3', category: 'Folk_Music' }
-        ];
+        // ========== MULTI-SOURCE RADIO ENGINE ==========
+        // Source: 'live' | 'archive' | 'youtube' | 'spotify'
+        let radioSource = 'live';
         let currentStationIndex = 0;
-        
-        /**
-         * Discover live Bengali/Indian radio streams from RadioBrowser API
-         * Runs once on page load to supplement fallback stations with live data
-         */
+        let archiveTrackIndex = 0;
+        let archivePlaylist = [];
+        let progressInterval = null;
+
+        // ---- LIVE RADIO: Verified Bengali/English streams (Feb 2026) ----
+        const liveStations = [
+            // Bengali - Bangladesh
+            { name: 'Radio Bhumi', url: 'https://stream.zeno.fm/ybf1umk1k18uv', category: 'Modern_Music', lang: 'bn' },
+            { name: 'Rajshahi FM', url: 'https://stream.zeno.fm/nxfshdayjrdvv', category: 'Modern_Music', lang: 'bn' },
+            { name: 'Radio GoonGoon 192k', url: 'https://audio.streamcast.xyz/listen/radiogoongoon/radio.mp3', category: 'Modern_Music', lang: 'bn' },
+            { name: 'A2Z Radio Bangladesh', url: 'https://listen.radioking.com/radio/1743/stream/125', category: 'Modern_Music', lang: 'bn' },
+            { name: 'Radio Vivid Voice', url: 'https://stream.zeno.fm/xuin6ocdc2juv', category: 'Family_Entertainment', lang: 'bn' },
+            // Bengali - India (Kolkata)
+            { name: 'AIR Akashvani Maitree Kolkata', url: 'https://airhlspush.pc.cdn.bitgravity.com/httppush/hlspbaudio245/hlspbaudio24564kbps.m3u8', category: 'Classical_Music', lang: 'bn' },
+            { name: 'AIR Kolkata Geetanjali', url: 'https://airhlspush.pc.cdn.bitgravity.com/httppush/hlspbaudio055/hlspbaudio05564kbps.m3u8', category: 'Classical_Music', lang: 'bn' },
+            { name: 'Akashvani FM Rainbow Kolkata', url: 'https://airhlspush.pc.cdn.bitgravity.com/httppush/hlspbaudio058/hlspbaudio05864kbps.m3u8', category: 'Modern_Music', lang: 'bn' },
+            { name: 'AIR FM Gold Kolkata', url: 'https://airhlspush.pc.cdn.bitgravity.com/httppush/hlspbaudio057/hlspbaudio05764kbps.m3u8', category: 'Traditional_Music', lang: 'bn' },
+            { name: 'Radio Quarantine Kolkata', url: 'https://stream-173.zeno.fm/krk4kw830tzuv', category: 'Modern_Music', lang: 'bn' },
+            { name: 'Ankora Radio', url: 'https://stream-153.zeno.fm/xush70b1cbruv', category: 'Modern_Music', lang: 'bn' },
+            { name: 'Radio Bangla Net', url: 'https://playerservices.streamtheworld.com/api/livestream-redirect/SP_R3563475_SC', category: 'Folk_Music', lang: 'bn' },
+            { name: 'Hot Now Bangla', url: 'https://stream.radiotreetal.com/listen', category: 'Modern_Music', lang: 'bn' },
+            // English / Classical
+            { name: 'Monocle 24 World Radio', url: 'https://playerservices.streamtheworld.com/api/livestream-redirect/MONOCLE_24.mp3', category: 'News_Current', lang: 'en' },
+            { name: 'SomaFM Suburbs of Goa', url: 'https://ice4.somafm.com/suburbsofgoa-128-aac', category: 'Traditional_Music', lang: 'en' },
+            { name: 'Radio Udaan', url: 'https://stream.radioudaan.com/listen/radio_udaan/radio.mp3', category: 'Family_Entertainment', lang: 'en' },
+            { name: 'Live FM Bahrain', url: 'https://stream.aiir.com/dbv0rxpwp6ytv', category: 'Modern_Music', lang: 'en' }
+        ];
+
+        // ---- ARCHIVE.ORG: Bengali music collections ----
+        const archiveCollections = {
+            Classical_Music: [
+                { id: 'ClassicSongVolume1', title: 'Rabindra Sangeet (A-J)', icon: '🎵' },
+                { id: 'RanarRanar', title: 'Rabindra Sangeet (K-S)', icon: '🎵' },
+                { id: 'TomarHoloShuru', title: 'Rabindra Sangeet (T)', icon: '🎵' },
+                { id: 'EklaCholoRe', title: 'Ekla Cholo Re', icon: '🎵' }
+            ],
+            Modern_Music: [
+                { id: 'BengaliBestEverSongs', title: 'Bengali Best Ever Songs', icon: '🎶' }
+            ],
+            Devotional: [
+                { id: 'purvaraga', title: 'Bengali Kirtan', icon: '🙏' }
+            ],
+            Literature: [
+                { id: 'sundaysuspenseonline', title: 'Sunday Suspense (Radio Mirchi)', icon: '📖' }
+            ],
+            Folk_Music: [
+                { id: 'ClassicSongVolume1', title: 'Bengali Folk & Baul', icon: '🪕' }
+            ]
+        };
+
+        // ---- YOUTUBE: Bengali playlists ----
+        const youtubePlaylistMap = {
+            Classical_Music: { id: 'PLtTLBM8bOQ2YoR0kLr7SLYEA73oP0LvZ_', title: 'Rabindra Sangeet Collection' },
+            Modern_Music: { id: 'PLCiNIjnMnRO47A0QBwdXIcBB3D0xOKTbC', title: 'Bengali Modern Hits' },
+            Folk_Music: { id: 'PLBKaSsmcB-h_RIKXy9hS5v2VGPaLBYJVu', title: 'Bengali Baul & Folk' },
+            Devotional: { id: 'PLIHvyF39qkHl3TQO6jKXGPKCFI0iqj7cX', title: 'Bengali Devotional' },
+            Literature: { id: 'PLhVChdEXoJ7NN_rRlkYQsN0TBpjVLVaQ3', title: 'Sunday Suspense Stories' },
+            Children: { id: 'PLfD1S01gIFtJ42TXBZx_FJz-BgQNrMjCX', title: 'Bengali Rhymes & Songs' }
+        };
+
+        // ---- SPOTIFY: Bengali playlists ----
+        const spotifyPlaylistMap = {
+            Classical_Music: { id: '37i9dQZF1DX6XceWZP1znY', title: 'Rabindra Sangeet Essentials' },
+            Modern_Music: { id: '37i9dQZF1DWVlMBeCqWV6S', title: 'Bengali Hits Today' },
+            Folk_Music: { id: '37i9dQZF1DX0XUfTFmNBRM', title: 'Bengali Folk & Baul' },
+            Devotional: { id: '37i9dQZF1DX7WNaWPc1jDN', title: 'Bengali Devotional' }
+        };
+
+        // ---- DAILY SCHEDULE (Liquidsoap-inspired auto-rotation) ----
+        const dailySchedule = [
+            { hour: 6,  name: 'Prabhati Sangeet',    category: 'Devotional',          icon: '🙏', preferSource: 'archive' },
+            { hour: 8,  name: 'Morning Ragas',       category: 'Classical_Music',      icon: '🎻', preferSource: 'live' },
+            { hour: 10, name: 'Rabindra Sangeet',    category: 'Classical_Music',      icon: '🎵', preferSource: 'archive' },
+            { hour: 12, name: 'Bengali Modern Hits', category: 'Modern_Music',         icon: '🎶', preferSource: 'live' },
+            { hour: 14, name: 'Folk Melodies',       category: 'Folk_Music',           icon: '🪕', preferSource: 'archive' },
+            { hour: 16, name: 'Children\'s Hour',    category: 'Children',             icon: '👶', preferSource: 'youtube' },
+            { hour: 18, name: 'Evening Ragas',       category: 'Classical_Music',      icon: '🎻', preferSource: 'live' },
+            { hour: 20, name: 'Literature Corner',   category: 'Literature',           icon: '📖', preferSource: 'archive' },
+            { hour: 22, name: 'Night Music',         category: 'Modern_Music',         icon: '🌙', preferSource: 'live' }
+        ];
+
+        /** Get the current scheduled program based on time */
+        function getCurrentScheduleSlot() {
+            const hour = new Date().getHours();
+            let current = dailySchedule[dailySchedule.length - 1]; // default last
+            for (let i = dailySchedule.length - 1; i >= 0; i--) {
+                if (hour >= dailySchedule[i].hour) { current = dailySchedule[i]; break; }
+            }
+            return current;
+        }
+
+        /** Build the schedule strip UI */
+        function buildScheduleStrip() {
+            const strip = document.getElementById('scheduleStrip');
+            if (!strip) return;
+            const currentSlot = getCurrentScheduleSlot();
+            strip.innerHTML = dailySchedule.map(s => {
+                const active = s.hour === currentSlot.hour ? ' active' : '';
+                const h = s.hour > 12 ? (s.hour - 12) + 'P' : (s.hour === 0 ? '12A' : s.hour + 'A');
+                return `<div class="schedule-chip${active}" onclick="playScheduleSlot(${s.hour})" title="${s.name}">
+                    <span>${s.icon}</span><span class="chip-time">${h}</span>
+                </div>`;
+            }).join('');
+        }
+
+        /** Play a specific schedule slot */
+        function playScheduleSlot(hour) {
+            const slot = dailySchedule.find(s => s.hour === hour);
+            if (!slot) return;
+            // Switch to the slot's preferred source
+            switchRadioSource(slot.preferSource, slot.category);
+            if (!isRadioPlaying) toggleRadio();
+        }
+
+        /** Switch radio source (live / archive / youtube / spotify) */
+        function switchRadioSource(source, category) {
+            radioSource = source;
+            // Update tab UI
+            document.querySelectorAll('.radio-source-tab').forEach(t => {
+                t.classList.toggle('active', t.dataset.source === source);
+            });
+            // Update status label
+            const labels = { live: 'LIVE RADIO', archive: 'ARCHIVE.ORG', youtube: 'YOUTUBE', spotify: 'SPOTIFY' };
+            const label = document.getElementById('radioSourceLabel');
+            if (label) label.textContent = labels[source] || source.toUpperCase();
+            // Show/hide progress bar (only for archive tracks)
+            const prog = document.getElementById('radioProgress');
+            if (prog) prog.style.display = source === 'archive' ? 'block' : 'none';
+            // If category specified, filter to that category
+            if (category && isRadioPlaying) {
+                if (source === 'live') playLiveByCategory(category);
+                else if (source === 'archive') playArchiveByCategory(category);
+                else if (source === 'youtube') showYouTubeEmbed(category);
+                else if (source === 'spotify') showSpotifyEmbed(category);
+            }
+        }
+
+        // ========== LIVE RADIO FUNCTIONS ==========
+        function playLiveByCategory(category) {
+            const matching = liveStations.filter(s => s.category === category);
+            const station = matching.length > 0 ? matching[0] : liveStations[0];
+            currentStationIndex = liveStations.indexOf(station);
+            if (isRadioPlaying) {
+                radioAudio.src = station.url;
+                radioAudio.play().catch(() => {});
+            }
+            updateNowPlaying(`📻 ${station.name}`);
+            updateNowPlayingSub(station.lang === 'bn' ? 'Bengali' : 'English');
+        }
+
+        // ========== ARCHIVE.ORG FUNCTIONS (Liquidsoap-style playlist) ==========
+        async function loadArchivePlaylist(collectionId) {
+            updateNowPlaying('⏳ Loading collection...');
+            try {
+                const controller = new AbortController();
+                setTimeout(() => controller.abort(), 8000);
+                const resp = await fetch(`https://archive.org/metadata/${collectionId}`, { signal: controller.signal });
+                const meta = await resp.json();
+                // Filter MP3 files only (originals)
+                archivePlaylist = (meta.files || [])
+                    .filter(f => f.name && f.name.endsWith('.mp3') && f.source === 'original')
+                    .map(f => ({
+                        name: (f.title || f.name.replace('.mp3', '')).replace(/_/g, ' '),
+                        url: `https://archive.org/download/${collectionId}/${encodeURIComponent(f.name)}`,
+                        duration: f.length ? parseFloat(f.length) : 0
+                    }));
+                // Shuffle for variety (Liquidsoap-style random rotation)
+                for (let i = archivePlaylist.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [archivePlaylist[i], archivePlaylist[j]] = [archivePlaylist[j], archivePlaylist[i]];
+                }
+                archiveTrackIndex = 0;
+                if (archivePlaylist.length > 0) {
+                    playArchiveTrack();
+                } else {
+                    updateNowPlaying('No tracks found in this collection');
+                }
+            } catch (e) {
+                console.warn('Archive.org load error:', e);
+                updateNowPlaying('Archive.org unavailable — try Live Radio');
+            }
+        }
+
+        function playArchiveTrack() {
+            if (archivePlaylist.length === 0) return;
+            const track = archivePlaylist[archiveTrackIndex];
+            radioAudio.src = track.url;
+            radioAudio.play().catch(() => {});
+            isRadioPlaying = true;
+            updatePlayButton(true);
+            updateNowPlaying(`🎵 ${track.name}`);
+            updateNowPlayingSub(`Track ${archiveTrackIndex + 1} of ${archivePlaylist.length}`);
+            startProgressTracking();
+        }
+
+        function playArchiveByCategory(category) {
+            const collections = archiveCollections[category] || archiveCollections['Classical_Music'];
+            const pick = collections[Math.floor(Math.random() * collections.length)];
+            loadArchivePlaylist(pick.id);
+        }
+
+        /** Auto-advance to next track when current ends (Liquidsoap crossfade concept) */
+        function setupArchiveAutoAdvance() {
+            if (!radioAudio) return;
+            radioAudio.addEventListener('ended', () => {
+                if (radioSource === 'archive' && archivePlaylist.length > 0) {
+                    archiveTrackIndex = (archiveTrackIndex + 1) % archivePlaylist.length;
+                    playArchiveTrack();
+                }
+            });
+        }
+
+        /** Progress bar tracking */
+        function startProgressTracking() {
+            clearInterval(progressInterval);
+            progressInterval = setInterval(() => {
+                if (radioAudio && radioAudio.duration && radioSource === 'archive') {
+                    const pct = (radioAudio.currentTime / radioAudio.duration) * 100;
+                    const fill = document.getElementById('radioProgressFill');
+                    if (fill) fill.style.width = pct + '%';
+                }
+            }, 500);
+        }
+
+        /** Seek within archive track */
+        function seekRadio(event) {
+            if (radioSource !== 'archive' || !radioAudio || !radioAudio.duration) return;
+            const bar = document.getElementById('radioProgress');
+            const rect = bar.getBoundingClientRect();
+            const pct = (event.clientX - rect.left) / rect.width;
+            radioAudio.currentTime = pct * radioAudio.duration;
+        }
+
+        // ========== YOUTUBE / SPOTIFY EMBEDS ==========
+        function showYouTubeEmbed(category) {
+            const entry = youtubePlaylistMap[category] || youtubePlaylistMap['Modern_Music'];
+            if (!entry) return;
+            // Pause native audio
+            if (radioAudio) { radioAudio.pause(); radioAudio.src = ''; }
+            updateNowPlaying(`▶️ ${entry.title}`);
+            updateNowPlayingSub('YouTube Playlist — opens in new tab');
+            // Open YouTube playlist in new tab (can't embed due to CORS on GitHub Pages)
+            window.open(`https://www.youtube.com/playlist?list=${entry.id}`, '_blank');
+        }
+
+        function showSpotifyEmbed(category) {
+            const entry = spotifyPlaylistMap[category] || spotifyPlaylistMap['Modern_Music'];
+            if (!entry) return;
+            if (radioAudio) { radioAudio.pause(); radioAudio.src = ''; }
+            updateNowPlaying(`🎧 ${entry.title}`);
+            updateNowPlayingSub('Spotify Playlist — opens in new tab');
+            window.open(`https://open.spotify.com/playlist/${entry.id}`, '_blank');
+        }
+
+        // ========== DISCOVER LIVE STATIONS (RadioBrowser API) ==========
         async function discoverLiveStations() {
-            // Search multiple tags to maximize chances of finding working Indian/Bengali streams
-            const searchTags = ['bengali', 'hindi', 'bollywood', 'indian'];
+            const searchTags = ['bengali', 'bangla', 'bangladesh', 'kolkata'];
             let totalDiscovered = 0;
-            
             for (const tag of searchTags) {
                 try {
                     const controller = new AbortController();
                     setTimeout(() => controller.abort(), 5000);
                     const response = await fetch(
-                        `https://de1.api.radio-browser.info/json/stations/search?tag=${tag}&limit=8&order=clickcount&reverse=true&hidebroken=true&has_extended_info=true`,
+                        `https://de1.api.radio-browser.info/json/stations/search?tag=${tag}&limit=6&order=clickcount&reverse=true&hidebroken=true`,
                         { signal: controller.signal }
                     );
                     const stations = await response.json();
-                    const httpsStations = stations.filter(s => 
-                        s.url_resolved && 
+                    stations.filter(s =>
+                        s.url_resolved &&
                         s.url_resolved.startsWith('https://') &&
                         (s.codec === 'MP3' || s.codec === 'AAC' || s.codec === 'AAC+')
-                    );
-                    httpsStations.forEach(s => {
-                        // Don't add duplicates
-                        if (!fallbackStations.some(fs => fs.url === s.url_resolved)) {
-                            fallbackStations.push({
-                                name: s.name || `${tag.charAt(0).toUpperCase() + tag.slice(1)} Radio`,
+                    ).forEach(s => {
+                        if (!liveStations.some(fs => fs.url === s.url_resolved)) {
+                            liveStations.push({
+                                name: s.name || 'Bengali Radio',
                                 url: s.url_resolved,
-                                category: 'Modern_Music'
+                                category: 'Modern_Music',
+                                lang: 'bn'
                             });
                             totalDiscovered++;
                         }
                     });
-                } catch (e) {
-                    // Continue with next tag
-                }
+                } catch (e) { /* continue */ }
             }
-            if (totalDiscovered > 0) {
-                console.log(`📻 Discovered ${totalDiscovered} additional live radio streams`);
-            }
+            if (totalDiscovered > 0) console.log(`📻 Discovered ${totalDiscovered} additional Bengali streams`);
         }
-        // Discover live stations on page load (non-blocking)
         discoverLiveStations();
 
-        /**
-         * Initialize Radio Player
-         */
+        // ========== CORE PLAYER FUNCTIONS ==========
         function initRadioPlayer() {
-            const radioControls = document.querySelector('.radio-controls');
-            if (!radioControls) return;
-            
-            const buttons = radioControls.querySelectorAll('.radio-btn');
-            if (buttons.length >= 3) {
-                buttons[0].onclick = () => skipStation(-1);  // Previous
-                buttons[1].onclick = () => toggleRadio();     // Play/Pause
-                buttons[2].onclick = () => skipStation(1);    // Next
-            }
-            
-            // Create audio element
             radioAudio = new Audio();
-            
+            radioAudio.volume = 0.8;
             radioAudio.addEventListener('playing', () => {
                 isRadioPlaying = true;
-                radioAudio._retryCount = 0; // Reset retries on success
+                radioAudio._retryCount = 0;
                 updatePlayButton(true);
-                updateNowPlaying();
             });
-            
             radioAudio.addEventListener('pause', () => {
                 isRadioPlaying = false;
                 updatePlayButton(false);
             });
-            
-            radioAudio.addEventListener('error', (e) => {
-                console.warn('Radio stream error:', e);
-                // Auto-try next station on error (up to 3 attempts)
+            radioAudio.addEventListener('error', () => {
                 if (!radioAudio._retryCount) radioAudio._retryCount = 0;
                 radioAudio._retryCount++;
                 if (radioAudio._retryCount <= 3 && isRadioPlaying) {
-                    currentStationIndex = (currentStationIndex + 1) % fallbackStations.length;
-                    updateNowPlaying('Trying next station...');
-                    radioAudio.src = fallbackStations[currentStationIndex].url;
-                    radioAudio.play().catch(() => {
-                        updateNowPlaying('No stations available — try again later');
-                        isRadioPlaying = false;
-                        updatePlayButton(false);
-                    });
+                    // Auto-skip to next station/track
+                    skipStation(1);
                 } else {
                     radioAudio._retryCount = 0;
                     updateNowPlaying('Stream unavailable — click ▶ to retry');
@@ -3329,165 +3680,126 @@
                     updatePlayButton(false);
                 }
             });
+            setupArchiveAutoAdvance();
+            buildScheduleStrip();
+            // Auto-detect schedule slot
+            const slot = getCurrentScheduleSlot();
+            updateNowPlayingSub(`${slot.icon} ${slot.name} — Click play to start`);
         }
 
-        /**
-         * Toggle Radio Play/Pause - Uses existing API with robust fallback
-         */
         async function toggleRadio() {
-            // If radioAudio not yet created (initRadioPlayer hasn't run), create it with proper handlers
-            if (!radioAudio) {
-                initRadioPlayer();
-                if (!radioAudio) return; // Safety: no radio controls found
-            }
-            
+            if (!radioAudio) { initRadioPlayer(); if (!radioAudio) return; }
             if (isRadioPlaying) {
                 radioAudio.pause();
                 radioAudio.src = '';
                 isRadioPlaying = false;
+                clearInterval(progressInterval);
                 updatePlayButton(false);
-                updateNowPlaying('Paused — Click play to resume');
-            } else {
-                updateNowPlaying('Connecting to stream...');
-                updatePlayButton(true);
-                
-                let streamStarted = false;
-                
-                try {
-                    // Try to start from API first (with short timeout)
-                    const controller = new AbortController();
-                    const timeoutId = setTimeout(() => controller.abort(), 3000);
-                    
-                    const response = await fetch(RADIO_ENDPOINTS.startCurrent, { 
-                        method: 'POST',
-                        signal: controller.signal
-                    });
-                    clearTimeout(timeoutId);
-                    const data = await response.json();
-                    
-                    if (data.stream_url) {
-                        radioAudio.src = data.stream_url;
-                        currentProgram = data;
-                        updateNowPlayingFromAPI(data);
-                        streamStarted = true;
-                    }
-                } catch (error) {
-                    console.warn('API unavailable, using fallback streams:', error.message);
-                }
-                
-                if (!streamStarted) {
-                    // Use fallback internet radio streams
-                    radioAudio.src = fallbackStations[currentStationIndex].url;
-                    updateNowPlaying();
-                }
-                
-                try {
+                updateNowPlaying('⏸ Paused — Click play to resume');
+                return;
+            }
+            updateNowPlaying('⏳ Connecting...');
+            updatePlayButton(true);
+
+            // Route to current source
+            if (radioSource === 'youtube') {
+                const slot = getCurrentScheduleSlot();
+                showYouTubeEmbed(slot.category);
+                return;
+            }
+            if (radioSource === 'spotify') {
+                const slot = getCurrentScheduleSlot();
+                showSpotifyEmbed(slot.category);
+                return;
+            }
+            if (radioSource === 'archive') {
+                const slot = getCurrentScheduleSlot();
+                await playArchiveByCategory(slot.category);
+                return;
+            }
+            // Live radio
+            try {
+                const controller = new AbortController();
+                setTimeout(() => controller.abort(), 3000);
+                const resp = await fetch(RADIO_ENDPOINTS.startCurrent, { method: 'POST', signal: controller.signal });
+                const data = await resp.json();
+                if (data.stream_url) {
+                    radioAudio.src = data.stream_url;
+                    currentProgram = data;
+                    updateNowPlayingFromAPI(data);
                     await radioAudio.play();
                     isRadioPlaying = true;
-                    updatePlayButton(true);
-                } catch (err) {
-                    console.warn('Play failed:', err);
-                    updateNowPlaying('Click play again to start');
-                    isRadioPlaying = false;
-                    updatePlayButton(false);
+                    return;
                 }
+            } catch (e) { /* API unavailable, use fallback */ }
+            // Fallback: use liveStations array
+            radioAudio.src = liveStations[currentStationIndex].url;
+            updateNowPlaying(`📻 ${liveStations[currentStationIndex].name}`);
+            updateNowPlayingSub(liveStations[currentStationIndex].lang === 'bn' ? 'Bengali' : 'English');
+            try { await radioAudio.play(); isRadioPlaying = true; updatePlayButton(true); }
+            catch (err) { updateNowPlaying('Click play again to start'); isRadioPlaying = false; updatePlayButton(false); }
+        }
+
+        function skipStation(direction) {
+            if (radioSource === 'archive' && archivePlaylist.length > 0) {
+                archiveTrackIndex = (archiveTrackIndex + direction + archivePlaylist.length) % archivePlaylist.length;
+                if (isRadioPlaying) playArchiveTrack();
+                else {
+                    updateNowPlaying(`🎵 ${archivePlaylist[archiveTrackIndex].name}`);
+                    updateNowPlayingSub(`Track ${archiveTrackIndex + 1} of ${archivePlaylist.length}`);
+                }
+                return;
+            }
+            // Live radio skip
+            currentStationIndex = (currentStationIndex + direction + liveStations.length) % liveStations.length;
+            if (isRadioPlaying) {
+                radioAudio.src = liveStations[currentStationIndex].url;
+                radioAudio.play().catch(() => {
+                    updateNowPlaying('Stream unavailable — try another');
+                });
+            }
+            updateNowPlaying(`📻 ${liveStations[currentStationIndex].name}`);
+            updateNowPlayingSub(liveStations[currentStationIndex].lang === 'bn' ? 'Bengali' : 'English');
+        }
+
+        function updateNowPlayingFromAPI(data) {
+            const np = document.getElementById('nowPlaying');
+            if (np && data) {
+                const cat = PROGRAM_CATEGORIES[data.category] || { icon: '🎵', name: data.category };
+                np.innerHTML = `${cat.icon} ${data.program_name || data.title}`;
             }
         }
 
-        /**
-         * Skip to Next/Previous Track - Uses existing API with fallback
-         */
-        async function skipStation(direction) {
-            try {
-                const endpoint = direction > 0 ? RADIO_ENDPOINTS.nextTrack : RADIO_ENDPOINTS.previousTrack;
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 3000);
-                
-                const response = await fetch(endpoint, { method: 'POST', signal: controller.signal });
-                clearTimeout(timeoutId);
-                const data = await response.json();
-                
-                if (data.stream_url) {
-                    if (isRadioPlaying) {
-                        radioAudio.src = data.stream_url;
-                        radioAudio.play().catch(() => {});
-                    }
-                    currentProgram = data;
-                    updateNowPlayingFromAPI(data);
-                    return;
-                }
-            } catch (error) {
-                console.warn('API skip unavailable, using fallback:', error.message);
-            }
-            
-            // Fallback to internet radio streams
-            currentStationIndex = (currentStationIndex + direction + fallbackStations.length) % fallbackStations.length;
-            if (isRadioPlaying) {
-                radioAudio.src = fallbackStations[currentStationIndex].url;
-                radioAudio.play().catch(() => {
-                    updateNowPlaying('Stream unavailable — try another station');
-                });
-            }
-            updateNowPlaying();
-        }
-        
-        /**
-         * Update Now Playing from API response
-         */
-        function updateNowPlayingFromAPI(data) {
-            const nowPlaying = document.querySelector('.now-playing');
-            if (nowPlaying && data) {
-                const category = PROGRAM_CATEGORIES[data.category] || { icon: '🎵', name: data.category };
-                nowPlaying.innerHTML = `${category.icon} ${data.program_name || data.title} — ${category.name}`;
-            }
-        }
-        
-        /**
-         * Fetch current schedule from API (with timeout)
-         */
         async function fetchCurrentSchedule() {
             try {
                 const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 3000);
-                
-                const response = await fetch(RADIO_ENDPOINTS.currentStatus, { signal: controller.signal });
-                clearTimeout(timeoutId);
-                const data = await response.json();
-                if (data && data.current_program) {
-                    currentProgram = data.current_program;
-                    updateNowPlayingFromAPI(data.current_program);
-                }
-            } catch (error) {
-                console.warn('Schedule API unavailable — using fallback display');
-                updateNowPlaying('🎵 BANF Radio — Click play to start');
+                setTimeout(() => controller.abort(), 3000);
+                const resp = await fetch(RADIO_ENDPOINTS.currentStatus, { signal: controller.signal });
+                const data = await resp.json();
+                if (data && data.current_program) { currentProgram = data.current_program; updateNowPlayingFromAPI(data.current_program); }
+            } catch (e) {
+                const slot = getCurrentScheduleSlot();
+                updateNowPlaying(`${slot.icon} ${slot.name}`);
+                updateNowPlayingSub('Click play to start');
             }
         }
 
-        /**
-         * Update Play Button Icon
-         */
         function updatePlayButton(playing) {
-            const playBtn = document.querySelector('.radio-controls .radio-btn:nth-child(2) i');
-            if (playBtn) {
-                playBtn.className = playing ? 'fas fa-pause' : 'fas fa-play';
-            }
+            const icon = document.getElementById('radioPlayIcon');
+            if (icon) icon.className = playing ? 'fas fa-pause' : 'fas fa-play';
         }
 
-        /**
-         * Update Now Playing Display (fallback mode)
-         */
-        function updateNowPlaying(customText = null) {
-            const nowPlaying = document.querySelector('.now-playing');
-            if (nowPlaying) {
-                nowPlaying.innerHTML = customText || `🎵 ${fallbackStations[currentStationIndex].name} — BANF Radio Live`;
-            }
+        function updateNowPlaying(text) {
+            const np = document.getElementById('nowPlaying');
+            if (np) np.innerHTML = text || `🎵 ${liveStations[currentStationIndex].name}`;
         }
 
-        // Initialize radio on page load and fetch schedule
-        document.addEventListener('DOMContentLoaded', () => {
-            initRadioPlayer();
-            fetchCurrentSchedule();
-        });
+        function updateNowPlayingSub(text) {
+            const sub = document.getElementById('nowPlayingSub');
+            if (sub) sub.textContent = text || '';
+        }
+
+        document.addEventListener('DOMContentLoaded', () => { initRadioPlayer(); fetchCurrentSchedule(); });
 
         // ========== ADMIN RADIO CONTROL FUNCTIONS ==========
         function toggleRadioStatus() {
