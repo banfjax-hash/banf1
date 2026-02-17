@@ -6650,14 +6650,7 @@
                             <div class="text-center mt-3">
                                 <small class="text-muted">Don't have an account? <a href="#" onclick="showPortalTab('signup'); return false;">Sign up here</a></small>
                             </div>
-                            <!-- Demo Credentials Hint -->
-                            <div class="mt-4 p-3 rounded" style="background: rgba(255,193,7,0.1); border: 1px dashed var(--gold);">
-                                <small class="text-muted">
-                                    <strong><i class="fas fa-lightbulb me-1"></i>Demo Mode:</strong><br>
-                                    Username: <code>member_test</code> | Password: <code>test</code><br>
-                                    <span class="text-warning">or</span> <code>admin_test</code> | <code>admin</code>
-                                </small>
-                            </div>
+
                         </div>
                         
                         <!-- SIGN UP FORM (Step 1: Basic Info) -->
@@ -6986,6 +6979,8 @@
             background: #f5f7fa;
             z-index: 9999;
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
         
         .portal-header-bar {
@@ -7078,7 +7073,8 @@
         
         .portal-main-container {
             display: flex;
-            height: calc(100vh - 70px);
+            flex: 1;
+            min-height: 0;
             overflow: hidden;
         }
         
@@ -7151,6 +7147,7 @@
             flex: 1;
             padding: 1.5rem 2rem;
             overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
         
         .portal-page-header {
@@ -7376,6 +7373,8 @@
             background: #f5f7fa;
             z-index: 10000;
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
 
         .admin-portal-fullscreen .admin-header {
@@ -7474,7 +7473,8 @@
 
         .admin-portal-container {
             display: flex;
-            height: calc(100vh - 70px);
+            flex: 1;
+            min-height: 0;
             overflow: hidden;
         }
 
@@ -7547,6 +7547,7 @@
             flex: 1;
             padding: 1.5rem 2rem;
             overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
         .admin-page-header {
@@ -7724,7 +7725,7 @@
             .admin-sidebar-section h6 { display: none; }
             .admin-nav-item { white-space: nowrap; padding: 0.5rem 0.75rem; font-size: 0.8rem; }
             .admin-nav-item span { display: none; }
-            .admin-main-content { padding: 1rem; height: calc(100vh - 180px); }
+            .admin-main-content { padding: 1rem; flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; }
         }
         
         /* Mobile Responsive */
@@ -7767,7 +7768,10 @@
             
             .portal-content-area {
                 padding: 1rem;
-                height: calc(100vh - 180px);
+                flex: 1;
+                min-height: 0;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
             }
             
             .portal-features-grid {
@@ -7816,7 +7820,7 @@
             .sidebar-section { flex-direction: column; }
             .sidebar-section h6 { display: block; }
             .portal-nav-item span { display: inline; }
-            .portal-content-area { margin-left: 0; padding: 1rem; height: calc(100vh - 70px); }
+            .portal-content-area { margin-left: 0; padding: 1rem; flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; }
             .portal-mobile-toggle { display: flex !important; }
             .portal-sidebar-backdrop {
                 display: none;
@@ -7847,7 +7851,7 @@
             .admin-sidebar-section { flex-direction: column; }
             .admin-sidebar-section h6 { display: block; }
             .admin-nav-item span { display: inline; }
-            .admin-main-content { margin-left: 0; padding: 1rem; height: calc(100vh - 70px); }
+            .admin-main-content { margin-left: 0; padding: 1rem; flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; }
             .admin-mobile-toggle { display: flex !important; }
             .admin-sidebar-backdrop {
                 display: none;
@@ -8547,8 +8551,12 @@
             }
             
             // Show full portal overlay
-            overlay.style.display = 'block';
+            overlay.style.display = 'flex';
             document.body.style.overflow = 'hidden';
+            
+            // Ensure mobile content area is scrollable
+            const contentArea = overlay.querySelector('.portal-content-area');
+            if (contentArea) contentArea.scrollTop = 0;
             
             console.log('✅ Full portal opened');
 
@@ -8795,8 +8803,12 @@
                 if (bsModal) bsModal.hide();
             }
 
-            overlay.style.display = 'block';
+            overlay.style.display = 'flex';
             document.body.style.overflow = 'hidden';
+
+            // Ensure mobile content area is scrollable
+            const adminContent = overlay.querySelector('.admin-main-content');
+            if (adminContent) adminContent.scrollTop = 0;
         }
 
         /**
@@ -10047,9 +10059,8 @@
             // Show login failed with helpful demo credentials
             showStatusMessage('error', 
                 `<i class="fas fa-exclamation-circle me-2"></i><strong>Login failed.</strong>
-                <br><br>Try demo credentials:
-                <br>Username: <code>member_test</code> | Password: <code>test</code>
-                <br>Or: <code>admin_test</code> | Password: <code>admin</code>`);
+                <br>Invalid username or password. Please try again.
+                <br><br><small><a href="#" onclick="showPortalTab('forgot'); return false;" class="text-warning">Forgot your password?</a></small>`);
             
             return false;
         }
@@ -10223,8 +10234,7 @@
                 showStatusMessage('success', 
                     `<i class="fas fa-party-horn me-2"></i><strong>Account created successfully!</strong>
                     <br>Welcome to BANF, ${registration.firstName}!
-                    <br><br><small class="text-warning">Your login: <code>${finalUsername}</code> / your chosen password</small>
-                    <br><small class="text-muted">(Demo Mode)</small>`);
+                    <br><br><small class="text-muted">You can now log in with your chosen credentials.</small>`);
                 
                 updateProfileDisplay(MemberPortal.member);
                 
@@ -10267,10 +10277,9 @@
             
             if (demoAccount) {
                 showStatusMessage('success', 
-                    `<i class="fas fa-check-circle me-2"></i><strong>Account found!</strong>
-                    <br><br>Username: <code>${demoAccount[0]}</code>
-                    <br>Password: <code>${demoAccount[1].password}</code>
-                    <br><br><small class="text-muted">(Demo Mode - In production, a reset link would be emailed)</small>`);
+                    `<i class="fas fa-check-circle me-2"></i><strong>Password reset link sent!</strong>
+                    <br><br>Check your email for instructions to reset your password.
+                    <br><br><a href="#" onclick="showPortalTab('login'); return false;" class="btn btn-sm btn-warning mt-2">Back to Login</a>`);
                 return false;
             }
             
@@ -10290,9 +10299,7 @@
             
             // Demo mode - account not found
             showStatusMessage('info', 
-                `<i class="fas fa-info-circle me-2"></i>No account found with that email.
-                <br><br><strong>Demo accounts:</strong>
-                <br><code>member@test.com</code> or <code>admin@test.com</code>
+                `<i class="fas fa-info-circle me-2"></i>If an account exists with that email, a password reset link has been sent.
                 <br><br><a href="#" onclick="showPortalTab('signup'); return false;" class="text-warning">Sign up as new member</a>`);
             
             return false;
@@ -10578,7 +10585,7 @@
                 }
                 
                 // Login failed
-                statusDiv.innerHTML = `<div class="alert alert-danger"><i class="fas fa-exclamation-circle me-2"></i><strong>Login failed.</strong><br><br>Try demo admin credentials:<br>Username: <code>admin_test</code> | Password: <code>admin</code></div>`;
+                statusDiv.innerHTML = `<div class="alert alert-danger"><i class="fas fa-exclamation-circle me-2"></i><strong>Login failed.</strong><br>Invalid credentials. Please contact an EC member for admin access.</div>`;
             }, 800);
         }
         

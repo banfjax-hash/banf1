@@ -31,16 +31,38 @@ import os
 import re
 import traceback
 from datetime import datetime, timedelta
+from functools import wraps
 from dotenv import load_dotenv
 
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app)  # Allow cross-origin for frontend
+CORS(app, origins=[
+    "https://ranadhir19.github.io",
+    "https://www.jaxbengali.org",
+    "http://localhost:*",
+    "http://127.0.0.1:*"
+])
+
+# ====== API KEY AUTHENTICATION ======
+API_KEY = os.getenv("BANF_API_KEY", "")
+
+def require_api_key(f):
+    """Decorator to require API key for protected routes"""
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        api_key = request.headers.get('X-API-Key') or request.args.get('api_key')
+        if not API_KEY:
+            # If no API key configured, allow requests (dev mode)
+            return f(*args, **kwargs)
+        if api_key != API_KEY:
+            return jsonify({"error": "Unauthorized - invalid or missing API key"}), 401
+        return f(*args, **kwargs)
+    return decorated
 
 # ====== CONFIGURATION ======
-GMAIL_ADDRESS = os.getenv("GMAIL_ADDRESS", "banfjax@gmail.com")
-GMAIL_APP_PASSWORD = os.getenv("GMAIL_APP_PASSWORD", "skmxlbejaryowvkt")  # Gmail App Password
+GMAIL_ADDRESS = os.getenv("GMAIL_ADDRESS")
+GMAIL_APP_PASSWORD = os.getenv("GMAIL_APP_PASSWORD")
 IMAP_SERVER = "imap.gmail.com"
 SMTP_SERVER = "smtp.gmail.com"
 SMTP_PORT = 587
@@ -174,6 +196,7 @@ def parse_email_message(msg, msg_id):
 # ====== API ROUTES ======
 
 @app.route('/api/gmail/status', methods=['GET'])
+@require_api_key
 def gmail_status():
     """Check Gmail connection status"""
     try:
@@ -197,6 +220,7 @@ def gmail_status():
 
 
 @app.route('/api/gmail/inbox', methods=['GET'])
+@require_api_key
 def get_inbox():
     """Get inbox emails with pagination"""
     page = int(request.args.get('page', 1))
@@ -250,6 +274,7 @@ def get_inbox():
 
 
 @app.route('/api/gmail/email/<email_id>', methods=['GET'])
+@require_api_key
 def get_email(email_id):
     """Get a single email by ID"""
     folder = request.args.get('folder', 'INBOX')
@@ -274,6 +299,7 @@ def get_email(email_id):
 
 
 @app.route('/api/gmail/folders', methods=['GET'])
+@require_api_key
 def get_folders():
     """Get list of Gmail folders/labels"""
     try:
@@ -297,6 +323,7 @@ def get_folders():
 
 
 @app.route('/api/gmail/send', methods=['POST'])
+@require_api_key
 def send_email():
     """Send an email"""
     data = request.json
@@ -359,6 +386,7 @@ def send_email():
 
 
 @app.route('/api/gmail/send-evite', methods=['POST'])
+@require_api_key
 def send_evite():
     """Send an evite/invitation email with RSVP link"""
     data = request.json
@@ -484,6 +512,7 @@ BANF - Bengali Association of North Florida
 
 
 @app.route('/api/gmail/rsvp-check', methods=['GET'])
+@require_api_key
 def check_rsvp_replies():
     """Check inbox for RSVP replies to evites"""
     event_name = request.args.get('event_name', '')
@@ -578,6 +607,7 @@ def check_rsvp_replies():
 
 
 @app.route('/api/gmail/delete/<email_id>', methods=['DELETE'])
+@require_api_key
 def delete_email(email_id):
     """Move email to trash"""
     folder = request.args.get('folder', 'INBOX')
@@ -594,6 +624,7 @@ def delete_email(email_id):
 
 
 @app.route('/api/gmail/mark-read/<email_id>', methods=['POST'])
+@require_api_key
 def mark_read(email_id):
     """Mark email as read"""
     folder = request.args.get('folder', 'INBOX')
@@ -611,6 +642,7 @@ def mark_read(email_id):
 # ====== CONTACT GROUP ROUTES ======
 
 @app.route('/api/gmail/contacts', methods=['GET'])
+@require_api_key
 def get_contacts():
     """Get all contact groups"""
     contacts = load_contacts()
@@ -618,6 +650,7 @@ def get_contacts():
 
 
 @app.route('/api/gmail/contacts/group', methods=['POST'])
+@require_api_key
 def create_group():
     """Create a new contact group"""
     data = request.json
@@ -640,6 +673,7 @@ def create_group():
 
 
 @app.route('/api/gmail/contacts/group/<group_name>', methods=['DELETE'])
+@require_api_key
 def delete_group(group_name):
     """Delete a contact group"""
     contacts = load_contacts()
@@ -652,6 +686,7 @@ def delete_group(group_name):
 
 
 @app.route('/api/gmail/contacts/group/<group_name>/add', methods=['POST'])
+@require_api_key
 def add_to_group(group_name):
     """Add contact(s) to a group"""
     data = request.json
@@ -674,6 +709,7 @@ def add_to_group(group_name):
 
 
 @app.route('/api/gmail/contacts/group/<group_name>/remove', methods=['POST'])
+@require_api_key
 def remove_from_group(group_name):
     """Remove contact from a group"""
     data = request.json
@@ -692,6 +728,7 @@ def remove_from_group(group_name):
 
 
 @app.route('/api/gmail/contacts/group/<group_name>/send', methods=['POST'])
+@require_api_key
 def send_to_group(group_name):
     """Send email to all contacts in a group"""
     data = request.json
@@ -741,6 +778,7 @@ def send_to_group(group_name):
 # ====== SEARCH ======
 
 @app.route('/api/gmail/search', methods=['GET'])
+@require_api_key
 def search_emails():
     """Search emails with Gmail search syntax"""
     query = request.args.get('q', '')
@@ -785,6 +823,7 @@ def search_emails():
 # ====== UNREAD COUNT ======
 
 @app.route('/api/gmail/unread', methods=['GET'])
+@require_api_key
 def unread_count():
     """Get unread email count"""
     try:
@@ -801,6 +840,7 @@ def unread_count():
 # ====== HEALTH CHECK ======
 
 @app.route('/api/gmail/health', methods=['GET'])
+@require_api_key
 def health_check():
     """Health check endpoint"""
     return jsonify({
@@ -808,6 +848,7 @@ def health_check():
         "status": "running",
         "email": GMAIL_ADDRESS,
         "timestamp": datetime.now().isoformat(),
+        "zelle_service": "http://localhost:5002/api/zelle/health",
         "endpoints": [
             "GET /api/gmail/status",
             "GET /api/gmail/inbox",
@@ -825,7 +866,16 @@ def health_check():
             "DELETE /api/gmail/contacts/group/<name>",
             "POST /api/gmail/contacts/group/<name>/add",
             "POST /api/gmail/contacts/group/<name>/remove",
-            "POST /api/gmail/contacts/group/<name>/send"
+            "POST /api/gmail/contacts/group/<name>/send",
+            "--- Zelle Integration (port 5002) ---",
+            "POST /api/zelle/scan",
+            "GET /api/zelle/payments",
+            "GET /api/zelle/stats",
+            "POST /api/zelle/payments/<id>/verify",
+            "POST /api/zelle/payments/<id>/reject",
+            "POST /api/zelle/payments/<id>/match",
+            "POST /api/zelle/poller/start",
+            "POST /api/zelle/poller/stop",
         ]
     })
 
