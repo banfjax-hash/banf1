@@ -79,16 +79,27 @@
     }
 }
         
-        /* Force all sections to be visible */
-        body > * {
+        /* Force all sections to be visible (scope to actual layout elements, not scripts/modals) */
+        body > section,
+        body > nav,
+        body > footer,
+        body > header {
             position: relative;
             z-index: 1;
         }
         
-        /* Prevent footer from collapsing */
+        /* Ensure footer has no trailing space */
         footer {
             position: relative;
             z-index: 1;
+            margin-bottom: 0;
+        }
+        
+        /* Hide modals/overlays from document flow entirely */
+        body > .modal,
+        body > .member-portal-fullscreen,
+        body > .admin-portal-fullscreen {
+            position: fixed !important;
         }
         
         /* ========== BASE STYLES ========== */
@@ -837,168 +848,130 @@
             border: 1px solid rgba(255,255,255,0.12);
             border-radius: 24px;
             padding: 2rem 2rem 1.5rem;
-            max-width: 800px;
+            max-width: 480px;
             margin: 0 auto;
             text-align: center;
             position: relative;
         }
-        /* Source tabs */
-        .radio-source-tabs {
-            display: flex;
-            justify-content: center;
-            gap: 0.5rem;
-            margin-bottom: 1.5rem;
-            flex-wrap: wrap;
+        /* Radio Image Box — Vinyl Disc */
+        .radio-image-box {
+            width: 160px;
+            height: 160px;
+            margin: 0 auto 1.5rem;
+            position: relative;
         }
-        .radio-source-tab {
-            padding: 0.4rem 1rem;
-            border-radius: 20px;
-            border: 1px solid rgba(255,255,255,0.2);
-            background: transparent;
-            color: rgba(255,255,255,0.7);
-            cursor: pointer;
-            font-size: 0.85rem;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 0.4rem;
-        }
-        .radio-source-tab:hover {
-            background: rgba(255,255,255,0.1);
-            color: #fff;
-        }
-        .radio-source-tab.active {
-            background: var(--gradient-primary);
-            color: #fff;
-            border-color: transparent;
-            font-weight: 600;
-        }
-        .radio-source-tab i { font-size: 0.9rem; }
-        .radio-status {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.75rem;
-            background: rgba(255, 107, 53, 0.2);
-            padding: 0.4rem 1.2rem;
-            border-radius: 50px;
-            margin-bottom: 1rem;
-            font-size: 0.85rem;
-        }
-        .live-dot {
-            width: 10px;
-            height: 10px;
-            background: var(--banf-orange);
+        .radio-vinyl {
+            width: 100%;
+            height: 100%;
             border-radius: 50%;
-            animation: pulse 1.5s infinite;
+            background: radial-gradient(circle, #222 20%, #111 40%, #333 42%, #111 44%, #333 46%, #111 60%, #222 80%, #111 100%);
+            box-shadow: 0 0 30px rgba(255,107,53,0.3), inset 0 0 20px rgba(0,0,0,0.5);
+            position: relative;
+            animation: none;
         }
-        @keyframes pulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.5; transform: scale(1.3); }
+        .radio-vinyl.spinning {
+            animation: vinylSpin 3s linear infinite;
         }
+        @keyframes vinylSpin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .vinyl-groove {
+            position: absolute;
+            border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+        .vinyl-groove:nth-child(1) { top: 15%; left: 15%; width: 70%; height: 70%; }
+        .vinyl-groove.vinyl-groove-2 { top: 25%; left: 25%; width: 50%; height: 50%; }
+        .vinyl-groove.vinyl-groove-3 { top: 35%; left: 35%; width: 30%; height: 30%; }
+        .vinyl-label {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 10px rgba(255,107,53,0.5);
+        }
+        .vinyl-text {
+            font-size: 0.65rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: #fff;
+        }
+        /* Now Playing */
         .now-playing {
-            font-size: 1.25rem;
+            font-size: 1.15rem;
             margin-bottom: 0.3rem;
             color: rgba(255,255,255,0.95);
             min-height: 1.5em;
         }
         .now-playing-sub {
-            font-size: 0.85rem;
+            font-size: 0.82rem;
             color: rgba(255,255,255,0.5);
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.2rem;
         }
-        /* Progress bar for Archive.org tracks */
-        .radio-progress {
-            width: 100%;
-            height: 4px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 2px;
-            margin-bottom: 1.5rem;
-            cursor: pointer;
-            display: none;
+        /* Equalizer Animation */
+        .radio-equalizer {
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 3px;
+            height: 36px;
+            margin-bottom: 1.2rem;
         }
-        .radio-progress-fill {
-            height: 100%;
+        .eq-bar {
+            width: 5px;
+            border-radius: 2px 2px 0 0;
             background: var(--gradient-primary);
-            border-radius: 2px;
-            width: 0%;
-            transition: width 0.3s linear;
+            height: 6px;
+            transition: height 0.1s;
         }
-        .radio-btn {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            border: none;
-            font-size: 1.3rem;
-            cursor: pointer;
-            background: var(--gradient-primary);
-            color: #fff;
-            transition: all 0.3s;
-            margin: 0 0.4rem;
+        .radio-equalizer.active .eq-bar {
+            animation: eqBounce 0.6s ease-in-out infinite alternate;
         }
-        .radio-btn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 0 25px rgba(255,107,53,0.4);
+        @keyframes eqBounce {
+            0% { height: 6px; opacity: 0.5; }
+            25% { height: 18px; opacity: 0.75; }
+            50% { height: 30px; opacity: 1; }
+            75% { height: 14px; opacity: 0.8; }
+            100% { height: 36px; opacity: 1; }
+        }
+        /* Play/Stop Button */
+        .radio-controls {
+            display: flex;
+            justify-content: center;
         }
         .radio-btn.play-btn {
-            width: 70px;
-            height: 70px;
-            font-size: 1.5rem;
-        }
-        /* Schedule strip */
-        .radio-schedule-strip {
-            display: flex;
-            justify-content: center;
-            gap: 0.75rem;
-            margin-top: 1.5rem;
-            flex-wrap: wrap;
-        }
-        .schedule-chip {
-            display: flex;
-            align-items: center;
-            gap: 0.35rem;
-            padding: 0.3rem 0.8rem;
-            border-radius: 12px;
-            background: rgba(255,255,255,0.06);
-            font-size: 0.75rem;
-            color: rgba(255,255,255,0.6);
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            border: none;
+            font-size: 1.6rem;
             cursor: pointer;
-            transition: all 0.3s;
-            border: 1px solid transparent;
-        }
-        .schedule-chip:hover { background: rgba(255,255,255,0.12); color: #fff; }
-        .schedule-chip.active {
-            background: rgba(255,107,53,0.2);
-            border-color: rgba(255,107,53,0.4);
+            background: var(--gradient-primary);
             color: #fff;
+            transition: all 0.3s;
+            box-shadow: 0 4px 20px rgba(255,107,53,0.35);
         }
-        .schedule-chip .chip-time { font-weight: 600; }
-        .radio-features {
-            display: flex;
-            justify-content: center;
-            gap: 1.5rem;
-            margin-top: 1.25rem;
-            flex-wrap: wrap;
-        }
-        .radio-feature {
-            text-align: center;
-            opacity: 0.85;
-            font-size: 0.8rem;
-        }
-        .radio-feature i {
-            font-size: 1.2rem;
-            color: var(--gold);
-            margin-bottom: 0.3rem;
-            display: block;
+        .radio-btn.play-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 30px rgba(255,107,53,0.5);
         }
         @media (max-width: 576px) {
-            .radio-player { padding: 1.25rem 1rem 1rem; }
-            .radio-source-tabs { gap: 0.35rem; }
-            .radio-source-tab { padding: 0.3rem 0.7rem; font-size: 0.78rem; }
-            .radio-btn { width: 50px; height: 50px; font-size: 1.1rem; }
-            .radio-btn.play-btn { width: 60px; height: 60px; font-size: 1.3rem; }
-            .now-playing { font-size: 1.05rem; }
-            .radio-schedule-strip { gap: 0.4rem; }
-            .schedule-chip { font-size: 0.7rem; padding: 0.25rem 0.6rem; }
+            .radio-player { padding: 1.25rem 1rem 1rem; max-width: 100%; }
+            .radio-image-box { width: 120px; height: 120px; margin-bottom: 1rem; }
+            .vinyl-label { width: 38px; height: 38px; }
+            .vinyl-text { font-size: 0.55rem; }
+            .now-playing { font-size: 1rem; }
+            .radio-btn.play-btn { width: 62px; height: 62px; font-size: 1.3rem; }
+            .radio-equalizer { height: 28px; }
+            .eq-bar { width: 4px; }
         }
 
         /* ========== MEMBERSHIP SECTION ========== */
@@ -2041,65 +2014,47 @@
         <div class="container">
             <div class="section-header">
                 <h2 style="color: #fff;">BANF Radio</h2>
-                <p style="color: rgba(255,255,255,0.8);">24/7 Bengali & English Music • Live Streams • Archive.org Collections</p>
+                <p style="color: rgba(255,255,255,0.8);">24/7 Bengali & English Music</p>
             </div>
             <div class="radio-player">
-                <!-- Source Tabs -->
-                <div class="radio-source-tabs">
-                    <button class="radio-source-tab active" data-source="live" onclick="switchRadioSource('live')">
-                        <i class="fas fa-broadcast-tower"></i> Live Radio
-                    </button>
-                    <button class="radio-source-tab" data-source="archive" onclick="switchRadioSource('archive')">
-                        <i class="fas fa-archive"></i> Archive.org
-                    </button>
-                    <button class="radio-source-tab" data-source="youtube" onclick="switchRadioSource('youtube')">
-                        <i class="fab fa-youtube"></i> YouTube
-                    </button>
-                    <button class="radio-source-tab" data-source="spotify" onclick="switchRadioSource('spotify')">
-                        <i class="fab fa-spotify"></i> Spotify
-                    </button>
+                <!-- Radio Image Box -->
+                <div class="radio-image-box">
+                    <div class="radio-vinyl">
+                        <div class="vinyl-groove"></div>
+                        <div class="vinyl-groove vinyl-groove-2"></div>
+                        <div class="vinyl-groove vinyl-groove-3"></div>
+                        <div class="vinyl-label">
+                            <span class="vinyl-text">BANF</span>
+                        </div>
+                    </div>
                 </div>
-                <!-- Status -->
-                <div class="radio-status">
-                    <div class="live-dot"></div>
-                    <span id="radioSourceLabel">LIVE RADIO</span>
-                </div>
-                <!-- Now Playing -->
+                <!-- Now Playing (program name from auto-schedule) -->
                 <h3 class="now-playing bengali-text" id="nowPlaying">
                     🎵 Bengali Music — Click play to start
                 </h3>
                 <div class="now-playing-sub" id="nowPlayingSub">Rabindra Sangeet • Folk • Modern Bengali • Classical</div>
-                <!-- Progress bar (for Archive.org tracks) -->
-                <div class="radio-progress" id="radioProgress" onclick="seekRadio(event)">
-                    <div class="radio-progress-fill" id="radioProgressFill"></div>
+                <!-- Equalizer Visualization -->
+                <div class="radio-equalizer" id="radioEqualizer">
+                    <div class="eq-bar" style="animation-delay: 0s;"></div>
+                    <div class="eq-bar" style="animation-delay: 0.15s;"></div>
+                    <div class="eq-bar" style="animation-delay: 0.3s;"></div>
+                    <div class="eq-bar" style="animation-delay: 0.45s;"></div>
+                    <div class="eq-bar" style="animation-delay: 0.6s;"></div>
+                    <div class="eq-bar" style="animation-delay: 0.2s;"></div>
+                    <div class="eq-bar" style="animation-delay: 0.5s;"></div>
+                    <div class="eq-bar" style="animation-delay: 0.1s;"></div>
+                    <div class="eq-bar" style="animation-delay: 0.35s;"></div>
                 </div>
-                <!-- Controls -->
+                <!-- Play / Stop Controls -->
                 <div class="radio-controls">
-                    <button class="radio-btn" title="Previous" onclick="skipStation(-1)"><i class="fas fa-backward"></i></button>
-                    <button class="radio-btn play-btn" title="Play/Pause" onclick="toggleRadio()"><i class="fas fa-play" id="radioPlayIcon"></i></button>
-                    <button class="radio-btn" title="Next" onclick="skipStation(1)"><i class="fas fa-forward"></i></button>
+                    <button class="radio-btn play-btn" title="Play/Stop" onclick="toggleRadio()">
+                        <i class="fas fa-play" id="radioPlayIcon"></i>
+                    </button>
                 </div>
-                <!-- Schedule Strip -->
-                <div class="radio-schedule-strip" id="scheduleStrip"></div>
-                <!-- Features -->
-                <div class="radio-features">
-                    <div class="radio-feature">
-                        <i class="fas fa-music"></i>
-                        <span>Bengali & English</span>
-                    </div>
-                    <div class="radio-feature">
-                        <i class="fas fa-broadcast-tower"></i>
-                        <span>22 Live Streams</span>
-                    </div>
-                    <div class="radio-feature">
-                        <i class="fas fa-archive"></i>
-                        <span>Archive.org</span>
-                    </div>
-                    <div class="radio-feature">
-                        <i class="fas fa-clock"></i>
-                        <span>Auto Schedule</span>
-                    </div>
-                </div>
+                <!-- Hidden elements kept for JS compatibility -->
+                <div id="radioSourceLabel" style="display:none;">LIVE RADIO</div>
+                <div id="radioProgress" style="display:none;"><div id="radioProgressFill"></div></div>
+                <div id="scheduleStrip" style="display:none;"></div>
             </div>
         </div>
     </section>
@@ -3693,7 +3648,8 @@
                 isRadioPlaying = false;
                 clearInterval(progressInterval);
                 updatePlayButton(false);
-                updateNowPlaying('⏸ Paused — Click play to resume');
+                updateNowPlaying('🎵 Bengali Music — Click play to start');
+                updateNowPlayingSub('Rabindra Sangeet • Folk • Modern Bengali • Classical');
                 return;
             }
             updateNowPlaying('⏳ Connecting...');
@@ -3784,7 +3740,12 @@
 
         function updatePlayButton(playing) {
             const icon = document.getElementById('radioPlayIcon');
-            if (icon) icon.className = playing ? 'fas fa-pause' : 'fas fa-play';
+            if (icon) icon.className = playing ? 'fas fa-stop' : 'fas fa-play';
+            // Animate vinyl disc and equalizer
+            const vinyl = document.querySelector('.radio-vinyl');
+            if (vinyl) vinyl.classList.toggle('spinning', playing);
+            const eq = document.getElementById('radioEqualizer');
+            if (eq) eq.classList.toggle('active', playing);
         }
 
         function updateNowPlaying(text) {
