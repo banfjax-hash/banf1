@@ -16,6 +16,7 @@
 
 import { ok, badRequest, serverError, notFound, forbidden } from 'wix-http-functions';
 import wixData from 'wix-data';
+import { fetch as wixFetch } from 'wix-fetch';
 
 // ============================================
 // UTILITY FUNCTIONS
@@ -93,8 +94,10 @@ export function get_health(request) {
         success: true,
         status: 'healthy',
         timestamp: new Date().toISOString(),
-        version: '2.0.0-selfcontained',
-        endpoints: 'all'
+        version: '3.0.0-selfcontained-email',
+        endpoints: ['health', 'events', 'members', 'radio', 'sponsors', 'gallery',
+                     'surveys', 'email_status', 'email_unread', 'email_inbox',
+                     'send_email', 'send_evite', 'contacts', 'rsvp_check', 'sent_history']
     });
 }
 export function options_health(request) { return handleCors(); }
@@ -623,92 +626,565 @@ export function options_submit_contact(request) { return handleCors(); }
 
 
 // ╔══════════════════════════════════════════════╗
-// ║  10. EMAIL / GMAIL (Stub Endpoints)           ║
-// ║      Need Gmail API credentials to work.      ║
-// ║      Return safe stubs so UI doesn't crash.   ║
+// ║  10. EMAIL GATEWAY (Self-Contained)           ║
+// ║      Uses wixData + SendGrid directly.        ║
+// ║      No .jsw imports needed.                  ║
 // ╚══════════════════════════════════════════════╝
 
-function emailNotConfigured() {
-    return jsonResponse({
-        success: false,
-        configured: false,
-        error: 'Email service not configured. Gmail API credentials required.',
-        status: 'disconnected'
-    });
+const BANF_EMAIL = 'banfjax@gmail.com';
+const BANF_ORG_NAME = 'Bengali Association of North Florida';
+let _sendgridKey = null;
+
+async function getSendGridKey() {
+    if (_sendgridKey) return _sendgridKey;
+    try {
+        const { getSecret } = await import('wix-secrets-backend');
+        _sendgridKey = await getSecret('sendgrid_api_key');
+        return _sendgridKey;
+    } catch (e) {
+        console.error('SendGrid key not found:', e.message);
+        return null;
+    }
 }
 
-export function get_email_status(request) { return emailNotConfigured(); }
+async function sendViaSendGrid(emailData, apiKey) {
+    const { to, subject, body, body_html, cc, bcc, reply_to } = emailData;
+    const personalizations = [{ to: to.split(',').map(e => ({ email: e.trim() })) }];
+    if (cc) personalizations[0].cc = cc.split(',').map(e => ({ email: e.trim() }));
+    if (bcc) personalizations[0].bcc = bcc.split(',').map(e => ({ email: e.trim() }));
+
+    const sgPayload = {
+        personalizations,
+        from: { email: BANF_EMAIL, name: BANF_ORG_NAME },
+        reply_to: { email: reply_to || BANF_EMAIL },
+        subject: subject,
+        content: []
+    };
+    if (body) sgPayload.content.push({ type: 'text/plain', value: body });
+    if (body_html) sgPayload.content.push({ type: 'text/html', value: body_html });
+    if (sgPayload.content.length === 0) sgPayload.content.push({ type: 'text/plain', value: '(No content)' });
+
+    const response = await wixFetch('https://api.sendgrid.com/v3/mail/send', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify(sgPayload)
+    });
+
+    if (response.status === 202 || response.status === 200) {
+        // Log sent email
+        try {
+            await wixData.insert('SentEmails', {
+                to, subject, body: body || body_html || '', sentAt: new Date(), sentBy: BANF_EMAIL, type: 'direct'
+            });
+        } catch (_) {}
+        return { success: true, message: `Email sent to ${to}`, timestamp: new Date().toISOString() };
+    } else {
+        const errText = await response.text();
+        return { success: false, error: `SendGrid error ${response.status}: ${errText}` };
+    }
+}
+
+// --- GET /_functions/email_status ---
+export async function get_email_status(request) {
+    try {
+        const apiKey = await getSendGridKey();
+        const hasKey = !!apiKey;
+
+        // Count sent emails
+        let sentCount = 0;
+        try {
+            const sentQuery = await wixData.query('SentEmails').count();
+            sentCount = sentQuery;
+        } catch (_) {}
+
+        // Count inbox messages
+        let inboxCount = 0;
+        let unreadCount = 0;
+        try {
+            inboxCount = await wixData.query('InboxMessages').count();
+            unreadCount = await wixData.query('InboxMessages').eq('read', false).count();
+        } catch (_) {}
+
+        return jsonResponse({
+            success: true,
+            configured: hasKey,
+            status: hasKey ? 'connected' : 'disconnected',
+            provider: hasKey ? 'sendgrid' : 'none',
+            email: BANF_EMAIL,
+            stats: { sent: sentCount, inbox: inboxCount, unread: unreadCount }
+        });
+    } catch (error) {
+        return jsonResponse({
+            success: false, configured: false, status: 'error', error: error.message
+        });
+    }
+}
 export function options_email_status(request) { return handleCors(); }
 
-export function get_email_unread(request) {
-    return jsonResponse({ success: true, count: 0, configured: false });
+// --- GET /_functions/email_unread ---
+export async function get_email_unread(request) {
+    try {
+        const count = await wixData.query('InboxMessages').eq('read', false).count();
+        return jsonResponse({ success: true, count, configured: true });
+    } catch (error) {
+        return jsonResponse({ success: true, count: 0, configured: false });
+    }
 }
 export function options_email_unread(request) { return handleCors(); }
 
-export function get_email_inbox(request) {
-    return jsonResponse({ success: true, emails: [], total: 0, configured: false });
+// --- GET /_functions/email_inbox ---
+export async function get_email_inbox(request) {
+    try {
+        const page = parseInt(getQueryParam(request, 'page')) || 1;
+        const perPage = parseInt(getQueryParam(request, 'per_page')) || 20;
+        const folder = getQueryParam(request, 'folder') || 'INBOX';
+
+        const results = await wixData.query('InboxMessages')
+            .eq('folder', folder)
+            .descending('receivedAt')
+            .skip((page - 1) * perPage)
+            .limit(perPage)
+            .find();
+
+        return jsonResponse({
+            success: true,
+            emails: results.items.map(m => ({
+                id: m._id,
+                from: m.from || '',
+                to: m.to || BANF_EMAIL,
+                subject: m.subject || '(No Subject)',
+                body: m.body || '',
+                date: m.receivedAt ? new Date(m.receivedAt).toISOString() : '',
+                read: !!m.read,
+                folder: m.folder || 'INBOX'
+            })),
+            total: results.totalCount,
+            page, per_page: perPage, folder
+        });
+    } catch (error) {
+        return jsonResponse({ success: true, emails: [], total: 0, configured: false });
+    }
 }
 export function options_email_inbox(request) { return handleCors(); }
 
-export function get_email_message(request) {
-    return errorResponse('Email service not configured', 503);
+// --- GET /_functions/email_message ---
+export async function get_email_message(request) {
+    try {
+        const messageId = getQueryParam(request, 'id');
+        if (!messageId) return errorResponse('Message ID is required', 400);
+
+        const msg = await wixData.get('InboxMessages', messageId);
+        if (!msg) return errorResponse('Message not found', 404);
+
+        return jsonResponse({
+            success: true,
+            message: {
+                id: msg._id,
+                from: msg.from || '',
+                to: msg.to || BANF_EMAIL,
+                subject: msg.subject || '',
+                body: msg.body || '',
+                body_html: msg.bodyHtml || '',
+                date: msg.receivedAt ? new Date(msg.receivedAt).toISOString() : '',
+                read: !!msg.read,
+                folder: msg.folder || 'INBOX',
+                attachments: msg.attachments || []
+            }
+        });
+    } catch (error) {
+        return errorResponse(error.message, 500);
+    }
 }
 export function options_email_message(request) { return handleCors(); }
 
-export function post_email_mark_read(request) {
-    return errorResponse('Email service not configured', 503);
+// --- POST /_functions/email_mark_read ---
+export async function post_email_mark_read(request) {
+    try {
+        const body = await parseBody(request);
+        if (!body || !body.id) return errorResponse('Message ID is required', 400);
+
+        await wixData.update('InboxMessages', { _id: body.id, read: true });
+        return jsonResponse({ success: true, message: 'Marked as read' });
+    } catch (error) {
+        return errorResponse(error.message, 500);
+    }
 }
 export function options_email_mark_read(request) { return handleCors(); }
 
-export function post_email_delete(request) {
-    return errorResponse('Email service not configured', 503);
-}
-export function options_email_delete(request) { return handleCors(); }
+// --- POST /_functions/send_email ---
+export async function post_send_email(request) {
+    try {
+        const body = await parseBody(request);
+        if (!body || !body.to || !body.subject) {
+            return errorResponse('to and subject are required', 400);
+        }
 
-export function post_send_email(request) {
-    return errorResponse('Email service not configured', 503);
+        const apiKey = await getSendGridKey();
+        if (!apiKey) {
+            return errorResponse('Email service not configured. Set sendgrid_api_key in Wix Secrets Manager.', 503);
+        }
+
+        const result = await sendViaSendGrid(body, apiKey);
+        return jsonResponse(result);
+    } catch (error) {
+        return errorResponse(error.message, 500);
+    }
 }
 export function options_send_email(request) { return handleCors(); }
 
-export function post_send_evite(request) {
-    return errorResponse('Email service not configured', 503);
+// --- POST /_functions/send_evite ---
+export async function post_send_evite(request) {
+    try {
+        const body = await parseBody(request);
+        if (!body || !body.recipients || !body.event_name) {
+            return errorResponse('recipients and event_name are required', 400);
+        }
+
+        const apiKey = await getSendGridKey();
+        if (!apiKey) {
+            return errorResponse('Email service not configured', 503);
+        }
+
+        let sentCount = 0;
+        const failed = [];
+
+        for (const recipient of body.recipients) {
+            const rEmail = recipient.email || '';
+            const rName = recipient.name || 'Member';
+            if (!rEmail) continue;
+
+            const htmlBody = `<div style="font-family:Arial; max-width:600px; margin:auto;">
+                <h2 style="color:#e74c3c;">🎉 You're Invited!</h2>
+                <p>Dear ${rName},</p>
+                <p>${body.message || 'You are cordially invited to our upcoming event.'}</p>
+                <table style="border-collapse:collapse; width:100%; margin:16px 0;">
+                    <tr><td style="padding:8px; font-weight:bold;">📅 Event</td><td style="padding:8px;">${body.event_name}</td></tr>
+                    <tr><td style="padding:8px; font-weight:bold;">📆 Date</td><td style="padding:8px;">${body.event_date || 'TBD'}</td></tr>
+                    <tr><td style="padding:8px; font-weight:bold;">⏰ Time</td><td style="padding:8px;">${body.event_time || 'TBD'}</td></tr>
+                    <tr><td style="padding:8px; font-weight:bold;">📍 Venue</td><td style="padding:8px;">${body.venue || 'TBD'}</td></tr>
+                </table>
+                <p>Please reply with <strong>YES</strong> / <strong>MAYBE</strong> / <strong>NO</strong></p>
+                <p style="color:#888; font-size:12px;">— ${BANF_ORG_NAME}</p>
+            </div>`;
+
+            const result = await sendViaSendGrid({
+                to: rEmail,
+                subject: body.subject || `You're Invited: ${body.event_name}`,
+                body: `BANF Invitation - ${body.event_name}\n\nDear ${rName},\n\n${body.message || 'You are invited!'}\n\n📅 ${body.event_date || 'TBD'}\n📍 ${body.venue || 'TBD'}`,
+                body_html: htmlBody
+            }, apiKey);
+
+            if (result.success) {
+                sentCount++;
+                try {
+                    await wixData.insert('SentEmails', {
+                        to: rEmail, recipientName: rName, subject: `Evite: ${body.event_name}`,
+                        body: body.message || '', sentAt: new Date(), type: 'evite',
+                        eventName: body.event_name, eventDate: body.event_date || ''
+                    });
+                } catch (_) {}
+            } else {
+                failed.push({ email: rEmail, error: result.error });
+            }
+        }
+
+        return jsonResponse({
+            success: true, sent_count: sentCount, failed_count: failed.length,
+            failed: failed.length > 0 ? failed : undefined,
+            timestamp: new Date().toISOString()
+        });
+    } catch (error) {
+        return errorResponse(error.message, 500);
+    }
 }
 export function options_send_evite(request) { return handleCors(); }
 
-export function get_email_search(request) {
-    return jsonResponse({ success: true, emails: [], total: 0, configured: false });
+// --- POST /_functions/email_delete ---
+export async function post_email_delete(request) {
+    try {
+        const body = await parseBody(request);
+        if (!body || !body.id) return errorResponse('Message ID is required', 400);
+
+        await wixData.remove('InboxMessages', body.id);
+        return jsonResponse({ success: true, message: 'Message deleted' });
+    } catch (error) {
+        return errorResponse(error.message, 500);
+    }
+}
+export function options_email_delete(request) { return handleCors(); }
+
+// --- GET /_functions/email_search ---
+export async function get_email_search(request) {
+    try {
+        const q = getQueryParam(request, 'q');
+        if (!q) return errorResponse('Search query is required', 400);
+
+        const results = await wixData.query('InboxMessages')
+            .contains('subject', q)
+            .or(wixData.query('InboxMessages').contains('from', q))
+            .or(wixData.query('InboxMessages').contains('body', q))
+            .descending('receivedAt')
+            .limit(50)
+            .find();
+
+        return jsonResponse({
+            success: true,
+            emails: results.items.map(m => ({
+                id: m._id, from: m.from || '', subject: m.subject || '',
+                date: m.receivedAt ? new Date(m.receivedAt).toISOString() : '',
+                read: !!m.read, snippet: (m.body || '').substring(0, 100)
+            })),
+            total: results.totalCount,
+            query: q
+        });
+    } catch (error) {
+        return jsonResponse({ success: true, emails: [], total: 0, query: q || '' });
+    }
 }
 export function options_email_search(request) { return handleCors(); }
 
-export function get_contacts(request) {
-    return jsonResponse({ success: true, contacts: [], total: 0, configured: false });
+// --- GET /_functions/contacts ---
+export async function get_contacts(request) {
+    try {
+        const groups = await wixData.query('ContactGroups')
+            .ascending('groupName')
+            .limit(100)
+            .find();
+
+        const enriched = [];
+        for (const g of groups.items) {
+            const memberCount = await wixData.query('GroupContacts')
+                .eq('groupName', g.groupName)
+                .count();
+            enriched.push({
+                id: g._id, name: g.groupName, description: g.description || '',
+                member_count: memberCount, created: g.createdAt || g._createdDate
+            });
+        }
+
+        return jsonResponse({ success: true, groups: enriched, total: enriched.length });
+    } catch (error) {
+        return jsonResponse({ success: true, groups: [], total: 0 });
+    }
 }
 export function options_contacts(request) { return handleCors(); }
 
-export function post_contact_group_create(request) {
-    return errorResponse('Email service not configured', 503);
+// --- POST /_functions/contact_group_create ---
+export async function post_contact_group_create(request) {
+    try {
+        const body = await parseBody(request);
+        if (!body || !body.group_name) return errorResponse('Group name is required', 400);
+
+        const existing = await wixData.query('ContactGroups').eq('groupName', body.group_name).find();
+        if (existing.totalCount > 0) {
+            return errorResponse('Group already exists', 400);
+        }
+
+        const item = await wixData.insert('ContactGroups', {
+            groupName: body.group_name,
+            description: body.description || '',
+            createdAt: new Date()
+        });
+
+        return jsonResponse({ success: true, group: item, message: `Group '${body.group_name}' created` });
+    } catch (error) {
+        return errorResponse(error.message, 500);
+    }
 }
 export function options_contact_group_create(request) { return handleCors(); }
 
-export function post_contact_group_add(request) {
-    return errorResponse('Email service not configured', 503);
-}
-export function options_contact_group_add(request) { return handleCors(); }
+// --- POST /_functions/contact_group_delete ---
+export async function post_contact_group_delete(request) {
+    try {
+        const body = await parseBody(request);
+        if (!body || !body.group_name) return errorResponse('Group name is required', 400);
 
-export function post_contact_group_remove(request) {
-    return errorResponse('Email service not configured', 503);
-}
-export function options_contact_group_remove(request) { return handleCors(); }
+        const group = await wixData.query('ContactGroups').eq('groupName', body.group_name).find();
+        if (group.totalCount === 0) return errorResponse('Group not found', 404);
 
-export function post_contact_group_delete(request) {
-    return errorResponse('Email service not configured', 503);
+        await wixData.remove('ContactGroups', group.items[0]._id);
+
+        // Also remove all contacts in the group
+        const contacts = await wixData.query('GroupContacts').eq('groupName', body.group_name).find();
+        for (const c of contacts.items) {
+            await wixData.remove('GroupContacts', c._id);
+        }
+
+        return jsonResponse({ success: true, message: `Group '${body.group_name}' deleted` });
+    } catch (error) {
+        return errorResponse(error.message, 500);
+    }
 }
 export function options_contact_group_delete(request) { return handleCors(); }
 
-export function get_rsvp_check(request) {
-    return jsonResponse({ success: true, rsvp: null, found: false, configured: false });
+// --- POST /_functions/contact_group_add ---
+export async function post_contact_group_add(request) {
+    try {
+        const body = await parseBody(request);
+        if (!body || !body.group_name || !body.contacts) {
+            return errorResponse('group_name and contacts are required', 400);
+        }
+
+        let addedCount = 0;
+        for (const contact of body.contacts) {
+            const email = contact.email || '';
+            if (!email) continue;
+
+            // Check for duplicates
+            const existing = await wixData.query('GroupContacts')
+                .eq('groupName', body.group_name)
+                .eq('email', email)
+                .find();
+
+            if (existing.totalCount === 0) {
+                await wixData.insert('GroupContacts', {
+                    groupName: body.group_name,
+                    name: contact.name || '',
+                    email: email,
+                    addedAt: new Date()
+                });
+                addedCount++;
+            }
+        }
+
+        return jsonResponse({ success: true, added: addedCount, message: `${addedCount} contacts added to '${body.group_name}'` });
+    } catch (error) {
+        return errorResponse(error.message, 500);
+    }
+}
+export function options_contact_group_add(request) { return handleCors(); }
+
+// --- POST /_functions/contact_group_remove ---
+export async function post_contact_group_remove(request) {
+    try {
+        const body = await parseBody(request);
+        if (!body || !body.group_name || !body.emails) {
+            return errorResponse('group_name and emails are required', 400);
+        }
+
+        let removedCount = 0;
+        const emails = Array.isArray(body.emails) ? body.emails : [body.emails];
+        for (const email of emails) {
+            const found = await wixData.query('GroupContacts')
+                .eq('groupName', body.group_name)
+                .eq('email', email)
+                .find();
+            for (const item of found.items) {
+                await wixData.remove('GroupContacts', item._id);
+                removedCount++;
+            }
+        }
+
+        return jsonResponse({ success: true, removed: removedCount });
+    } catch (error) {
+        return errorResponse(error.message, 500);
+    }
+}
+export function options_contact_group_remove(request) { return handleCors(); }
+
+// --- GET /_functions/rsvp_check ---
+export async function get_rsvp_check(request) {
+    try {
+        const eventName = getQueryParam(request, 'event_name') || '';
+        const daysBack = parseInt(getQueryParam(request, 'days_back')) || 30;
+
+        if (!eventName) return errorResponse('event_name is required', 400);
+
+        const cutoff = new Date();
+        cutoff.setDate(cutoff.getDate() - daysBack);
+
+        const results = await wixData.query('SentEmails')
+            .eq('type', 'evite')
+            .contains('eventName', eventName)
+            .ge('sentAt', cutoff)
+            .find();
+
+        const rsvps = results.items.map(item => ({
+            email: item.to,
+            name: item.recipientName || '',
+            status: item.rsvpStatus || 'pending',
+            sentAt: item.sentAt
+        }));
+
+        const summary = {
+            total: rsvps.length,
+            yes: rsvps.filter(r => r.status === 'yes').length,
+            no: rsvps.filter(r => r.status === 'no').length,
+            maybe: rsvps.filter(r => r.status === 'maybe').length,
+            pending: rsvps.filter(r => r.status === 'pending').length
+        };
+
+        return jsonResponse({ success: true, event: eventName, rsvps, summary });
+    } catch (error) {
+        return errorResponse(error.message, 500);
+    }
 }
 export function options_rsvp_check(request) { return handleCors(); }
+
+// --- GET /_functions/sent_history ---
+export async function get_sent_history(request) {
+    try {
+        const page = parseInt(getQueryParam(request, 'page')) || 1;
+        const perPage = parseInt(getQueryParam(request, 'per_page')) || 20;
+
+        const results = await wixData.query('SentEmails')
+            .descending('sentAt')
+            .skip((page - 1) * perPage)
+            .limit(perPage)
+            .find();
+
+        return jsonResponse({
+            success: true,
+            emails: results.items.map(e => ({
+                id: e._id, to: e.to || '', subject: e.subject || '',
+                type: e.type || 'direct', sentAt: e.sentAt,
+                eventName: e.eventName || null
+            })),
+            total: results.totalCount,
+            page, per_page: perPage
+        });
+    } catch (error) {
+        return jsonResponse({ success: true, emails: [], total: 0 });
+    }
+}
+export function options_sent_history(request) { return handleCors(); }
+
+// --- GET /_functions/setup_email_collections ---
+export async function get_setup_email_collections(request) {
+    try {
+        const collections = [
+            { name: 'ContactGroups', fields: ['groupName', 'description', 'createdAt'] },
+            { name: 'GroupContacts', fields: ['groupName', 'name', 'email', 'addedAt'] },
+            { name: 'SentEmails', fields: ['to', 'subject', 'body', 'sentAt', 'sentBy', 'type', 'eventName'] },
+            { name: 'InboxMessages', fields: ['from', 'to', 'subject', 'body', 'receivedAt', 'read', 'folder'] }
+        ];
+
+        const status = [];
+        for (const col of collections) {
+            try {
+                // Test by querying — if collection doesn't exist, this throws
+                await wixData.query(col.name).limit(1).find();
+                status.push({ collection: col.name, status: 'exists' });
+            } catch (e) {
+                // Try to create by inserting and removing a dummy record
+                try {
+                    const dummy = {};
+                    col.fields.forEach(f => { dummy[f] = ''; });
+                    const inserted = await wixData.insert(col.name, dummy);
+                    await wixData.remove(col.name, inserted._id);
+                    status.push({ collection: col.name, status: 'created' });
+                } catch (createErr) {
+                    status.push({ collection: col.name, status: 'needs_manual_creation', error: createErr.message });
+                }
+            }
+        }
+
+        return jsonResponse({ success: true, collections: status, message: 'Email collections setup complete' });
+    } catch (error) {
+        return errorResponse(error.message, 500);
+    }
+}
+export function options_setup_email_collections(request) { return handleCors(); }
 
 
 // ╔══════════════════════════════════════════════╗
