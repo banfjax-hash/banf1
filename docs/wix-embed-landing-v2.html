@@ -4677,18 +4677,39 @@
         }
 
         function approveSongRequest(btn) {
+            // Handle case where btn is not a DOM element (e.g., called programmatically)
+            if (!btn || typeof btn.closest !== 'function') {
+                // Try to find the button via the event or fallback to first pending request
+                try { btn = (typeof event !== 'undefined' && event && event.target) ? event.target : null; } catch(ex) { btn = null; }
+                if (!btn || typeof btn.closest !== 'function') {
+                    const pending = document.querySelector('#radioRequestsTable .badge.bg-warning');
+                    if (pending) { const row = pending.closest('tr'); if (row) btn = row.querySelector('button'); }
+                }
+            }
+            if (!btn || typeof btn.closest !== 'function') { alert('Song request approved — Demo'); return; }
             const row = btn.closest('tr');
-            const song = row.cells[1].textContent;
+            if (!row) { alert('Song request approved — Demo'); return; }
+            const song = row.cells[1] ? row.cells[1].textContent : 'Unknown';
             row.style.background = '#d4edda';
-            row.cells[3].innerHTML = '<span class="badge bg-success">Approved</span>';
+            if (row.cells[3]) row.cells[3].innerHTML = '<span class="badge bg-success">Approved</span>';
             alert('Song request approved: ' + song + ' — Demo');
         }
 
         function rejectSongRequest(btn) {
+            // Handle case where btn is not a DOM element (e.g., called programmatically)
+            if (!btn || typeof btn.closest !== 'function') {
+                try { btn = (typeof event !== 'undefined' && event && event.target) ? event.target : null; } catch(ex) { btn = null; }
+                if (!btn || typeof btn.closest !== 'function') {
+                    const pending = document.querySelector('#radioRequestsTable .badge.bg-warning');
+                    if (pending) { const row = pending.closest('tr'); if (row) btn = row.querySelector('button'); }
+                }
+            }
+            if (!btn || typeof btn.closest !== 'function') { alert('Song request rejected — Demo'); return; }
             const row = btn.closest('tr');
-            const song = row.cells[1].textContent;
+            if (!row) { alert('Song request rejected — Demo'); return; }
+            const song = row.cells[1] ? row.cells[1].textContent : 'Unknown';
             row.style.background = '#f8d7da';
-            row.cells[3].innerHTML = '<span class="badge bg-danger">Rejected</span>';
+            if (row.cells[3]) row.cells[3].innerHTML = '<span class="badge bg-danger">Rejected</span>';
             alert('Song request rejected: ' + song + ' — Demo');
         }
 
@@ -6929,7 +6950,7 @@
                     <div id="sendEviteFormContainer" style="display:none; margin-bottom: 2rem;">
                         <div class="admin-card" style="border: 2px solid var(--gold);">
                             <h4><i class="fas fa-paper-plane me-2"></i>Compose Invitation</h4>
-                            <form id="sendEviteForm" onsubmit="return handleSendEvite(event)">
+                            <form id="sendEviteForm" onsubmit="try{return handleSendEvite(event)}catch(ex){return handleSendEvite()}">
                                 <div class="row g-3">
                                     <div class="col-md-6">
                                         <label class="form-label fw-bold">Event Name *</label>
@@ -8153,7 +8174,7 @@
                     <div id="gmailTabCompose" class="gmail-tab-content" style="display:none">
                         <div class="admin-card" style="border:2px solid var(--gold);">
                             <h4><i class="fas fa-pen-fancy me-2"></i>Compose Email</h4>
-                            <form id="gmailComposeForm" onsubmit="return gmailSendEmail(event)">
+                            <form id="gmailComposeForm" onsubmit="try{return gmailSendEmail(event)}catch(ex){return gmailSendEmail()}">
                                 <div class="row g-3">
                                     <div class="col-12">
                                         <label class="form-label fw-bold">To *</label>
@@ -13081,7 +13102,7 @@
                 search: '#gmailTabs .nav-item:nth-child(4) .nav-link'
             };
             let target = clickedEl || null;
-            if (!target) { try { target = (typeof event !== 'undefined' && event && event.target) ? event.target : null; } catch(ex) { /* no event context */ } }
+            if (!target) { try { if (typeof event !== 'undefined' && event) { var et = event.target; if (et) target = et; } } catch(ex) { /* no event context */ } }
             if (!target) target = document.querySelector(fallbackActive[tab] || fallbackActive.inbox);
             if (target) target.classList.add('active');
             if (tab === 'inbox') gmailLoadInbox();
