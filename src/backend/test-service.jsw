@@ -1,0 +1,38 @@
+// backend/test-service.jsw
+// Simple test service to verify Wix Velo backend works
+
+/**
+ * Simple hello world test
+ * @param {string} name 
+ * @returns {Promise<Object>} Greeting
+ */
+export async function helloBANF(name) {
+    return {
+        message: `Hello ${name || 'World'}! BANF Velo backend is working!`,
+        timestamp: new Date().toISOString(),
+        environment: 'Wix Velo Backend'
+    };
+}
+
+/**
+ * Test database connectivity
+ * @returns {Promise<Object>} DB status
+ */
+export async function testDatabase() {
+    try {
+        const wixData = await import('wix-data');
+        // Try a simple query
+        const result = await wixData.query("TestCollection").limit(1).find();
+        return {
+            connected: true,
+            itemCount: result.totalCount,
+            message: "Database connection successful"
+        };
+    } catch (err) {
+        return {
+            connected: false,
+            error: err.message,
+            message: "Database not configured yet - this is expected for new sites"
+        };
+    }
+}
