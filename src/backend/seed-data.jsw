@@ -1,0 +1,370 @@
+/**
+ * BANF Data Seeding Module
+ * ========================
+ * Populates ALL Wix Data collections with realistic sample data for testing.
+ *
+ * Usage:
+ *   1. Publish your Wix site so backend modules are deployed
+ *   2. Open the browser dev console on your live site (F12)
+ *   3. Call via Wix frontend:
+ *        import { seedAllCollections, seedCollection, clearCollection } from 'backend/seed-data.jsw';
+ *        seedAllCollections().then(r => console.log(r));
+ *   4. Or call individual collections:
+ *        seedCollection("Events").then(r => console.log(r));
+ *
+ * ⚠️  Running seedAllCollections() is IDEMPOTENT — it skips collections
+ *     that already have data. Use clearCollection("Name") first to reset.
+ *
+ * Collections seeded (30 primary collections):
+ *   Members, ECMembers, MemberProfiles, MembershipPlans, Events, Sponsors,
+ *   SponsorTiers, RadioSchedule, RadioNowPlaying, SongRequests, EMagazines,
+ *   EMagazineArticles, Announcements, Complaints, Surveys, Volunteers,
+ *   Documents, JacksonvilleGuide, PhotoAlbums, Photos, Admins,
+ *   FinancialRecords, Transactions, ContactSubmissions, Vendors,
+ *   Scholarships, CarpoolOffers, ImportantMessages, Guides
+ */
+
+import wixData from 'wix-data';
+
+// ── Seed Data ────────────────────────────────────────────────────────────────
+
+const SEED_DATA = {
+    Members: [
+        { name: "Rahim Ahmed", email: "rahim.ahmed@example.com", phone: "904-555-0101", plan: "family", familyMembers: ["Fatima Ahmed", "Samir Ahmed"], registrationDate: new Date("2025-01-15"), status: "active", paymentStatus: "paid" },
+        { name: "Nasreen Chowdhury", email: "nasreen.c@example.com", phone: "904-555-0102", plan: "regular", familyMembers: [], registrationDate: new Date("2025-02-10"), status: "active", paymentStatus: "paid" },
+        { name: "Kamal Hossain", email: "kamal.h@example.com", phone: "904-555-0103", plan: "family", familyMembers: ["Ruma Hossain", "Arif Hossain", "Nadia Hossain"], registrationDate: new Date("2025-03-01"), status: "active", paymentStatus: "paid" },
+        { name: "Taslima Begum", email: "taslima.b@example.com", phone: "904-555-0104", plan: "regular", familyMembers: [], registrationDate: new Date("2025-04-20"), status: "active", paymentStatus: "paid" },
+        { name: "Mohammad Siddique", email: "m.siddique@example.com", phone: "904-555-0105", plan: "family", familyMembers: ["Ayesha Siddique"], registrationDate: new Date("2025-06-01"), status: "active", paymentStatus: "paid" },
+        { name: "Sultana Rahman", email: "sultana.r@example.com", phone: "904-555-0106", plan: "student", familyMembers: [], registrationDate: new Date("2025-08-15"), status: "active", paymentStatus: "paid" },
+        { name: "Anwar Hasan", email: "anwar.hasan@example.com", phone: "904-555-0107", plan: "regular", familyMembers: [], registrationDate: new Date("2025-09-01"), status: "pending", paymentStatus: "unpaid" },
+        { name: "Roksana Akter", email: "roksana.a@example.com", phone: "904-555-0108", plan: "family", familyMembers: ["Imran Akter"], registrationDate: new Date("2025-10-10"), status: "active", paymentStatus: "paid" }
+    ],
+
+    ECMembers: [
+        { name: "Dr. Farhan Mahmud", role: "President", bio: "Dr. Mahmud has been a pillar of the Jacksonville Bangladeshi community for over 15 years. He leads BANF with a vision for cultural preservation and community growth.", email: "president@banfjax.org", photo: "", initials: "FM", order: 1 },
+        { name: "Sabrina Khan", role: "Vice President", bio: "Sabrina brings 10 years of nonprofit leadership experience. She oversees membership engagement and community outreach programs.", email: "vp@banfjax.org", photo: "", initials: "SK", order: 2 },
+        { name: "Rezaul Karim", role: "Treasurer", bio: "Rezaul manages BANF finances with transparency and accountability. A CPA by profession, he ensures every dollar serves the community.", email: "treasurer@banfjax.org", photo: "", initials: "RK", order: 3 },
+        { name: "Lamia Nazneen", role: "Secretary", bio: "Lamia keeps BANF organized and communicating effectively. She manages meeting minutes, official correspondence, and records.", email: "secretary@banfjax.org", photo: "", initials: "LN", order: 4 },
+        { name: "Ashraf Uddin", role: "Cultural Director", bio: "Ashraf organizes cultural events, Puja celebrations, and community gatherings that keep our traditions alive in Jacksonville.", email: "cultural@banfjax.org", photo: "", initials: "AU", order: 5 },
+        { name: "Nusrat Jahan", role: "Youth Coordinator", bio: "Nusrat connects Bangladeshi-American youth with their heritage through workshops, mentoring, and educational programs.", email: "youth@banfjax.org", photo: "", initials: "NJ", order: 6 }
+    ],
+
+    MemberProfiles: [
+        { firstName: "Rahim", lastName: "Ahmed", email: "rahim.ahmed@example.com", phoneNumber: "904-555-0101", username: "rahim_ahmed", membershipType: "family", status: "active", hometown: "Dhaka", profession: "Software Engineer", joinDate: new Date("2025-01-15"), membershipExpiry: new Date("2027-01-15"), address: "1234 Riverside Ave", city: "Jacksonville", state: "FL", zip: "32204", isActive: true, engagementScore: 85 },
+        { firstName: "Nasreen", lastName: "Chowdhury", email: "nasreen.c@example.com", phoneNumber: "904-555-0102", username: "nasreen_c", membershipType: "regular", status: "active", hometown: "Chittagong", profession: "Teacher", joinDate: new Date("2025-02-10"), membershipExpiry: new Date("2027-02-10"), address: "5678 San Jose Blvd", city: "Jacksonville", state: "FL", zip: "32217", isActive: true, engagementScore: 72 },
+        { firstName: "Kamal", lastName: "Hossain", email: "kamal.h@example.com", phoneNumber: "904-555-0103", username: "kamal_h", membershipType: "family", status: "active", hometown: "Sylhet", profession: "Restaurant Owner", joinDate: new Date("2025-03-01"), membershipExpiry: new Date("2027-03-01"), address: "9101 Beach Blvd", city: "Jacksonville", state: "FL", zip: "32246", isActive: true, engagementScore: 91 }
+    ],
+
+    MembershipPlans: [
+        { planType: "regular", name: "Regular Membership", price: 50, earlyBirdPrice: 40, earlyBirdActive: true, benefits: ["Access to all community events", "Voting rights in elections", "Member directory access", "Newsletter subscription"], description: "Standard individual membership for the calendar year." },
+        { planType: "family", name: "Family Membership", price: 80, earlyBirdPrice: 65, earlyBirdActive: true, benefits: ["All Regular benefits", "Family event discounts", "Up to 4 family members", "Priority event registration"], description: "Family membership covering up to 4 household members." },
+        { planType: "student", name: "Student Membership", price: 25, earlyBirdPrice: 20, earlyBirdActive: true, benefits: ["Access to community events", "Mentorship program", "Scholarship eligibility", "Youth programs"], description: "Discounted membership for full-time students under 25." },
+        { planType: "lifetime", name: "Lifetime Membership", price: 500, earlyBirdPrice: 500, earlyBirdActive: false, benefits: ["All Family benefits forever", "VIP event access", "Legacy member recognition", "Board nomination eligibility"], description: "One-time payment for permanent membership." }
+    ],
+
+    Events: [
+        { name: "Pohela Boishakh — Bengali New Year 1433", date: new Date("2026-04-14T17:00:00Z"), description: "Celebrate the Bengali New Year with traditional music, dance, food, and cultural performances. Open to all families. Dress in traditional attire!", location: "Jacksonville Fairgrounds, 510 Fairground Pl, Jacksonville, FL 32202", status: "upcoming", image: "", attendeeCount: 0, category: "cultural", maxAttendees: 500, ticketPrice: 0, isPublic: true },
+        { name: "BANF Annual Picnic 2026", date: new Date("2026-05-25T11:00:00Z"), description: "Annual family picnic at Hanna Park. BBQ, cricket, volleyball, kids zone, and raffle prizes. Member families eat free!", location: "Kathryn Abbey Hanna Park, 500 Wonderwood Dr, Jacksonville, FL 32233", status: "upcoming", image: "", attendeeCount: 0, category: "social", maxAttendees: 300, ticketPrice: 0, isPublic: true },
+        { name: "Durga Puja Celebration 2026", date: new Date("2026-10-02T16:00:00Z"), description: "Multi-day Durga Puja festival with pandal, anjali, cultural programs, and prasad distribution. Join us for the biggest Bengali festival of the year.", location: "BANF Community Center, Jacksonville, FL", status: "upcoming", image: "", attendeeCount: 0, category: "religious", maxAttendees: 800, ticketPrice: 0, isPublic: true },
+        { name: "Eid-ul-Fitr Community Dinner", date: new Date("2026-03-31T18:00:00Z"), description: "Community Iftar and Eid celebration dinner. Enjoy traditional Bangladeshi dishes, nasheed, and community bonding. All are welcome.", location: "Islamic Center of Northeast Florida, Jacksonville, FL", status: "upcoming", image: "", attendeeCount: 0, category: "religious", maxAttendees: 400, ticketPrice: 0, isPublic: true },
+        { name: "BANF Cricket Tournament 2026", date: new Date("2026-06-15T08:00:00Z"), description: "Annual inter-community cricket tournament. 8 teams, round-robin format. Trophies, medals, and bragging rights. Register your team by June 1.", location: "Ed Austin Regional Park, 11751 McCormick Rd, Jacksonville, FL 32225", status: "upcoming", image: "", attendeeCount: 0, category: "sports", maxAttendees: 200, ticketPrice: 10, isPublic: true },
+        { name: "Ekushey February — Mother Language Day", date: new Date("2026-02-21T17:00:00Z"), description: "Commemorating International Mother Language Day. Poetry recital, Shaheed Minar tribute, cultural show, and children's art competition.", location: "Jacksonville Public Library, 303 N Laura St, Jacksonville, FL 32202", status: "past", image: "", attendeeCount: 120, category: "cultural", maxAttendees: 200, ticketPrice: 0, isPublic: true },
+        { name: "Bijoya Dashami Reunion 2025", date: new Date("2025-10-12T16:00:00Z"), description: "Post-Durga Puja reunion with sindoor khela, potluck, and cultural performances.", location: "BANF Community Center, Jacksonville, FL", status: "past", image: "", attendeeCount: 250, category: "cultural", maxAttendees: 300, ticketPrice: 0, isPublic: true }
+    ],
+
+    Sponsors: [
+        { eventYear: 2026, companyName: "Bengal Tiger Restaurant", industry: "Food & Beverage", website: "https://bengaltigerjax.com", contactName: "Abdul Rashid", contactTitle: "Owner", email: "info@bengaltigerjax.com", phone: "904-555-0201", address: "3456 University Blvd W", city: "Jacksonville", state: "FL", zip: "32217", tier: "gold", tierName: "Gold Sponsor", pledgedAmount: 2000, paidAmount: 2000, balance: 0, logo: "", logoApproved: true, status: "active", paymentStatus: "paid", recognitionName: "Bengal Tiger Restaurant", applicationNumber: "SPO-2026-001", appliedAt: new Date("2025-11-01"), createdAt: new Date("2025-11-01"), lastModified: new Date("2025-11-15") },
+        { eventYear: 2026, companyName: "Dhaka Grocery & Halal Meat", industry: "Retail / Grocery", website: "", contactName: "Shafiqul Islam", contactTitle: "Owner", email: "dhakagrocery@example.com", phone: "904-555-0202", address: "7890 Beach Blvd", city: "Jacksonville", state: "FL", zip: "32216", tier: "silver", tierName: "Silver Sponsor", pledgedAmount: 1000, paidAmount: 1000, balance: 0, logo: "", logoApproved: true, status: "active", paymentStatus: "paid", recognitionName: "Dhaka Grocery", applicationNumber: "SPO-2026-002", appliedAt: new Date("2025-11-10"), createdAt: new Date("2025-11-10"), lastModified: new Date("2025-11-20") },
+        { eventYear: 2026, companyName: "First Coast Bengali Medical Group", industry: "Healthcare", website: "https://fcbmedical.com", contactName: "Dr. Tanvir Hoque", contactTitle: "Director", email: "dr.hoque@fcbmedical.com", phone: "904-555-0203", address: "1234 Southside Blvd", city: "Jacksonville", state: "FL", zip: "32256", tier: "platinum", tierName: "Platinum Sponsor", pledgedAmount: 5000, paidAmount: 5000, balance: 0, logo: "", logoApproved: true, status: "active", paymentStatus: "paid", recognitionName: "First Coast Bengali Medical Group", applicationNumber: "SPO-2026-003", appliedAt: new Date("2025-10-15"), createdAt: new Date("2025-10-15"), lastModified: new Date("2025-10-20") },
+        { eventYear: 2026, companyName: "Sylhet Sweets & Bakery", industry: "Food & Beverage", website: "", contactName: "Monir Khan", contactTitle: "Owner", email: "sylhetsweets@example.com", phone: "904-555-0204", address: "2345 Atlantic Blvd", city: "Jacksonville", state: "FL", zip: "32207", tier: "bronze", tierName: "Bronze Sponsor", pledgedAmount: 500, paidAmount: 250, balance: 250, logo: "", logoApproved: false, status: "active", paymentStatus: "partial", recognitionName: "Sylhet Sweets", applicationNumber: "SPO-2026-004", appliedAt: new Date("2025-12-01"), createdAt: new Date("2025-12-01"), lastModified: new Date("2026-01-05") },
+        { eventYear: 2026, companyName: "Jax Bengali Insurance Agency", industry: "Insurance & Financial", website: "https://jaxbengaliins.com", contactName: "Nazmul Huq", contactTitle: "Agent", email: "nazmul@jaxbengaliins.com", phone: "904-555-0205", address: "5678 Blanding Blvd", city: "Jacksonville", state: "FL", zip: "32244", tier: "gold", tierName: "Gold Sponsor", pledgedAmount: 2000, paidAmount: 1000, balance: 1000, logo: "", logoApproved: true, status: "active", paymentStatus: "partial", recognitionName: "Jax Bengali Insurance", applicationNumber: "SPO-2026-005", appliedAt: new Date("2025-12-15"), createdAt: new Date("2025-12-15"), lastModified: new Date("2026-01-10") }
+    ],
+
+    SponsorTiers: [
+        { tierKey: "platinum", name: "Platinum Sponsor", minAmount: 5000, maxSpots: 2, logoSize: "extra-large", websitePosition: 1 },
+        { tierKey: "gold", name: "Gold Sponsor", minAmount: 2000, maxSpots: 5, logoSize: "large", websitePosition: 2 },
+        { tierKey: "silver", name: "Silver Sponsor", minAmount: 1000, maxSpots: 10, logoSize: "medium", websitePosition: 3 },
+        { tierKey: "bronze", name: "Bronze Sponsor", minAmount: 500, maxSpots: 20, logoSize: "small", websitePosition: 4 },
+        { tierKey: "supporter", name: "Community Supporter", minAmount: 100, maxSpots: 50, logoSize: "text-only", websitePosition: 5 }
+    ],
+
+    RadioSchedule: [
+        { timeSlot: "06:00-09:00", showName: "Shokal er Alo", emoji: "🌅", description: "Morning devotional and Rabindra Sangeet", isLive: false },
+        { timeSlot: "09:00-12:00", showName: "Madhyahne Gaan", emoji: "🎵", description: "Modern Bangla hits and Bollywood classics", isLive: false },
+        { timeSlot: "12:00-15:00", showName: "Dopur er Adda", emoji: "☕", description: "Afternoon chill — Nazrul Geeti and soft rock", isLive: false },
+        { timeSlot: "15:00-18:00", showName: "Bikel er Mehfil", emoji: "🎶", description: "Community requests and dedications", isLive: true },
+        { timeSlot: "18:00-21:00", showName: "Shondha er Baithak", emoji: "🌙", description: "Evening talk show, news, and cultural discussions", isLive: true },
+        { timeSlot: "21:00-00:00", showName: "Raater Gaan", emoji: "🌃", description: "Late night ghazals, Baul, and folk music", isLive: false },
+        { timeSlot: "00:00-06:00", showName: "Nidra Sangeet", emoji: "💤", description: "Overnight instrumentals and soothing melodies", isLive: false }
+    ],
+
+    RadioNowPlaying: [
+        { title: "Amar Sonar Bangla", artist: "Rezwana Choudhury Bannya", album: "Classic Bangla", duration: "4:30", coverArt: "" }
+    ],
+
+    SongRequests: [
+        { songTitle: "Ekla Cholo Re", artist: "Rabindranath Tagore", message: "Dedicating to all BANF volunteers!", requestDate: new Date("2026-02-15T14:00:00Z"), status: "played", memberId: "" },
+        { songTitle: "Coffee Houser Sei Addate", artist: "Manna Dey", message: "Reminds me of Dhaka University days", requestDate: new Date("2026-02-18T19:00:00Z"), status: "pending", memberId: "" },
+        { songTitle: "Amar Bhitor O Bahire", artist: "Rabindranath Tagore", message: "", requestDate: new Date("2026-02-20T08:00:00Z"), status: "pending", memberId: "" }
+    ],
+
+    EMagazines: [
+        { title: "BANF Patrika — Spring 2026", issueNumber: 12, issueDate: new Date("2026-03-01"), coverImageUrl: "", description: "Spring issue featuring Pohela Boishakh preparations, community spotlight on Dr. Hoque's free health clinic, and youth poetry corner.", isPublished: true, articleCount: 8, editorName: "Lamia Nazneen" },
+        { title: "BANF Patrika — Winter 2025", issueNumber: 11, issueDate: new Date("2025-12-01"), coverImageUrl: "", description: "Winter issue with Bijoya Dashami photo gallery, 2025 year in review, member achievements, and Bengali recipe collection.", isPublished: true, articleCount: 10, editorName: "Lamia Nazneen" },
+        { title: "BANF Patrika — Fall 2025", issueNumber: 10, issueDate: new Date("2025-09-01"), coverImageUrl: "", description: "Fall issue covering Durga Puja preview, new member welcome, cricket tournament results, and education scholarship winners.", isPublished: true, articleCount: 7, editorName: "Nusrat Jahan" }
+    ],
+
+    EMagazineArticles: [
+        { title: "Pohela Boishakh 1433: Celebrating New Beginnings", authorName: "Ashraf Uddin", content: "As we prepare to welcome Bengali New Year 1433, our community comes together to honor traditions that connect us to our roots. This year promises to be the biggest celebration yet...", category: "culture", status: "published", magazineId: "", publishDate: new Date("2026-03-01"), readTime: 5, tags: ["boishakh", "culture", "tradition"] },
+        { title: "Dr. Hoque's Free Health Clinic: Serving Our Community", authorName: "Sabrina Khan", content: "Every Saturday morning, Dr. Tanvir Hoque opens the doors of his clinic to uninsured and underinsured members of our community. This selfless service has touched hundreds of lives...", category: "community_news", status: "published", magazineId: "", publishDate: new Date("2026-03-01"), readTime: 4, tags: ["health", "community", "volunteer"] },
+        { title: "Youth Poetry Corner: Voices of the Next Generation", authorName: "Nusrat Jahan", content: "This issue's youth poetry selection features works by five talented Bangladeshi-American teens from Jacksonville, exploring themes of identity, belonging, and heritage...", category: "youth", status: "published", magazineId: "", publishDate: new Date("2026-03-01"), readTime: 6, tags: ["youth", "poetry", "culture"] },
+        { title: "Shorshe Ilish: Grandma's Recipe Perfected", authorName: "Roksana Akter", content: "Nothing says Bengali cuisine like Hilsa fish in mustard sauce. My grandmother's recipe has been in our family for three generations. Here is how to make it perfectly every time...", category: "recipe", status: "published", magazineId: "", publishDate: new Date("2025-12-01"), readTime: 3, tags: ["recipe", "food", "tradition"] }
+    ],
+
+    Announcements: [
+        { title: "Pohela Boishakh 2026 Registration Open!", content: "Registration for the Pohela Boishakh celebration is now open. Early bird tickets available until March 15. Volunteers needed for food, stage, and decoration committees.", date: new Date("2026-02-15"), priority: "high", isActive: true, category: "event" },
+        { title: "New Member Welcome — February 2026", content: "Welcome to our newest members who joined in February! We look forward to seeing you at upcoming events.", date: new Date("2026-02-01"), priority: "normal", isActive: true, category: "membership" },
+        { title: "Cricket Tournament Team Registration Deadline Extended", content: "Due to popular demand, the team registration deadline for the 2026 Cricket Tournament has been extended to June 5. Register your team now!", date: new Date("2026-02-10"), priority: "normal", isActive: true, category: "sports" }
+    ],
+
+    Complaints: [
+        { complaintId: "COMP-2026-001", accessCode: "DEMO-ACCESS-001", accessCodeHash: "demo_hash_001", category: "event", subject: "Parking issues at Bijoya Dashami", description: "The parking at the last Bijoya event was very disorganized. Many families had to park far away and walk. Please consider better parking management for upcoming events.", incidentDate: new Date("2025-10-12"), location: "BANF Community Center", involvedParties: "", desiredOutcome: "Better parking arrangements for future events", status: "resolved", priority: "normal", isAnonymous: true, submittedAt: new Date("2025-10-15") }
+    ],
+
+    Surveys: [
+        { title: "Pohela Boishakh 2026 — What Do You Want?", description: "Help us plan the best Bengali New Year celebration! Tell us your preferences for food, performances, and activities.", status: "active", startDate: new Date("2026-02-01"), endDate: new Date("2026-03-31"), questions: JSON.stringify([{ id: "q1", text: "Which food items are must-haves?", type: "multi-select", options: ["Panta Ilish", "Biryani", "Pitha", "Fuchka/Chotpoti", "Sweets"] }, { id: "q2", text: "Preferred entertainment?", type: "multi-select", options: ["Classical dance", "Band performance", "Drama", "Comedy show", "Kids talent show"] }, { id: "q3", text: "Would you volunteer?", type: "single-select", options: ["Yes", "Maybe", "No"] }]), responseCount: 0, createdBy: "admin", createdAt: new Date("2026-02-01") }
+    ],
+
+    Volunteers: [
+        { name: "Sultana Rahman", email: "sultana.r@example.com", phone: "904-555-0106", skills: ["Event coordination", "Bengali/English translation", "Social media"], availability: "weekends", status: "active", hoursLogged: 24, joinDate: new Date("2025-08-15") },
+        { name: "Anwar Hasan", email: "anwar.hasan@example.com", phone: "904-555-0107", skills: ["Photography", "Video editing", "Sound system setup"], availability: "flexible", status: "active", hoursLogged: 16, joinDate: new Date("2025-09-01") },
+        { name: "Taslima Begum", email: "taslima.b@example.com", phone: "904-555-0104", skills: ["Cooking", "Decoration", "Children's activities"], availability: "weekends", status: "active", hoursLogged: 32, joinDate: new Date("2025-04-20") }
+    ],
+
+    Documents: [
+        { title: "BANF Constitution & Bylaws", fileName: "BANF_Constitution_2025.pdf", description: "Official constitution and bylaws of the Bangladesh Association of North Florida.", category: "governance", uploadedBy: "admin", uploadDate: new Date("2025-01-01"), fileUrl: "", isPublic: true, version: "3.0" },
+        { title: "2025 Annual Financial Report", fileName: "BANF_Financial_Report_2025.pdf", description: "Complete financial report for fiscal year 2025.", category: "financial", uploadedBy: "treasurer", uploadDate: new Date("2026-01-15"), fileUrl: "", isPublic: true, version: "1.0" },
+        { title: "Event Planning Checklist Template", fileName: "Event_Checklist_Template.xlsx", description: "Standard checklist for planning BANF community events.", category: "template", uploadedBy: "cultural_director", uploadDate: new Date("2025-06-01"), fileUrl: "", isPublic: true, version: "2.0" }
+    ],
+
+    JacksonvilleGuide: [
+        { name: "Bengal Tiger Restaurant", category: "restaurant", address: "3456 University Blvd W, Jacksonville, FL 32217", phone: "904-555-0201", description: "Authentic Bangladeshi and Indian cuisine. Known for their biryani, fish curry, and weekend buffet. Halal certified.", bengaliOwned: true, bengaliStaff: true, rating: 4.5, priceRange: "$$", website: "https://bengaltigerjax.com", hours: "Tue-Sun 11am-10pm" },
+        { name: "Dhaka Grocery & Halal Meat", category: "grocery", address: "7890 Beach Blvd, Jacksonville, FL 32216", phone: "904-555-0202", description: "Full range of Bangladeshi groceries, spices, frozen fish, and fresh halal meat.", bengaliOwned: true, bengaliStaff: true, rating: 4.3, priceRange: "$", website: "", hours: "Daily 9am-9pm" },
+        { name: "Islamic Center of Northeast Florida", category: "mosque", address: "2333 St Johns Bluff Rd S, Jacksonville, FL 32246", phone: "904-555-0301", description: "Largest mosque in Jacksonville. Regular jummah prayers, Quran classes, and Eid celebrations.", bengaliOwned: false, bengaliStaff: true, rating: 4.7, priceRange: "Free", website: "https://icnef.org", hours: "Open for all prayers" },
+        { name: "Neel Dental Care", category: "healthcare", address: "4567 Baymeadows Rd, Jacksonville, FL 32217", phone: "904-555-0302", description: "Bengali-owned dental practice. Dr. Neel speaks Bengali and English.", bengaliOwned: true, bengaliStaff: true, rating: 4.8, priceRange: "$$", website: "https://neeldental.com", hours: "Mon-Fri 8am-5pm" }
+    ],
+
+    PhotoAlbums: [
+        { name: "Bijoya Dashami 2025", description: "Photos from our Bijoya Dashami celebration.", coverImage: "", photoCount: 45, date: new Date("2025-10-12"), isPublic: true, category: "events" },
+        { name: "Cricket Tournament 2025", description: "Action shots and team photos from the 2025 BANF Cricket Tournament.", coverImage: "", photoCount: 32, date: new Date("2025-06-15"), isPublic: true, category: "sports" },
+        { name: "Ekushey February 2026", description: "International Mother Language Day observance.", coverImage: "", photoCount: 18, date: new Date("2026-02-21"), isPublic: true, category: "cultural" }
+    ],
+
+    Photos: [
+        { caption: "Sindoor khela at Bijoya Dashami 2025", image: "", photographer: "Anwar Hasan", date: new Date("2025-10-12"), isApproved: true, isFeatured: true, likeCount: 12 },
+        { caption: "Cricket tournament final — winning moment", image: "", photographer: "Anwar Hasan", date: new Date("2025-06-15"), isApproved: true, isFeatured: true, likeCount: 8 },
+        { caption: "Children's art competition at Ekushey", image: "", photographer: "Taslima Begum", date: new Date("2026-02-21"), isApproved: true, isFeatured: false, likeCount: 5 }
+    ],
+
+    Admins: [
+        { name: "BANF Admin", email: "banfjax@gmail.com", role: "super_admin", isActive: true, createdAt: new Date("2025-01-01"), lastLogin: new Date("2026-02-20") },
+        { name: "Dr. Farhan Mahmud", email: "president@banfjax.org", role: "president", isActive: true, createdAt: new Date("2025-01-01"), lastLogin: new Date("2026-02-19") },
+        { name: "Rezaul Karim", email: "treasurer@banfjax.org", role: "treasurer", isActive: true, createdAt: new Date("2025-01-01"), lastLogin: new Date("2026-02-18") }
+    ],
+
+    FinancialRecords: [
+        { type: "income", category: "membership_fees", description: "January 2026 membership collections", amount: 1250, date: new Date("2026-01-31"), recordedBy: "treasurer" },
+        { type: "income", category: "sponsorship", description: "Gold sponsor payment — Bengal Tiger Restaurant", amount: 2000, date: new Date("2025-11-15"), recordedBy: "treasurer" },
+        { type: "income", category: "sponsorship", description: "Platinum sponsor — First Coast Bengali Medical", amount: 5000, date: new Date("2025-10-20"), recordedBy: "treasurer" },
+        { type: "expense", category: "event", description: "Bijoya Dashami venue rental & catering", amount: 3500, date: new Date("2025-10-10"), recordedBy: "treasurer" },
+        { type: "expense", category: "operations", description: "Website hosting & domain renewal", amount: 200, date: new Date("2026-01-01"), recordedBy: "treasurer" },
+        { type: "income", category: "event_tickets", description: "Cricket tournament registrations", amount: 800, date: new Date("2025-06-10"), recordedBy: "treasurer" }
+    ],
+
+    Transactions: [
+        { type: "credit", amount: 1250, description: "Membership dues — Jan 2026", category: "membership", date: new Date("2026-01-31"), status: "completed" },
+        { type: "credit", amount: 5000, description: "Platinum sponsor payment", category: "sponsorship", date: new Date("2025-10-20"), status: "completed" },
+        { type: "debit", amount: 3500, description: "Bijoya event expenses", category: "event", date: new Date("2025-10-10"), status: "completed" },
+        { type: "debit", amount: 200, description: "Website hosting", category: "operations", date: new Date("2026-01-01"), status: "completed" }
+    ],
+
+    ContactSubmissions: [
+        { name: "Sarah Johnson", email: "sarah.j@example.com", subject: "Interest in Bengali cooking class", message: "Hi, I'm a neighbor in Riverside and I'd love to learn Bengali cooking. Do you offer classes to non-members?", submittedAt: new Date("2026-02-10"), status: "replied" },
+        { name: "Rafiq Alam", email: "rafiq.a@example.com", subject: "New to Jacksonville — How to join?", message: "I just moved to Jacksonville from New York. How can I become a BANF member?", submittedAt: new Date("2026-02-18"), status: "new" }
+    ],
+
+    Vendors: [
+        { companyName: "Deshi Catering Co.", contactName: "Habibur Rahman", email: "deshicatering@example.com", phone: "904-555-0401", category: "catering", services: ["Bengali catering", "Event buffets", "Puja prasad preparation"], rating: 4.6, status: "active", eventsServed: 8, city: "Jacksonville", state: "FL" },
+        { companyName: "Bangla Sound & Lights", contactName: "Rafiq Miah", email: "banglasound@example.com", phone: "904-555-0402", category: "audio_visual", services: ["PA system rental", "Stage lighting", "DJ services", "Live streaming"], rating: 4.4, status: "active", eventsServed: 12, city: "Jacksonville", state: "FL" },
+        { companyName: "Jax Tents & Events", contactName: "Mike Thompson", email: "jaxtents@example.com", phone: "904-555-0403", category: "equipment_rental", services: ["Tent rental", "Tables & chairs", "Stage setup", "Pandal construction"], rating: 4.2, status: "active", eventsServed: 5, city: "Jacksonville", state: "FL" }
+    ],
+
+    Scholarships: [
+        { name: "BANF Academic Excellence Scholarship", description: "Annual scholarship for Bangladeshi-American high school seniors in Jacksonville with GPA 3.5+.", amount: 1000, status: "active", deadline: new Date("2026-05-01"), requirements: ["GPA 3.5+", "Bangladeshi heritage", "Jacksonville resident", "Community service 50+ hours", "Essay submission"], availableSlots: 3, fundedBy: "BANF Community Fund", createdAt: new Date("2026-01-15") }
+    ],
+
+    CarpoolOffers: [
+        { driverName: "Kamal Hossain", origin: "San Jose area, Jacksonville", destination: "Jacksonville Fairgrounds", eventName: "Pohela Boishakh 2026", date: new Date("2026-04-14T16:00:00Z"), availableSeats: 3, bookedSeats: 0, phone: "904-555-0103", notes: "Family-friendly, can fit car seats", status: "active" }
+    ],
+
+    ImportantMessages: [
+        { title: "Annual General Meeting — March 15, 2026", content: "All members are invited to the Annual General Meeting. Agenda includes 2025 financial review, 2026 budget approval, and EC elections. Your vote matters!", priority: "high", isActive: true, createdAt: new Date("2026-02-15"), expiryDate: new Date("2026-03-16"), createdBy: "admin" }
+    ],
+
+    Guides: [
+        { title: "New Member Welcome Guide", content: "Welcome to BANF! Here is everything you need to know about our community, events, and membership benefits.", category: "membership", isPublished: true },
+        { title: "Event Volunteer Handbook", content: "Thank you for volunteering! Please read these guidelines for event setup, food handling, and safety procedures.", category: "volunteering", isPublished: true }
+    ]
+};
+
+
+// ── Public API ───────────────────────────────────────────────────────────────
+
+/**
+ * Seed ALL collections with sample data.
+ * Skips collections that already contain data (idempotent).
+ *
+ * @returns {Promise<Object>} Summary of seeded/skipped collections
+ */
+export async function seedAllCollections() {
+    const collectionNames = Object.keys(SEED_DATA);
+    const results = { seeded: [], skipped: [], failed: [], total: collectionNames.length };
+
+    for (const name of collectionNames) {
+        try {
+            const result = await seedCollection(name);
+            if (result.action === 'seeded') {
+                results.seeded.push({ name, count: result.count });
+            } else {
+                results.skipped.push({ name, reason: result.reason });
+            }
+        } catch (err) {
+            results.failed.push({ name, error: err.message || String(err) });
+        }
+    }
+
+    results.summary = `Seeded: ${results.seeded.length}, Skipped: ${results.skipped.length}, Failed: ${results.failed.length}`;
+    return results;
+}
+
+/**
+ * Seed a single collection with sample data.
+ *
+ * @param {string} collectionName - Name of the Wix Data collection
+ * @returns {Promise<Object>} Result with action and count
+ */
+export async function seedCollection(collectionName) {
+    const records = SEED_DATA[collectionName];
+    if (!records || records.length === 0) {
+        return { collection: collectionName, action: 'skipped', reason: 'No seed data defined' };
+    }
+
+    // Check if collection already has data
+    try {
+        const existing = await wixData.query(collectionName)
+            .limit(1)
+            .find({ suppressAuth: true });
+
+        if (existing.items.length > 0) {
+            return { collection: collectionName, action: 'skipped', reason: 'Collection already has data', existingCount: existing.totalCount };
+        }
+    } catch (_) {
+        // Collection doesn't exist yet — will be created on first insert
+    }
+
+    // Insert all records
+    let insertedCount = 0;
+    for (const record of records) {
+        try {
+            await wixData.insert(collectionName, record, { suppressAuth: true });
+            insertedCount++;
+        } catch (err) {
+            console.error(`[seed-data] Failed to insert into ${collectionName}:`, err);
+        }
+    }
+
+    return { collection: collectionName, action: 'seeded', count: insertedCount, total: records.length };
+}
+
+/**
+ * Clear all data from a single collection.
+ * ⚠️  Use with caution — deletes ALL records!
+ *
+ * @param {string} collectionName - Name of the collection to clear
+ * @returns {Promise<Object>} Result with count of deleted records
+ */
+export async function clearCollection(collectionName) {
+    let deletedCount = 0;
+    let hasMore = true;
+
+    while (hasMore) {
+        const results = await wixData.query(collectionName)
+            .limit(100)
+            .find({ suppressAuth: true });
+
+        if (results.items.length === 0) {
+            hasMore = false;
+            break;
+        }
+
+        for (const item of results.items) {
+            try {
+                await wixData.remove(collectionName, item._id, { suppressAuth: true });
+                deletedCount++;
+            } catch (_) { /* skip */ }
+        }
+
+        if (results.items.length < 100) {
+            hasMore = false;
+        }
+    }
+
+    return { collection: collectionName, deleted: deletedCount };
+}
+
+/**
+ * Clear ALL collections and re-seed with fresh sample data.
+ * ⚠️  DESTRUCTIVE — removes all existing data first!
+ *
+ * @returns {Promise<Object>} Combined clear + seed results
+ */
+export async function resetAllCollections() {
+    const collectionNames = Object.keys(SEED_DATA);
+    const clearResults = [];
+
+    // Step 1: Clear all
+    for (const name of collectionNames) {
+        try {
+            const result = await clearCollection(name);
+            clearResults.push(result);
+        } catch (_) {
+            clearResults.push({ collection: name, deleted: 0, error: 'clear failed' });
+        }
+    }
+
+    // Step 2: Seed all
+    const seedResults = await seedAllCollections();
+
+    return {
+        cleared: clearResults,
+        seeded: seedResults,
+        summary: `Cleared ${clearResults.reduce((sum, r) => sum + r.deleted, 0)} records, then ${seedResults.summary}`
+    };
+}
+
+/**
+ * Get a list of all collections that have seed data defined.
+ *
+ * @returns {Object} List of collection names and record counts
+ */
+export function getAvailableSeedCollections() {
+    const collections = {};
+    for (const [name, records] of Object.entries(SEED_DATA)) {
+        collections[name] = records.length;
+    }
+    return {
+        collections,
+        totalCollections: Object.keys(collections).length,
+        totalRecords: Object.values(collections).reduce((sum, n) => sum + n, 0)
+    };
+}

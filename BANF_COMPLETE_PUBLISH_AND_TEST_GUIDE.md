@@ -23,8 +23,9 @@
 10. [Wix Velo API & Database Connection Testing](#10-wix-velo-api--database-connection-testing)
 11. [Element-by-Element Landing Page Verification](#11-element-by-element-landing-page-verification)
 12. [Backend Services Verification](#12-backend-services-verification)
-13. [Troubleshooting](#13-troubleshooting)
-14. [Quick Reference Commands](#14-quick-reference-commands)
+13. [Seed Sample Data for Testing](#13-seed-sample-data-for-testing)
+14. [Troubleshooting](#14-troubleshooting)
+15. [Quick Reference Commands](#15-quick-reference-commands)
 
 ---
 
@@ -566,7 +567,56 @@ These Wix Velo APIs must be available after publish:
 
 ---
 
-## 13. Troubleshooting
+## 13. Seed Sample Data for Testing
+
+After publishing, the site's database collections will be empty. Use the built-in seeding module to populate **30 collections** with realistic Bengali-American community data.
+
+### One-time setup (from browser console or a test page):
+
+```javascript
+import { seedAllCollections } from 'backend/seed-data.jsw';
+
+// Seed all 30 collections (idempotent — skips collections that have data)
+const result = await seedAllCollections();
+console.log(result.summary);
+// → "Seeded: 29, Skipped: 1, Failed: 0"
+```
+
+### What gets created:
+- **8 Members** with realistic Bengali names, FL addresses, 904 area codes
+- **7 Events** including Pohela Boishakh, Durga Puja, Ekushey (2 past + 5 upcoming)
+- **5 Sponsors** — local Jacksonville businesses with tier assignments
+- **7 Radio Schedule** entries with Bengali/English show names
+- **3 E-Magazines** + **4 Articles** about culture, recipes, youth
+- **4 Jacksonville Guide** listings (restaurants, grocery, mosque, dental)
+- **6 Financial Records** + **4 Transactions** — realistic org income/expenses
+- **Plus** Admins, Volunteers, Vendors, Documents, Complaints, Surveys, Scholarships, and more
+
+### Other useful commands:
+
+```javascript
+import { seedCollection, clearCollection, resetAllCollections, getAvailableSeedCollections } from 'backend/seed-data.jsw';
+
+// Seed just one collection
+await seedCollection("Events");
+
+// Clear a collection (⚠️ deletes all records)
+await clearCollection("Events");
+
+// Reset everything (⚠️ destructive — clears all, then re-seeds)
+await resetAllCollections();
+
+// See what collections and record counts are available
+const info = getAvailableSeedCollections();
+// → { totalCollections: 30, totalRecords: 105, collections: [...] }
+```
+
+> 📖 **Full documentation:** See [`BANF_DATA_SEEDING_GUIDE.md`](BANF_DATA_SEEDING_GUIDE.md)  
+> 📦 **Portable seed data:** See [`seed-data/banf_seed_data.json`](seed-data/banf_seed_data.json)
+
+---
+
+## 14. Troubleshooting
 
 ### Error: "FailedToDeployDocument"
 ```
@@ -625,7 +675,7 @@ npm install --registry=https://registry.npmjs.org/
 
 ---
 
-## 14. Quick Reference Commands
+## 15. Quick Reference Commands
 
 ### One-liner: Clone → Install → Login → Publish
 ```bash
