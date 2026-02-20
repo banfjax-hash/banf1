@@ -1,0 +1,28 @@
+// backend/site-stats.jsw
+// Site statistics for BANF homepage
+
+import wixData from 'wix-data';
+
+/**
+ * Get site statistics for hero section
+ * @returns {Promise<Object>} Site stats
+ */
+export async function getSiteStats() {
+    try {
+        const [members, events, sponsors] = await Promise.all([
+            wixData.query("Members").eq("status", "active").count(),
+            wixData.query("Events").count(),
+            wixData.query("Sponsors").eq("active", true).count()
+        ]);
+
+        return {
+            families: members || 80,
+            events: events || 10,
+            years: 17,  // Founded 2008
+            sponsors: sponsors || 45
+        };
+    } catch (err) {
+        // Return defaults if DB not ready
+        return { families: 80, events: 10, years: 17, sponsors: 45 };
+    }
+}
