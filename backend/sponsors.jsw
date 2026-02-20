@@ -1,0 +1,69 @@
+// Sponsors Compatibility Module
+// -----------------------------------------------------------------------------
+// Purpose:
+//   Provide backward-compatible exports for code that imports:
+//   `backend/sponsors.jsw`
+//
+// Why:
+//   Current project has `sponsor-management.jsw` / `sponsorship.jsw`, but some
+//   page code still references `backend/sponsors.jsw`, which causes build errors.
+// -----------------------------------------------------------------------------
+
+import wixData from 'wix-data';
+
+function normalizeSponsor(item = {}) {
+    return {
+        _id: item._id,
+        companyName: item.companyName || item.name || 'Sponsor',
+        tier: (item.tier || item.tierName || '').toLowerCase(),
+        logo: item.logo || item.logoUrl || '',
+        website: item.website || '',
+        description: item.description || '',
+        status: (item.status || '').toLowerCase(),
+        isActive: item.isActive !== false,
+        ...item,
+    };
+}
+
+function isActiveSponsor(item = {}) {
+    const status = (item.status || '').toLowerCase();
+    return item.isActive !== false && (status === '' || status === 'active' || status === 'completed');
+}
+
+/**
+ * Return active sponsors for public pages.
+ */
+export async function getActiveSponsors(limit = 100) {
+    const res = await wixData.query('Sponsors')
+        .limit(limit)
+        .ascending('tier')
+        .find();
+
+    return (res.items || []).map(normalizeSponsor).filter(isActiveSponsor);
+}
+
+/**
+ * Return active sponsors for a specific tier.
+ */
+export async function getSponsorsByTier(tier, limit = 100) {
+    const normalizedTier = (tier || '').toLowerCase();
+
+    const res = await wixData.query('Sponsors')
+        .eq('tier', normalizedTier)
+        .limit(limit)
+        .find();
+
+    return (res.items || []).map(normalizeSponsor).filter(isActiveSponsor);
+}
+
+/**
+ * Return sponsor details by id.
+ */
+export async function getSponsorDetails(sponsorId) {
+    if (!sponsorId) {
+        throw new Error('sponsorId is required');
+    }
+
+    const item = await wixData.get('Sponsors', sponsorId);
+    return normalizeSponsor(item);
+}
