@@ -1,0 +1,1565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EC Admin Portal — Bengali Association of North Florida</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--banf-red:#8B0000;--banf-crimson:#DC143C;--banf-gold:#D4AF37;--grad:linear-gradient(135deg,#8B0000,#DC143C)}
+*{font-family:'Poppins',sans-serif;box-sizing:border-box}
+body{background:#f0f2f5;margin:0}
+.admin-header{background:var(--grad);color:#fff;padding:.75rem 1.5rem;position:sticky;top:0;z-index:1000;box-shadow:0 4px 16px rgba(139,0,0,.4);display:flex;justify-content:space-between;align-items:center}
+.admin-header h1{font-size:1.1rem;margin:0;font-weight:600}
+.admin-header .badge-role{background:rgba(255,255,255,.2);border-radius:20px;padding:.2rem .7rem;font-size:.75rem}
+#login-wall{display:flex;align-items:center;justify-content:center;min-height:80vh}
+#login-wall .card{width:360px;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,.15)}
+.sidebar{width:230px;min-height:calc(100vh - 58px);background:#fff;border-right:1px solid #e0e0e0;position:fixed;top:58px;left:0;overflow-y:auto;padding:.5rem 0}
+.sidebar .nav-link{color:#444;padding:.55rem 1.2rem;font-size:.85rem;border-radius:0;display:flex;align-items:center;gap:.6rem}
+.sidebar .nav-link:hover,.sidebar .nav-link.active{background:#f8e8e8;color:var(--banf-red);font-weight:600}
+.main-content{margin-left:230px;padding:1.5rem;min-height:calc(100vh - 58px)}
+.section{display:none}
+.section.active{display:block}
+.stat-card{background:#fff;border-radius:12px;padding:1.2rem;box-shadow:0 2px 8px rgba(0,0,0,.08);margin-bottom:1rem;border-left:4px solid var(--banf-crimson)}
+.stat-card .num{font-size:2rem;font-weight:700;color:var(--banf-red)}
+.stat-card .lbl{color:#888;font-size:.8rem;text-transform:uppercase;letter-spacing:.5px}
+.btn-banf{background:var(--grad);color:#fff;border:none;border-radius:8px;padding:.45rem 1.1rem;font-size:.85rem}
+.btn-banf:hover{opacity:.88;color:#fff}
+.tbl-wrap{background:#fff;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.08);overflow:auto}
+table thead{background:#f8e8e8}
+table thead th{color:var(--banf-red);font-weight:600;font-size:.8rem;text-transform:uppercase;letter-spacing:.4px}
+.badge-status-active{background:#d4edda;color:#155724}
+.badge-status-pending{background:#fff3cd;color:#856404}
+.badge-status-inactive{background:#f8d7da;color:#721c24}
+.toast-area{position:fixed;top:70px;right:20px;z-index:9999;width:300px}
+.section-title{font-size:1.3rem;font-weight:700;color:var(--banf-red);margin-bottom:1.2rem;padding-bottom:.5rem;border-bottom:2px solid #f8e8e8}
+.filter-bar{background:#fff;border-radius:10px;padding:.8rem 1rem;margin-bottom:1rem;box-shadow:0 2px 6px rgba(0,0,0,.06)}
+textarea.form-control{resize:vertical}
+.spinner-sm{width:1rem;height:1rem;border-width:.15em}
+@media(max-width:768px){.sidebar{display:none}.main-content{margin-left:0}}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="admin-header" id="header" style="display:none">
+  <h1><i class="fas fa-shield-alt me-2"></i>BANF EC Admin Portal</h1>
+  <div class="d-flex align-items-center gap-3">
+    <span class="badge-role" id="hdr-role"></span>
+    <span id="hdr-email" style="font-size:.8rem;opacity:.85"></span>
+    <button class="btn btn-sm btn-outline-light" onclick="logout()"><i class="fas fa-sign-out-alt"></i></button>
+  </div>
+</div>
+
+<!-- LOGIN -->
+<div id="login-wall">
+  <div class="card p-4">
+    <div class="text-center mb-4">
+      <div style="font-size:2.5rem;color:var(--banf-red)"><i class="fas fa-shield-alt"></i></div>
+      <h5 class="mt-2 mb-0">EC Admin Portal</h5>
+      <small class="text-muted">Bengali Association of North Florida</small>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Email</label>
+      <input type="email" class="form-control" id="login-email" placeholder="your@email.com" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <button class="btn btn-banf w-100" onclick="doLogin()"><i class="fas fa-sign-in-alt me-2"></i>Sign In</button>
+    <div id="login-err" class="text-danger small mt-2" style="display:none"></div>
+  </div>
+</div>
+
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar" style="display:none">
+  <a class="nav-link active" href="#" onclick="show('dashboard',this)"><i class="fas fa-tachometer-alt fa-fw"></i>Dashboard</a>
+  <a class="nav-link" href="#" onclick="show('events',this)"><i class="fas fa-calendar-alt fa-fw"></i>Events (Evite)</a>
+  <a class="nav-link" href="#" onclick="show('rsvps',this)"><i class="fas fa-ticket-alt fa-fw"></i>RSVPs &amp; Attendance</a>
+  <a class="nav-link" href="#" onclick="show('members',this)"><i class="fas fa-users fa-fw"></i>Members</a>
+  <a class="nav-link" href="#" onclick="show('payments',this)"><i class="fas fa-money-bill-wave fa-fw"></i>Payments</a>
+  <a class="nav-link" href="#" onclick="show('surveys',this)"><i class="fas fa-poll fa-fw"></i>Surveys</a>
+  <a class="nav-link" href="#" onclick="show('automation',this)"><i class="fas fa-robot fa-fw"></i>Process Automation</a>
+  <a class="nav-link" href="#" onclick="show('crm',this)"><i class="fas fa-sitemap fa-fw"></i>CRM / Families</a>
+  <a class="nav-link" href="#" onclick="show('vendors',this)"><i class="fas fa-store fa-fw"></i>Vendors &amp; Sponsors</a>
+  <a class="nav-link" href="#" onclick="show('kb',this)"><i class="fas fa-book fa-fw"></i>Knowledge Base</a>
+  <a class="nav-link" href="#" onclick="show('agents',this)"><i class="fas fa-brain fa-fw"></i>AI Agents</a>
+  <a class="nav-link" href="#" onclick="show('roles',this)"><i class="fas fa-user-shield fa-fw"></i>Roles &amp; Access</a>
+  <a class="nav-link" href="#" onclick="show('email-templates',this)"><i class="fas fa-envelope-open-text fa-fw"></i>Email Templates</a>
+  <a class="nav-link" href="#" onclick="show('reports',this)"><i class="fas fa-chart-bar fa-fw"></i>Reports</a>
+  <a class="nav-link" href="#" onclick="show('tools',this)"><i class="fas fa-tools fa-fw"></i>System Tools</a>
+  <hr style="margin:.4rem 1rem;border-color:#f0d0d0">
+  <div style="padding:.25rem 1.2rem;font-size:.7rem;text-transform:uppercase;letter-spacing:1px;color:#bbb;font-weight:600">Workflows</div>
+  <a class="nav-link" href="#" onclick="show('workflows',this)"><i class="fas fa-project-diagram fa-fw"></i>Workflow Hub</a>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main-content" id="main-content" style="display:none">
+
+  <!-- DASHBOARD -->
+  <div id="sec-dashboard" class="section active">
+    <div class="section-title"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</div>
+    <div class="row g-3" id="dash-stats">
+      <div class="col-6 col-md-3"><div class="stat-card"><div class="num" id="s-members">—</div><div class="lbl">Members</div></div></div>
+      <div class="col-6 col-md-3"><div class="stat-card"><div class="num" id="s-payments">—</div><div class="lbl">Payments</div></div></div>
+      <div class="col-6 col-md-3"><div class="stat-card"><div class="num" id="s-complaints">—</div><div class="lbl">Complaints</div></div></div>
+      <div class="col-6 col-md-3"><div class="stat-card" style="border-color:#f39c12"><div class="num text-warning" id="s-queue">—</div><div class="lbl">Email Queue</div></div></div>
+    </div>
+    <div class="row g-3 mt-1">
+      <div class="col-md-6">
+        <div class="tbl-wrap p-3">
+          <div class="fw-bold mb-2 text-muted small">RECENT PAYMENTS</div>
+          <table class="table table-sm mb-0"><thead><tr><th>Name</th><th>Amount</th><th>Status</th></tr></thead><tbody id="dash-payments"></tbody></table>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="tbl-wrap p-3">
+          <div class="fw-bold mb-2 text-muted small">PENDING EMAIL QUEUE</div>
+          <table class="table table-sm mb-0"><thead><tr><th>From</th><th>Subject</th><th>Action</th></tr></thead><tbody id="dash-queue"></tbody></table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EVENTS -->
+  <div id="sec-events" class="section">
+    <div class="section-title"><i class="fas fa-calendar-alt me-2"></i>Events (Evite)</div>
+    <div class="d-flex gap-2 mb-3">
+      <button class="btn btn-banf btn-sm" data-bs-toggle="modal" data-bs-target="#modal-create-event"><i class="fas fa-plus me-1"></i>Create Event</button>
+      <button class="btn btn-outline-secondary btn-sm" onclick="loadEvents()"><i class="fas fa-sync me-1"></i>Refresh</button>
+    </div>
+    <div class="tbl-wrap">
+      <table class="table table-hover mb-0">
+        <thead><tr><th>Title</th><th>Date</th><th>Venue</th><th>RSVPs</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody id="events-tbl"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- RSVPS -->
+  <div id="sec-rsvps" class="section">
+    <div class="section-title"><i class="fas fa-ticket-alt me-2"></i>RSVPs &amp; Attendance</div>
+    <div class="filter-bar d-flex gap-2 flex-wrap">
+      <select class="form-select form-select-sm" id="rsvp-event-filter" style="max-width:280px">
+        <option value="">— All Events —</option>
+      </select>
+      <button class="btn btn-banf btn-sm" onclick="loadRsvps()"><i class="fas fa-search me-1"></i>Load</button>
+      <button class="btn btn-outline-success btn-sm" onclick="showScanModal()"><i class="fas fa-qrcode me-1"></i>QR Scan</button>
+      <button class="btn btn-outline-info btn-sm" onclick="loadAttendance()"><i class="fas fa-file-alt me-1"></i>Report</button>
+      <button class="btn btn-outline-warning btn-sm" onclick="parseEmails()"><i class="fas fa-envelope-open me-1"></i>Parse Emails</button>
+    </div>
+    <div class="tbl-wrap">
+      <table class="table table-hover mb-0">
+        <thead><tr><th>Name</th><th>Email</th><th>Status</th><th>Guests</th><th>Scanned</th><th>Override</th></tr></thead>
+        <tbody id="rsvps-tbl"></tbody>
+      </table>
+    </div>
+    <div id="attendance-output" class="mt-3" style="display:none"></div>
+  </div>
+
+  <!-- MEMBERS -->
+  <div id="sec-members" class="section">
+    <div class="section-title"><i class="fas fa-users me-2"></i>Members</div>
+    <div class="filter-bar d-flex gap-2 flex-wrap">
+      <input type="text" class="form-control form-control-sm" id="member-search" placeholder="Search name/email…" style="max-width:260px">
+      <button class="btn btn-banf btn-sm" onclick="loadMembers()"><i class="fas fa-search me-1"></i>Search</button>
+      <span class="text-muted small ms-auto align-self-center" id="member-count"></span>
+    </div>
+    <div class="tbl-wrap">
+      <table class="table table-hover mb-0">
+        <thead><tr><th>Name</th><th>Email</th><th>Membership</th><th>Joined</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody id="members-tbl"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- PAYMENTS -->
+  <div id="sec-payments" class="section">
+    <div class="section-title"><i class="fas fa-money-bill-wave me-2"></i>Payments</div>
+    <div class="d-flex gap-2 mb-3 flex-wrap">
+      <button class="btn btn-banf btn-sm" data-bs-toggle="modal" data-bs-target="#modal-payment"><i class="fas fa-plus me-1"></i>Record Payment</button>
+      <select class="form-select form-select-sm" id="pay-status-filter" style="max-width:160px" onchange="loadPayments()">
+        <option value="">All Status</option>
+        <option value="completed">Completed</option>
+        <option value="pending">Pending</option>
+        <option value="failed">Failed</option>
+      </select>
+      <button class="btn btn-outline-secondary btn-sm" onclick="loadPayments()"><i class="fas fa-sync me-1"></i>Refresh</button>
+    </div>
+    <div class="tbl-wrap">
+      <table class="table table-hover mb-0">
+        <thead><tr><th>Member</th><th>Amount</th><th>Purpose</th><th>Method</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
+        <tbody id="payments-tbl"></tbody>
+      </table>
+    </div>
+    <div id="pay-total" class="mt-2 text-end fw-bold text-muted small"></div>
+  </div>
+
+  <!-- SURVEYS -->
+  <div id="sec-surveys" class="section">
+    <div class="section-title"><i class="fas fa-poll me-2"></i>Surveys</div>
+    <div class="d-flex gap-2 mb-3 flex-wrap">
+      <button class="btn btn-banf btn-sm" data-bs-toggle="modal" data-bs-target="#modal-create-survey"><i class="fas fa-plus me-1"></i>Create Survey</button>
+      <button class="btn btn-outline-secondary btn-sm" onclick="loadSurveys()"><i class="fas fa-sync me-1"></i>Refresh</button>
+      <button class="btn btn-outline-warning btn-sm" onclick="setupSurveyCollections()"><i class="fas fa-database me-1"></i>Setup Collections</button>
+    </div>
+    <div id="surveys-list" class="row g-3"></div>
+  </div>
+
+  <!-- PROCESS AUTOMATION -->
+  <div id="sec-automation" class="section">
+    <div class="section-title"><i class="fas fa-robot me-2"></i>Process Automation</div>
+    <div class="row g-3 mb-3">
+      <div class="col-md-4">
+        <div class="card h-100">
+          <div class="card-body">
+            <h6 class="card-title text-danger fw-bold"><i class="fas fa-inbox me-2"></i>Email Queue</h6>
+            <p class="card-text small text-muted">Auto-responses awaiting EC approval</p>
+            <button class="btn btn-banf btn-sm w-100" onclick="loadEmailQueue()">Load Queue</button>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card h-100">
+          <div class="card-body">
+            <h6 class="card-title text-danger fw-bold"><i class="fas fa-search me-2"></i>Gmail Scan</h6>
+            <p class="card-text small text-muted">Scan Gmail inbox for new messages + auto-draft responses</p>
+            <button class="btn btn-banf btn-sm w-100" onclick="runEmailScan()">Run Scan</button>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card h-100">
+          <div class="card-body">
+            <h6 class="card-title text-danger fw-bold"><i class="fas fa-cogs me-2"></i>Auto-Response Rules</h6>
+            <p class="card-text small text-muted">View &amp; manage automated response templates</p>
+            <button class="btn btn-banf btn-sm w-100" onclick="loadAutoResponses()">View Rules</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="automation-output"></div>
+  </div>
+
+  <!-- CRM -->
+  <div id="sec-crm" class="section">
+    <div class="section-title"><i class="fas fa-sitemap me-2"></i>CRM / Family Universe</div>
+    <div class="d-flex gap-2 mb-3 flex-wrap">
+      <button class="btn btn-banf btn-sm" onclick="loadCrmDashboard()"><i class="fas fa-chart-pie me-1"></i>CRM Dashboard</button>
+      <button class="btn btn-outline-secondary btn-sm" onclick="window.open('/_functions/crm_admin','_blank')"><i class="fas fa-external-link-alt me-1"></i>Full CRM Admin</button>
+    </div>
+    <div id="crm-stats" class="row g-3 mb-3"></div>
+    <div id="crm-families-output" class="tbl-wrap" style="display:none">
+      <table class="table table-hover mb-0">
+        <thead><tr><th>Family ID</th><th>Head of Family</th><th>Adults</th><th>Children</th><th>Membership</th></tr></thead>
+        <tbody id="crm-families-tbl"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- VENDORS -->
+  <div id="sec-vendors" class="section">
+    <div class="section-title"><i class="fas fa-store me-2"></i>Vendors &amp; Sponsors</div>
+    <ul class="nav nav-tabs mb-3" id="vendor-tabs">
+      <li class="nav-item"><a class="nav-link active" href="#" onclick="loadVendors(); return false">Vendors</a></li>
+      <li class="nav-item"><a class="nav-link" href="#" onclick="loadSponsors(); return false">Sponsors</a></li>
+      <li class="nav-item"><a class="nav-link" href="#" onclick="loadAds(); return false">Ads</a></li>
+    </ul>
+    <button class="btn btn-banf btn-sm mb-3" id="vendor-add-btn" onclick="showAddVendorModal()"><i class="fas fa-plus me-1"></i>Add</button>
+    <div id="vendors-output" class="tbl-wrap"></div>
+  </div>
+
+  <!-- KNOWLEDGE BASE -->
+  <div id="sec-kb" class="section">
+    <div class="section-title"><i class="fas fa-book me-2"></i>Knowledge Base</div>
+    <div class="row g-3 mb-3">
+      <div class="col-md-6">
+        <div class="card p-3">
+          <h6 class="fw-bold text-danger">Search Knowledge Base</h6>
+          <div class="input-group input-group-sm">
+            <input type="text" class="form-control" id="kb-search-q" placeholder="Search query…">
+            <button class="btn btn-banf" onclick="searchKb()">Search</button>
+          </div>
+          <div id="kb-search-results" class="mt-2" style="max-height:200px;overflow:auto"></div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card p-3">
+          <h6 class="fw-bold text-danger">Add Document</h6>
+          <input type="text" class="form-control form-control-sm mb-2" id="kb-title" placeholder="Document title">
+          <textarea class="form-control form-control-sm mb-2" id="kb-content" rows="3" placeholder="Document content…"></textarea>
+          <select class="form-select form-select-sm mb-2" id="kb-category">
+            <option value="general">General</option>
+            <option value="bylaws">Bylaws</option>
+            <option value="events">Events</option>
+            <option value="finance">Finance</option>
+            <option value="membership">Membership</option>
+          </select>
+          <button class="btn btn-banf btn-sm w-100" onclick="addKbDoc()">Add Document</button>
+        </div>
+      </div>
+    </div>
+    <div class="tbl-wrap">
+      <table class="table table-sm mb-0">
+        <thead><tr><th>Title</th><th>Category</th><th>Sensitivity</th><th>Added</th></tr></thead>
+        <tbody id="kb-tbl"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- AI AGENTS -->
+  <div id="sec-agents" class="section">
+    <div class="section-title"><i class="fas fa-brain me-2"></i>AI Agents</div>
+    <div id="agents-list" class="row g-3"></div>
+  </div>
+
+  <!-- ROLES -->
+  <div id="sec-roles" class="section">
+    <div class="section-title"><i class="fas fa-user-shield me-2"></i>Roles &amp; Access</div>
+    <div class="d-flex gap-2 mb-3">
+      <button class="btn btn-banf btn-sm" data-bs-toggle="modal" data-bs-target="#modal-role"><i class="fas fa-plus me-1"></i>Grant Role</button>
+      <button class="btn btn-outline-secondary btn-sm" onclick="loadRoles()"><i class="fas fa-sync me-1"></i>Refresh</button>
+    </div>
+    <div class="tbl-wrap">
+      <table class="table table-hover mb-0">
+        <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>EC Title</th><th>Granted By</th><th>Date</th><th>Status</th><th>Action</th></tr></thead>
+        <tbody id="roles-tbl"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- EMAIL TEMPLATES -->
+  <div id="sec-email-templates" class="section">
+    <div class="section-title"><i class="fas fa-envelope-open-text me-2"></i>Email Templates</div>
+    <div class="d-flex gap-2 mb-3">
+      <button class="btn btn-banf btn-sm" onclick="newEmailTemplate()"><i class="fas fa-plus me-1"></i>New Template</button>
+      <button class="btn btn-outline-secondary btn-sm" onclick="loadEmailTemplates()"><i class="fas fa-sync me-1"></i>Refresh</button>
+    </div>
+    <p class="text-muted small mb-3">All outgoing BANF emails use these templates. Variables like <code>{{firstName}}</code>, <code>{{lastName}}</code>, <code>{{email}}</code>, <code>{{roleLabel}}</code>, <code>{{ecTitle}}</code>, <code>{{portalUrl}}</code>, <code>{{grantedBy}}</code>, <code>{{grantedAt}}</code> are automatically filled from member profiles and context data.</p>
+    <div class="tbl-wrap mb-4">
+      <table class="table table-hover mb-0">
+        <thead><tr><th>Template ID</th><th>Name</th><th>Subject</th><th>Description</th><th>Status</th><th>Last Modified By</th><th>Action</th></tr></thead>
+        <tbody id="email-templates-body"></tbody>
+      </table>
+    </div>
+    <!-- Template Editor -->
+    <div id="email-template-editor" style="display:none" class="tbl-wrap p-4">
+      <h6 class="fw-bold text-danger mb-3" id="editor-title"><i class="fas fa-edit me-2"></i>Edit Template</h6>
+      <div class="row g-3">
+        <div class="col-md-4">
+          <label class="form-label fw-bold">Template ID <span class="text-danger">*</span></label>
+          <input type="text" class="form-control form-control-sm" id="et-templateId" placeholder="e.g. role_welcome" />
+          <div class="form-text">Unique key (snake_case). Cannot change after creation.</div>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label fw-bold">Template Name <span class="text-danger">*</span></label>
+          <input type="text" class="form-control form-control-sm" id="et-name" placeholder="e.g. Role Grant Welcome Email" />
+        </div>
+        <div class="col-md-4">
+          <label class="form-label fw-bold">Status</label>
+          <select class="form-select form-select-sm" id="et-isActive">
+            <option value="true">Active</option>
+            <option value="false">Inactive</option>
+          </select>
+        </div>
+        <div class="col-12">
+          <label class="form-label fw-bold">Subject Line <span class="text-danger">*</span></label>
+          <input type="text" class="form-control form-control-sm" id="et-subject" placeholder="e.g. BANF: You have been granted {{roleLabel}} access" />
+        </div>
+        <div class="col-12">
+          <label class="form-label fw-bold">Description</label>
+          <input type="text" class="form-control form-control-sm" id="et-description" placeholder="Brief description of when this email is sent" />
+        </div>
+        <div class="col-12">
+          <label class="form-label fw-bold">HTML Body <span class="text-danger">*</span></label>
+          <div class="form-text mb-1">Use <code>{{varName}}</code> for variables. Conditional: <code>{{#if varName}}content{{/if varName}}</code></div>
+          <textarea class="form-control form-control-sm font-monospace" id="et-bodyHtml" rows="18" style="font-size:.78rem;line-height:1.4"></textarea>
+        </div>
+        <div class="col-12">
+          <label class="form-label fw-bold">Variables (comma-separated)</label>
+          <input type="text" class="form-control form-control-sm" id="et-variables" placeholder="firstName,lastName,email,roleLabel,ecTitle,portalUrl,grantedBy,grantedAt" />
+          <div class="form-text">List all variables this template uses, for reference.</div>
+        </div>
+        <div class="col-12 d-flex gap-2 mt-2">
+          <button class="btn btn-banf btn-sm" onclick="saveEmailTemplate()"><i class="fas fa-save me-1"></i>Save Template</button>
+          <button class="btn btn-outline-secondary btn-sm" onclick="previewEmailTemplate()"><i class="fas fa-eye me-1"></i>Preview</button>
+          <button class="btn btn-outline-danger btn-sm" onclick="cancelEditTemplate()"><i class="fas fa-times me-1"></i>Cancel</button>
+        </div>
+      </div>
+      <div id="et-preview-area" style="display:none" class="mt-4">
+        <hr>
+        <h6 class="fw-bold text-muted mb-2"><i class="fas fa-eye me-1"></i>Preview (with sample data)</h6>
+        <div style="border:1px solid #e5e7eb;border-radius:8px;overflow:hidden">
+          <iframe id="et-preview-frame" style="width:100%;min-height:450px;border:none"></iframe>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- REPORTS -->
+  <div id="sec-reports" class="section">
+    <div class="section-title"><i class="fas fa-chart-bar me-2"></i>Reports</div>
+    <div class="row g-3">
+      <div class="col-md-4"><div class="card p-3 text-center"><i class="fas fa-users fa-2x text-danger mb-2"></i><div class="fw-bold">Membership Report</div><button class="btn btn-banf btn-sm mt-2 w-100" onclick="genReport('membership')">Generate</button></div></div>
+      <div class="col-md-4"><div class="card p-3 text-center"><i class="fas fa-money-bill fa-2x text-success mb-2"></i><div class="fw-bold">Financial Report</div><button class="btn btn-banf btn-sm mt-2 w-100" onclick="genReport('financial')">Generate</button></div></div>
+      <div class="col-md-4"><div class="card p-3 text-center"><i class="fas fa-calendar fa-2x text-primary mb-2"></i><div class="fw-bold">Events Report</div><button class="btn btn-banf btn-sm mt-2 w-100" onclick="genReport('events')">Generate</button></div></div>
+      <div class="col-md-4"><div class="card p-3 text-center"><i class="fas fa-poll fa-2x text-warning mb-2"></i><div class="fw-bold">Survey Report</div><button class="btn btn-banf btn-sm mt-2 w-100" onclick="genReport('surveys')">Generate</button></div></div>
+      <div class="col-md-4"><div class="card p-3 text-center"><i class="fas fa-sitemap fa-2x text-info mb-2"></i><div class="fw-bold">CRM Audit Report</div><button class="btn btn-banf btn-sm mt-2 w-100" onclick="genReport('crm')">Generate</button></div></div>
+      <div class="col-md-4"><div class="card p-3 text-center"><i class="fas fa-envelope fa-2x text-secondary mb-2"></i><div class="fw-bold">Communication Report</div><button class="btn btn-banf btn-sm mt-2 w-100" onclick="genReport('comms')">Generate</button></div></div>
+    </div>
+    <div id="report-output" class="mt-4" style="display:none">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h6 id="report-title" class="fw-bold text-danger mb-0"></h6>
+        <button class="btn btn-outline-secondary btn-sm" onclick="exportReport()"><i class="fas fa-download me-1"></i>Export CSV</button>
+      </div>
+      <div id="report-content"></div>
+    </div>
+  </div>
+
+  <!-- SYSTEM TOOLS -->
+  <div id="sec-tools" class="section">
+    <div class="section-title"><i class="fas fa-tools me-2"></i>System Tools</div>
+    <div class="row g-3">
+      <div class="col-md-4"><div class="card p-3"><h6 class="fw-bold text-danger">Bootstrap System</h6><p class="small text-muted">Seed all collections, roles, agents, knowledge base</p><button class="btn btn-banf btn-sm w-100" onclick="runBootstrap()">Run Bootstrap</button></div></div>
+      <div class="col-md-4"><div class="card p-3"><h6 class="fw-bold text-danger">Archive Data</h6><p class="small text-muted">View archived member &amp; event data</p><button class="btn btn-banf btn-sm w-100" onclick="loadArchive()">View Archive</button></div></div>
+      <div class="col-md-4"><div class="card p-3"><h6 class="fw-bold text-danger">Run Test Suite</h6><p class="small text-muted">Execute full backend test suite</p><button class="btn btn-banf btn-sm w-100" onclick="runTests()">Run Tests</button></div></div>
+    </div>
+    <div id="tools-output" class="mt-3"></div>
+  </div>
+
+  <!-- WORKFLOW HUB -->
+  <div id="sec-workflows" class="section">
+    <div class="section-title"><i class="fas fa-project-diagram me-2"></i>Workflow Hub</div>
+    <p class="text-muted mb-4" style="font-size:.88rem">Each workflow guides you through a multi-step admin process — run individual steps automatically or manually, in <strong>Demo</strong> or <strong>Live</strong> mode.</p>
+    <div class="row g-4">
+      <div class="col-12 col-md-6 col-lg-4">
+        <div class="card h-100 border-0 shadow-sm" style="border-top:4px solid #8B0000!important">
+          <div class="card-body">
+            <div style="font-size:2rem;color:#8B0000" class="mb-2"><i class="fas fa-users"></i></div>
+            <h5 class="fw-bold mb-1">Annual Membership Drive</h5>
+            <p class="text-muted small mb-3">End-to-end membership drive for FY2026-27: configure tiers, build universe pool, send invitations (demo then live), monitor registrations, confirm payments, close drive.</p>
+            <div class="d-flex gap-2 mb-2">
+              <span class="badge bg-warning text-dark">8 Steps</span>
+              <span class="badge" style="background:#d4edda;color:#155724">Demo + Live</span>
+              <span class="badge bg-secondary">FY2026-27</span>
+            </div>
+            <a href="https://banfwix.wixsite.com/banf1/_functions/membership_drive_workflow" class="btn btn-banf w-100" target="_self" onclick="openWorkflow('membership_drive_workflow')">
+              <i class="fas fa-play me-2"></i>Open Workflow
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="col-12 col-md-6 col-lg-4">
+        <div class="card h-100 border-0 shadow-sm" style="border-top:4px solid #1565c0!important">
+          <div class="card-body">
+            <div style="font-size:2rem;color:#1565c0" class="mb-2"><i class="fas fa-balance-scale"></i></div>
+            <h5 class="fw-bold mb-1">Financial Reconciliation</h5>
+            <p class="text-muted small mb-3">Reconcile financial entries against membership registrations and payments for any accounting year. Flag discrepancies, resolve manually, generate signed report.</p>
+            <div class="d-flex gap-2 mb-2">
+              <span class="badge bg-warning text-dark">7 Steps</span>
+              <span class="badge" style="background:#d4edda;color:#155724">Any Year</span>
+              <span class="badge bg-secondary">Export CSV</span>
+            </div>
+            <a href="https://banfwix.wixsite.com/banf1/_functions/reconciliation_workflow" class="btn w-100" style="background:#1565c0;color:#fff;border:none" onclick="openWorkflow('reconciliation_workflow')">
+              <i class="fas fa-play me-2"></i>Open Workflow
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="col-12 col-md-6 col-lg-4">
+        <div class="card h-100 border-0 shadow-sm" style="border-top:4px solid #7c3aed!important">
+          <div class="card-body">
+            <div style="font-size:2rem;color:#7c3aed" class="mb-2"><i class="fas fa-archive"></i></div>
+            <h5 class="fw-bold mb-1">Archive Document Mapping</h5>
+            <p class="text-muted small mb-3">Map all historical documents (PDFs, XLSX, PPTX) from the archive into WixData collections by accounting year. Verify, correct and export mappings.</p>
+            <div class="d-flex gap-2 mb-2">
+              <span class="badge bg-warning text-dark">~120 Docs</span>
+              <span class="badge" style="background:#ede9fe;color:#4c1d95">Any Year</span>
+              <span class="badge bg-secondary">Editable</span>
+            </div>
+            <a href="https://banfwix.wixsite.com/banf1/_functions/archive_mapping" class="btn w-100" style="background:#7c3aed;color:#fff;border:none" onclick="openWorkflow('archive_mapping')">
+              <i class="fas fa-play me-2"></i>Open Mapper
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="col-12 col-md-6 col-lg-4">
+        <div class="card h-100 border-0 shadow-sm" style="border-top:4px solid #555!important;opacity:.6">
+          <div class="card-body">
+            <div style="font-size:2rem;color:#555" class="mb-2"><i class="fas fa-calendar-check"></i></div>
+            <h5 class="fw-bold mb-1">Event Planning Workflow</h5>
+            <p class="text-muted small mb-3">Full event lifecycle: venue booking, vendor management, evite + RSVP, day-of checklist, post-event report.</p>
+            <div class="d-flex gap-2 mb-2">
+              <span class="badge bg-secondary">Coming Soon</span>
+            </div>
+            <button class="btn btn-outline-secondary w-100" disabled><i class="fas fa-clock me-2"></i>Coming Soon</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /main-content -->
+
+<!-- TOAST AREA -->
+<div class="toast-area" id="toast-area"></div>
+
+<!-- MODALS -->
+<!-- Create Event -->
+<div class="modal fade" id="modal-create-event" tabindex="-1">
+  <div class="modal-dialog"><div class="modal-content">
+    <div class="modal-header" style="background:var(--grad);color:#fff"><h5 class="modal-title">Create Event</h5><button class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
+    <div class="modal-body">
+      <div class="mb-2"><label class="form-label small">Title</label><input type="text" class="form-control form-control-sm" id="ev-title"></div>
+      <div class="mb-2"><label class="form-label small">Date &amp; Time</label><input type="datetime-local" class="form-control form-control-sm" id="ev-date"></div>
+      <div class="mb-2"><label class="form-label small">Venue</label><input type="text" class="form-control form-control-sm" id="ev-venue"></div>
+      <div class="mb-2"><label class="form-label small">Description</label><textarea class="form-control form-control-sm" id="ev-desc" rows="3"></textarea></div>
+      <div class="mb-2"><label class="form-label small">Max Capacity</label><input type="number" class="form-control form-control-sm" id="ev-capacity" value="200"></div>
+      <div class="form-check mb-2"><input type="checkbox" class="form-check-input" id="ev-free"><label class="form-check-label small" for="ev-free">Free Event</label></div>
+      <div class="mb-2" id="ev-price-wrapper"><label class="form-label small">Ticket Price ($)</label><input type="number" class="form-control form-control-sm" id="ev-price" value="0"></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-banf" onclick="createEvent()">Create Event</button></div>
+  </div></div>
+</div>
+
+<!-- Record Payment -->
+<div class="modal fade" id="modal-payment" tabindex="-1">
+  <div class="modal-dialog"><div class="modal-content">
+    <div class="modal-header" style="background:var(--grad);color:#fff"><h5 class="modal-title">Record Payment</h5><button class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
+    <div class="modal-body">
+      <div class="mb-2"><label class="form-label small">Member Name</label><input type="text" class="form-control form-control-sm" id="pay-name"></div>
+      <div class="mb-2"><label class="form-label small">Email</label><input type="email" class="form-control form-control-sm" id="pay-email"></div>
+      <div class="mb-2"><label class="form-label small">Amount ($)</label><input type="number" class="form-control form-control-sm" id="pay-amount"></div>
+      <div class="mb-2"><label class="form-label small">Purpose</label><input type="text" class="form-control form-control-sm" id="pay-purpose" placeholder="Membership 2025-26"></div>
+      <div class="mb-2"><label class="form-label small">Method</label>
+        <select class="form-select form-select-sm" id="pay-method">
+          <option value="zelle">Zelle</option><option value="cash">Cash</option><option value="check">Check</option><option value="online">Online</option><option value="manual">Manual</option>
+        </select>
+      </div>
+      <div class="mb-2"><label class="form-label small">Notes</label><textarea class="form-control form-control-sm" id="pay-notes" rows="2"></textarea></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-banf" onclick="recordPayment()">Record</button></div>
+  </div></div>
+</div>
+
+<!-- Create Survey -->
+<div class="modal fade" id="modal-create-survey" tabindex="-1">
+  <div class="modal-dialog modal-lg"><div class="modal-content">
+    <div class="modal-header" style="background:var(--grad);color:#fff"><h5 class="modal-title">Create Survey</h5><button class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
+    <div class="modal-body">
+      <div class="mb-2"><label class="form-label small">Survey Title</label><input type="text" class="form-control form-control-sm" id="sv-title" placeholder="Annual Member Satisfaction Survey"></div>
+      <div class="mb-2"><label class="form-label small">Description</label><textarea class="form-control form-control-sm" id="sv-desc" rows="2"></textarea></div>
+      <div class="mb-3">
+        <label class="form-label small fw-bold">Questions</label>
+        <div id="sv-questions"></div>
+        <button class="btn btn-outline-danger btn-sm mt-2" onclick="addSurveyQuestion()"><i class="fas fa-plus me-1"></i>Add Question</button>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-banf" onclick="createSurvey()">Create Survey</button></div>
+  </div></div>
+</div>
+
+<!-- Grant Role -->
+<div class="modal fade" id="modal-role" tabindex="-1">
+  <div class="modal-dialog"><div class="modal-content">
+    <div class="modal-header" style="background:var(--grad);color:#fff"><h5 class="modal-title">Grant Role</h5><button class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
+    <div class="modal-body">
+      <div class="row g-2 mb-2">
+        <div class="col"><label class="form-label small">First Name</label><input type="text" class="form-control form-control-sm" id="role-fname" placeholder="e.g. Rana"></div>
+        <div class="col"><label class="form-label small">Last Name</label><input type="text" class="form-control form-control-sm" id="role-lname" placeholder="e.g. Dhir"></div>
+      </div>
+      <div class="mb-2"><label class="form-label small">Email</label><input type="email" class="form-control form-control-sm" id="role-email" placeholder="member@email.com"></div>
+      <div class="mb-2"><label class="form-label small">Role</label>
+        <select class="form-select form-select-sm" id="role-select" onchange="toggleEcTitle()">
+          <option value="admin">Admin</option>
+          <option value="ec_member">EC Member</option>
+          <option value="member">Member</option>
+          <option value="super_admin">Super Admin</option>
+        </select>
+      </div>
+      <div class="mb-2" id="ec-title-wrap" style="display:none">
+        <label class="form-label small">EC Designation</label>
+        <select class="form-select form-select-sm" id="role-title">
+          <option value="">— Select Designation —</option>
+          <option value="President">President</option>
+          <option value="Vice President">Vice President</option>
+          <option value="Treasurer">Treasurer</option>
+          <option value="Secretary">Secretary</option>
+          <option value="Joint Secretary">Joint Secretary</option>
+          <option value="Cultural Secretary">Cultural Secretary</option>
+          <option value="Sports Secretary">Sports Secretary</option>
+          <option value="Social Media">Social Media</option>
+          <option value="General Member">General Member</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-banf" onclick="grantRole()">Grant</button></div>
+  </div></div>
+</div>
+
+<!-- Survey Detail -->
+<div class="modal fade" id="modal-survey-detail" tabindex="-1">
+  <div class="modal-dialog modal-xl"><div class="modal-content">
+    <div class="modal-header" style="background:var(--grad);color:#fff">
+      <h5 class="modal-title" id="sv-detail-title">Survey Detail</h5>
+      <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+    </div>
+    <div class="modal-body" id="sv-detail-body"></div>
+    <div class="modal-footer" id="sv-detail-footer"></div>
+  </div></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+const API = 'https://banfwix.wixsite.com/banf1/_functions';
+let adminEmail = '';
+let adminRole = '';
+let currentReportData = [];
+let surveyQCount = 0;
+let eventsCache = [];
+let currentSurveyId = null;
+
+// ─── AUTH ───────────────────────────────────────
+function getHeaders() {
+  return { 'Content-Type': 'application/json', 'x-user-email': adminEmail };
+}
+
+async function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  if (!email) return showToast('Enter your email', 'danger');
+  try {
+    const res = await fetch(`${API}/admin_dashboard`, { headers: { 'x-user-email': email } });
+    const data = await res.json();
+    if (!data.success) {
+      document.getElementById('login-err').style.display = '';
+      document.getElementById('login-err').textContent = data.error || 'Access denied';
+      return;
+    }
+    adminEmail = email;
+    adminRole = data.adminRole || 'admin';
+    localStorage.setItem('banf_admin_email', email);
+    localStorage.setItem('banf_admin_role', adminRole);
+    showPortal(data);
+  } catch (e) {
+    document.getElementById('login-err').style.display = '';
+    document.getElementById('login-err').textContent = 'Login failed: ' + e.message;
+  }
+}
+
+function showPortal(data) {
+  document.getElementById('login-wall').style.display = 'none';
+  document.getElementById('header').style.display = '';
+  document.getElementById('sidebar').style.display = '';
+  document.getElementById('main-content').style.display = '';
+  document.getElementById('hdr-email').textContent = adminEmail;
+  document.getElementById('hdr-role').textContent = adminRole.replace(/_/g,' ').toUpperCase();
+  if (data) renderDashboard(data);
+}
+
+function logout() {
+  localStorage.removeItem('banf_admin_email');
+  localStorage.removeItem('banf_admin_role');
+  location.reload();
+}
+
+// ─── NAVIGATION ─────────────────────────────────
+function show(sectionId, el) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
+  document.getElementById('sec-' + sectionId).classList.add('active');
+  if (el) el.classList.add('active');
+  const loaders = {
+    dashboard: loadDashboard, events: loadEvents, rsvps: loadEventsForFilter,
+    members: loadMembers, payments: loadPayments, surveys: loadSurveys,
+    automation: () => {}, crm: loadCrmDashboard, vendors: loadVendors,
+    kb: loadKb, agents: loadAgents, roles: loadRoles,
+    'email-templates': loadEmailTemplates,
+    reports: () => {}, tools: () => {},
+    workflows: () => {}
+  };
+  if (loaders[sectionId]) loaders[sectionId]();
+}
+
+function openWorkflow(name) {
+  const base = 'https://banfwix.wixsite.com/banf1/_functions';
+  window.open(`${base}/${name}`, '_self');
+}
+
+// ─── DASHBOARD ──────────────────────────────────
+async function loadDashboard() {
+  try {
+    const res = await fetch(`${API}/admin_dashboard`, { headers: getHeaders() });
+    const data = await res.json();
+    if (data.success) renderDashboard(data);
+  } catch(e) { showToast('Dashboard load failed', 'danger'); }
+}
+
+function renderDashboard(data) {
+  const s = data.stats || {};
+  document.getElementById('s-members').textContent = s.members || 0;
+  document.getElementById('s-payments').textContent = s.payments || 0;
+  document.getElementById('s-complaints').textContent = s.complaints || 0;
+  document.getElementById('s-queue').textContent = s.emailQueuePending || 0;
+  const pTbl = document.getElementById('dash-payments');
+  pTbl.innerHTML = (data.recentPayments || []).map(p => `
+    <tr><td>${p.memberName||''}</td><td>$${(p.amount||0).toFixed(2)}</td>
+    <td><span class="badge badge-status-${p.status||'pending'}">${p.status||''}</span></td></tr>`).join('') || '<tr><td colspan="3" class="text-muted small text-center">No data</td></tr>';
+  const qTbl = document.getElementById('dash-queue');
+  qTbl.innerHTML = (data.pendingEmailQueue || []).map(q => `
+    <tr><td class="small">${q.fromEmail||''}</td><td class="small">${(q.subject||'').substring(0,40)}</td>
+    <td><button class="btn btn-xs btn-outline-success" style="font-size:.7rem;padding:.1rem .4rem" onclick="approveEmail('${q._id}')">Approve</button></td></tr>`).join('') || '<tr><td colspan="3" class="text-muted small text-center">Queue empty</td></tr>';
+}
+
+// ─── EVENTS ─────────────────────────────────────
+async function loadEvents() {
+  const tbl = document.getElementById('events-tbl');
+  tbl.innerHTML = '<tr><td colspan="6" class="text-center py-3"><div class="spinner-border spinner-sm text-danger"></div></td></tr>';
+  try {
+    const res = await fetch(`${API}/evite_events`, { headers: getHeaders() });
+    const data = await res.json();
+    eventsCache = data.events || [];
+    tbl.innerHTML = eventsCache.map(ev => `
+      <tr>
+        <td class="fw-bold">${ev.title||''}</td>
+        <td class="small">${ev.eventDate ? new Date(ev.eventDate).toLocaleDateString() : ''}</td>
+        <td class="small">${ev.venue||''}</td>
+        <td>${ev.rsvpCount||0}/${ev.maxCapacity||'—'}</td>
+        <td><span class="badge badge-status-${ev.isActive?'active':'inactive'}">${ev.isActive?'Active':'Closed'}</span></td>
+        <td>
+          <button class="btn btn-outline-info btn-sm mx-1" onclick="viewEventRsvps('${ev._id}')"><i class="fas fa-list"></i></button>
+          <button class="btn btn-outline-success btn-sm" onclick="viewAttendance('${ev._id}')"><i class="fas fa-file-alt"></i></button>
+        </td>
+      </tr>`).join('') || '<tr><td colspan="6" class="text-center text-muted py-3">No events found</td></tr>';
+  } catch(e) { tbl.innerHTML = '<tr><td colspan="6" class="text-danger small">Load failed</td></tr>'; }
+}
+
+async function loadEventsForFilter() {
+  const sel = document.getElementById('rsvp-event-filter');
+  try {
+    const res = await fetch(`${API}/evite_events`, { headers: getHeaders() });
+    const data = await res.json();
+    eventsCache = data.events || [];
+    sel.innerHTML = '<option value="">— All Events —</option>' + eventsCache.map(ev => `<option value="${ev._id}">${ev.title}</option>`).join('');
+  } catch(e) {}
+}
+
+async function createEvent() {
+  const body = {
+    title: document.getElementById('ev-title').value,
+    eventDate: document.getElementById('ev-date').value,
+    venue: document.getElementById('ev-venue').value,
+    description: document.getElementById('ev-desc').value,
+    maxCapacity: parseInt(document.getElementById('ev-capacity').value)||200,
+    isFree: document.getElementById('ev-free').checked,
+    ticketPrice: parseFloat(document.getElementById('ev-price').value)||0
+  };
+  if (!body.title) return showToast('Title required','danger');
+  try {
+    const res = await fetch(`${API}/evite_create_event`, { method:'POST', headers: getHeaders(), body: JSON.stringify(body) });
+    const data = await res.json();
+    if (data.success) { showToast('Event created!','success'); bootstrap.Modal.getInstance(document.getElementById('modal-create-event')).hide(); loadEvents(); }
+    else showToast(data.error || 'Failed','danger');
+  } catch(e) { showToast('Error: '+e.message,'danger'); }
+}
+
+async function viewEventRsvps(eventId) { show('rsvps', null); document.getElementById('rsvp-event-filter').value = eventId; loadRsvps(); }
+async function viewAttendance(eventId) { show('rsvps', null); document.getElementById('rsvp-event-filter').value = eventId; loadAttendance(); }
+
+// ─── RSVPS ──────────────────────────────────────
+async function loadRsvps() {
+  const eventId = document.getElementById('rsvp-event-filter').value;
+  const tbl = document.getElementById('rsvps-tbl');
+  tbl.innerHTML = '<tr><td colspan="6" class="text-center py-3"><div class="spinner-border spinner-sm text-danger"></div></td></tr>';
+  try {
+    const url = eventId ? `${API}/evite_rsvps?eventId=${eventId}` : `${API}/evite_rsvps`;
+    const res = await fetch(url, { headers: getHeaders() });
+    const data = await res.json();
+    const rsvps = data.rsvps || [];
+    tbl.innerHTML = rsvps.map(r => `
+      <tr>
+        <td>${r.name||''}</td><td class="small">${r.email||''}</td>
+        <td><span class="badge badge-status-${r.status||'pending'}">${r.status||''}</span></td>
+        <td>${r.guestCount||0}</td>
+        <td><span class="badge ${r.checkedIn?'bg-success':'bg-secondary'}">${r.checkedIn?'Yes':'No'}</span></td>
+        <td><button class="btn btn-xs btn-outline-warning" style="font-size:.7rem;padding:.1rem .5rem" onclick="overrideRsvp('${r._id}','${r.eventId||eventId}')">Override</button></td>
+      </tr>`).join('') || '<tr><td colspan="6" class="text-muted small text-center py-3">No RSVPs found</td></tr>';
+  } catch(e) { tbl.innerHTML = '<tr><td colspan="6" class="text-danger small">Load failed</td></tr>'; }
+}
+
+async function loadAttendance() {
+  const eventId = document.getElementById('rsvp-event-filter').value;
+  if (!eventId) return showToast('Select an event first','warning');
+  const out = document.getElementById('attendance-output');
+  out.style.display = '';
+  out.innerHTML = '<div class="spinner-border spinner-sm text-danger"></div> Loading...';
+  try {
+    const res = await fetch(`${API}/evite_attendance_report?eventId=${eventId}`, { headers: getHeaders() });
+    const data = await res.json();
+    if (!data.success) { out.innerHTML = '<div class="text-danger small">'+data.error+'</div>'; return; }
+    const r = data.report || {};
+    out.innerHTML = `<div class="card p-3"><h6 class="fw-bold text-danger">${r.eventTitle||'Event'} — Attendance Report</h6>
+      <div class="row g-2 mb-3">
+        <div class="col-4"><div class="stat-card"><div class="num">${r.totalRsvps||0}</div><div class="lbl">Total RSVPs</div></div></div>
+        <div class="col-4"><div class="stat-card" style="border-color:#28a745"><div class="num text-success">${r.checkedIn||0}</div><div class="lbl">Attended</div></div></div>
+        <div class="col-4"><div class="stat-card" style="border-color:#ffc107"><div class="num text-warning">${r.noShow||0}</div><div class="lbl">No Show</div></div></div>
+      </div>
+      <div class="small text-muted">Attendance rate: <strong>${r.attendanceRate||'—'}</strong> | Generated: ${new Date().toLocaleString()}</div>
+    </div>`;
+  } catch(e) { out.innerHTML = '<div class="text-danger small">Error: '+e.message+'</div>'; }
+}
+
+async function parseEmails() {
+  showToast('Scanning Gmail for RSVP emails…','info');
+  try {
+    const res = await fetch(`${API}/evite_scan`, { method:'POST', headers: getHeaders(), body: JSON.stringify({}) });
+    const data = await res.json();
+    if (data.success) showToast(`Parsed ${data.parsed||0} RSVPs from email`,'success');
+    else showToast(data.error||'Failed','danger');
+  } catch(e) { showToast('Error: '+e.message,'danger'); }
+}
+
+function showScanModal() {
+  const code = prompt('Enter QR code / member ID to check in:');
+  if (!code) return;
+  const eventId = document.getElementById('rsvp-event-filter').value;
+  if (!eventId) return showToast('Select an event first','warning');
+  fetch(`${API}/evite_scan`, { method:'POST', headers: getHeaders(), body: JSON.stringify({ qrCode: code, eventId }) })
+    .then(r => r.json()).then(d => { if(d.success) showToast(`✅ Checked in: ${d.member?.name||code}`,'success'); else showToast(d.error||'Not found','danger'); });
+}
+
+async function overrideRsvp(rsvpId, eventId) {
+  const status = prompt('Override status (attending/declined/waitlist):');
+  if (!status) return;
+  try {
+    const res = await fetch(`${API}/evite_rsvp_override`, { method:'POST', headers: getHeaders(), body: JSON.stringify({ rsvpId, eventId, status }) });
+    const data = await res.json();
+    if (data.success) { showToast('Override applied','success'); loadRsvps(); } else showToast(data.error,'danger');
+  } catch(e) { showToast('Error','danger'); }
+}
+
+// ─── MEMBERS ────────────────────────────────────
+async function loadMembers() {
+  const search = document.getElementById('member-search').value.trim();
+  const tbl = document.getElementById('members-tbl');
+  tbl.innerHTML = '<tr><td colspan="6" class="text-center py-3"><div class="spinner-border spinner-sm text-danger"></div></td></tr>';
+  try {
+    const url = `${API}/admin_members?limit=100${search ? '&search='+encodeURIComponent(search) : ''}`;
+    const res = await fetch(url, { headers: getHeaders() });
+    const data = await res.json();
+    document.getElementById('member-count').textContent = `${(data.members||[]).length} of ${data.total||0}`;
+    tbl.innerHTML = (data.members||[]).map(m => `
+      <tr>
+        <td class="fw-bold">${m.firstName||''} ${m.lastName||''}</td>
+        <td class="small">${m.email||''}</td>
+        <td class="small">${m.membershipType||'—'}</td>
+        <td class="small">${m._createdDate ? new Date(m._createdDate).toLocaleDateString() : '—'}</td>
+        <td><span class="badge badge-status-${m.isActive?'active':'inactive'}">${m.isActive?'Active':'Inactive'}</span></td>
+        <td>
+          <button class="btn btn-xs btn-outline-primary mx-1" style="font-size:.7rem;padding:.1rem .5rem" onclick="editMember('${m._id}','${(m.firstName+' '+m.lastName).replace(/'/g,'`')}','${m.membershipType||''}')">Edit</button>
+          <button class="btn btn-xs btn-outline-danger" style="font-size:.7rem;padding:.1rem .5rem" onclick="deactivateMember('${m._id}','${m.firstName}')">Deactivate</button>
+        </td>
+      </tr>`).join('') || '<tr><td colspan="6" class="text-muted small text-center py-3">No members found</td></tr>';
+  } catch(e) { tbl.innerHTML = '<tr><td colspan="6" class="text-danger small">Load failed</td></tr>'; }
+}
+
+async function editMember(id, name, type) {
+  const newType = prompt(`Edit membership type for ${name}:`, type);
+  if (!newType) return;
+  try {
+    const res = await fetch(`${API}/admin_member_update`, { method:'POST', headers: getHeaders(), body: JSON.stringify({ _id: id, membershipType: newType }) });
+    const data = await res.json();
+    if (data.success) { showToast('Member updated','success'); loadMembers(); } else showToast(data.error,'danger');
+  } catch(e) { showToast('Error','danger'); }
+}
+
+async function deactivateMember(id, name) {
+  if (!confirm(`Deactivate ${name}?`)) return;
+  try {
+    const res = await fetch(`${API}/admin_member_deactivate`, { method:'POST', headers: getHeaders(), body: JSON.stringify({ memberId: id }) });
+    const data = await res.json();
+    if (data.success) { showToast('Member deactivated','success'); loadMembers(); } else showToast(data.error,'danger');
+  } catch(e) { showToast('Error','danger'); }
+}
+
+// ─── PAYMENTS ───────────────────────────────────
+async function loadPayments() {
+  const status = document.getElementById('pay-status-filter').value;
+  const tbl = document.getElementById('payments-tbl');
+  tbl.innerHTML = '<tr><td colspan="7" class="text-center py-3"><div class="spinner-border spinner-sm text-danger"></div></td></tr>';
+  try {
+    const url = `${API}/admin_payments?limit=100${status ? '&status='+status : ''}`;
+    const res = await fetch(url, { headers: getHeaders() });
+    const data = await res.json();
+    document.getElementById('pay-total').textContent = `Total: $${(data.totalAmount||0).toFixed(2)} across ${data.total||0} records`;
+    tbl.innerHTML = (data.payments||[]).map(p => `
+      <tr>
+        <td>${p.memberName||''}</td>
+        <td class="fw-bold">$${(p.amount||0).toFixed(2)}</td>
+        <td class="small">${p.purpose||''}</td>
+        <td class="small">${p.method||''}</td>
+        <td><span class="badge badge-status-${p.status||'pending'}">${p.status||''}</span></td>
+        <td class="small">${p._createdDate ? new Date(p._createdDate).toLocaleDateString() : '—'}</td>
+        <td><button class="btn btn-xs btn-outline-warning" style="font-size:.7rem;padding:.1rem .5rem" onclick="updatePaymentStatus('${p._id}','${p.status}')">Update</button></td>
+      </tr>`).join('') || '<tr><td colspan="7" class="text-muted small text-center py-3">No payments</td></tr>';
+  } catch(e) { tbl.innerHTML = '<tr><td colspan="7" class="text-danger small">Load failed</td></tr>'; }
+}
+
+async function recordPayment() {
+  const body = {
+    memberName: document.getElementById('pay-name').value,
+    email: document.getElementById('pay-email').value,
+    amount: document.getElementById('pay-amount').value,
+    purpose: document.getElementById('pay-purpose').value,
+    method: document.getElementById('pay-method').value,
+    notes: document.getElementById('pay-notes').value
+  };
+  if (!body.memberName || !body.amount || !body.purpose) return showToast('Fill required fields','danger');
+  try {
+    const res = await fetch(`${API}/admin_payment_record`, { method:'POST', headers: getHeaders(), body: JSON.stringify(body) });
+    const data = await res.json();
+    if (data.success) { showToast('Payment recorded','success'); bootstrap.Modal.getInstance(document.getElementById('modal-payment')).hide(); loadPayments(); }
+    else showToast(data.error||'Failed','danger');
+  } catch(e) { showToast('Error: '+e.message,'danger'); }
+}
+
+async function updatePaymentStatus(id, current) {
+  const status = prompt('Update status (pending/completed/failed):', current);
+  if (!status) return;
+  try {
+    const res = await fetch(`${API}/admin_payment_update`, { method:'POST', headers: getHeaders(), body: JSON.stringify({ _id: id, status }) });
+    const data = await res.json();
+    if (data.success) { showToast('Status updated','success'); loadPayments(); } else showToast(data.error,'danger');
+  } catch(e) { showToast('Error','danger'); }
+}
+
+// ─── SURVEYS ────────────────────────────────────
+async function setupSurveyCollections() {
+  showToast('Setting up survey collections…','info');
+  try {
+    const res = await fetch(`${API}/survey_setup`, { method:'POST', headers: getHeaders(), body: JSON.stringify({}) });
+    const data = await res.json();
+    showToast(data.success ? 'Collections ready ✅' : (data.error||'Failed'),'success');
+  } catch(e) { showToast('Error: '+e.message,'danger'); }
+}
+
+async function loadSurveys() {
+  const out = document.getElementById('surveys-list');
+  out.innerHTML = '<div class="col-12 text-center py-3"><div class="spinner-border spinner-sm text-danger"></div></div>';
+  try {
+    const res = await fetch(`${API}/survey_list`, { headers: getHeaders() });
+    const data = await res.json();
+    const surveys = data.surveys || [];
+    if (!surveys.length) { out.innerHTML = '<div class="col-12 text-muted small text-center py-3">No surveys yet. Create one!</div>'; return; }
+    out.innerHTML = surveys.map(sv => `
+      <div class="col-md-4">
+        <div class="card h-100 border-0 shadow-sm">
+          <div class="card-body">
+            <span class="badge ${sv.status==='active'?'bg-success':sv.status==='closed'?'bg-secondary':'bg-warning text-dark'} mb-2">${sv.status||'draft'}</span>
+            <h6 class="card-title fw-bold">${sv.title||''}</h6>
+            <p class="card-text small text-muted">${sv.description||''}</p>
+            <div class="small text-muted">${sv.questionCount||0} questions · ${sv.recipientCount||0} sent · ${sv.responseCount||0} responses</div>
+          </div>
+          <div class="card-footer bg-transparent d-flex gap-1 flex-wrap">
+            <button class="btn btn-banf btn-sm flex-fill" onclick="openSurveyDetail('${sv._id}')">Detail</button>
+            ${sv.status!=='closed' ? `<button class="btn btn-outline-success btn-sm" onclick="sendSurveyNow('${sv._id}')"><i class="fas fa-paper-plane"></i></button>` : ''}
+            ${sv.status!=='draft' ? `<button class="btn btn-outline-info btn-sm" onclick="viewSurveyReport('${sv._id}')"><i class="fas fa-chart-bar"></i></button>` : ''}
+          </div>
+        </div>
+      </div>`).join('');
+  } catch(e) { out.innerHTML = '<div class="col-12 text-danger small">Load failed</div>'; }
+}
+
+async function openSurveyDetail(surveyId) {
+  currentSurveyId = surveyId;
+  const modal = new bootstrap.Modal(document.getElementById('modal-survey-detail'));
+  const body = document.getElementById('sv-detail-body');
+  const footer = document.getElementById('sv-detail-footer');
+  body.innerHTML = '<div class="text-center py-3"><div class="spinner-border text-danger"></div></div>';
+  modal.show();
+  try {
+    const [dRes, rRes] = await Promise.all([
+      fetch(`${API}/survey_detail?surveyId=${surveyId}`, { headers: getHeaders() }),
+      fetch(`${API}/survey_report?surveyId=${surveyId}`, { headers: getHeaders() })
+    ]);
+    const d = await dRes.json(); const r = await rRes.json();
+    const sv = d.survey || {}; const rpt = r.report || {};
+    document.getElementById('sv-detail-title').textContent = sv.title || 'Survey Detail';
+    body.innerHTML = `
+      <div class="row g-3 mb-3">
+        <div class="col-3"><div class="stat-card"><div class="num">${rpt.totalSent||0}</div><div class="lbl">Sent</div></div></div>
+        <div class="col-3"><div class="stat-card" style="border-color:#28a745"><div class="num text-success">${rpt.responded||0}</div><div class="lbl">Responded</div></div></div>
+        <div class="col-3"><div class="stat-card" style="border-color:#ffc107"><div class="num text-warning">${rpt.pending||0}</div><div class="lbl">Pending</div></div></div>
+        <div class="col-3"><div class="stat-card" style="border-color:#17a2b8"><div class="num text-info">${rpt.escalations||0}</div><div class="lbl">Escalations</div></div></div>
+      </div>
+      <h6 class="fw-bold text-danger">Questions (${(sv.questions||[]).length})</h6>
+      ${(sv.questions||[]).map((q,i) => `
+        <div class="card mb-2 p-2">
+          <div class="fw-bold small">${i+1}. ${q.text||q.question||''} <span class="badge bg-secondary ms-1">${q.type||''}</span></div>
+          ${rpt.results && rpt.results[q.id||i] ? `<div class="small text-muted mt-1">${JSON.stringify(rpt.results[q.id||i])}</div>` : ''}
+        </div>`).join('')}
+      ${rpt.sentTo?.length ? `<h6 class="fw-bold text-danger mt-3">Recipients (${rpt.sentTo.length})</h6>
+        <table class="table table-sm"><thead><tr><th>Name</th><th>Email</th><th>Responded</th><th>Opened</th></tr></thead>
+        <tbody>${(rpt.sentTo||[]).map(r=>`<tr><td>${r.name}</td><td class="small">${r.email}</td>
+          <td><span class="badge ${r.hasResponded?'bg-success':'bg-secondary'}">${r.hasResponded?'Yes':'No'}</span></td>
+          <td><span class="badge ${r.hasOpened?'bg-info':'bg-secondary'}">${r.hasOpened?'Yes':'No'}</span></td></tr>`).join('')}</tbody></table>` : ''}`;
+    footer.innerHTML = `
+      ${sv.status!=='closed'?`<button class="btn btn-success btn-sm" onclick="sendSurveyNow('${surveyId}')"><i class="fas fa-paper-plane me-1"></i>Send to EC</button>`:''}
+      ${sv.status==='active'?`<button class="btn btn-outline-secondary btn-sm" onclick="closeSurvey('${surveyId}')">Close Survey</button>`:''}
+      ${sv.status!=='draft'?`<button class="btn btn-outline-dark btn-sm" onclick="processSurvey('${surveyId}')"><i class="fas fa-cogs me-1"></i>Process</button>`:''}`;
+  } catch(e) { body.innerHTML = '<div class="text-danger">'+e.message+'</div>'; }
+}
+
+async function sendSurveyNow(surveyId) {
+  if (!confirm('Send this survey to all EC test members?')) return;
+  showToast('Sending survey emails…','info');
+  try {
+    const res = await fetch(`${API}/survey_send`, { method:'POST', headers: getHeaders(), body: JSON.stringify({ surveyId, sendToEC: true }) });
+    const data = await res.json();
+    if (data.success) showToast(`Sent to ${data.sentCount||0} recipients ✅`,'success');
+    else showToast(data.error||'Failed','danger');
+    loadSurveys();
+  } catch(e) { showToast('Error: '+e.message,'danger'); }
+}
+
+async function processSurvey(surveyId) {
+  showToast('Processing responses…','info');
+  try {
+    const res = await fetch(`${API}/survey_process`, { method:'POST', headers: getHeaders(), body: JSON.stringify({ surveyId }) });
+    const data = await res.json();
+    showToast(data.success ? 'Processing complete ✅' : (data.error||'Failed'), data.success?'success':'danger');
+  } catch(e) { showToast('Error','danger'); }
+}
+
+async function closeSurvey(surveyId) {
+  if (!confirm('Close this survey?')) return;
+  try {
+    const res = await fetch(`${API}/survey_close`, { method:'POST', headers: getHeaders(), body: JSON.stringify({ surveyId }) });
+    const data = await res.json();
+    if (data.success) { showToast('Survey closed','success'); bootstrap.Modal.getInstance(document.getElementById('modal-survey-detail')).hide(); loadSurveys(); }
+    else showToast(data.error||'Failed','danger');
+  } catch(e) { showToast('Error','danger'); }
+}
+
+async function viewSurveyReport(surveyId) { openSurveyDetail(surveyId); }
+
+// Survey creation form helpers
+function addSurveyQuestion() {
+  surveyQCount++;
+  const idx = surveyQCount;
+  const div = document.createElement('div');
+  div.className = 'card p-2 mb-2';
+  div.id = 'sq-'+idx;
+  div.innerHTML = `
+    <div class="d-flex gap-2 align-items-start">
+      <div class="flex-grow-1">
+        <input type="text" class="form-control form-control-sm mb-1" id="sq-text-${idx}" placeholder="Question text">
+        <select class="form-select form-select-sm" id="sq-type-${idx}">
+          <option value="rating_1_10">Rating 1–10</option>
+          <option value="rating_1_5">Rating 1–5</option>
+          <option value="yes_no">Yes / No</option>
+          <option value="text">Open Text</option>
+        </select>
+      </div>
+      <button class="btn btn-outline-danger btn-sm" onclick="document.getElementById('sq-${idx}').remove()"><i class="fas fa-trash"></i></button>
+    </div>`;
+  document.getElementById('sv-questions').appendChild(div);
+}
+
+async function createSurvey() {
+  const title = document.getElementById('sv-title').value.trim();
+  const description = document.getElementById('sv-desc').value.trim();
+  if (!title) return showToast('Title required','danger');
+  const questions = [];
+  document.querySelectorAll('[id^="sq-"]').forEach(el => {
+    const idx = el.id.replace('sq-','');
+    const txt = document.getElementById('sq-text-'+idx)?.value?.trim();
+    const type = document.getElementById('sq-type-'+idx)?.value;
+    if (txt) questions.push({ id: 'q'+idx, text: txt, type, required: true });
+  });
+  if (!questions.length) return showToast('Add at least one question','danger');
+  try {
+    const res = await fetch(`${API}/survey_create`, { method:'POST', headers: getHeaders(), body: JSON.stringify({ title, description, questions }) });
+    const data = await res.json();
+    if (data.success) { showToast('Survey created ✅','success'); bootstrap.Modal.getInstance(document.getElementById('modal-create-survey')).hide(); surveyQCount=0; document.getElementById('sv-questions').innerHTML=''; loadSurveys(); }
+    else showToast(data.error||'Failed','danger');
+  } catch(e) { showToast('Error: '+e.message,'danger'); }
+}
+
+// ─── PROCESS AUTOMATION ──────────────────────────
+async function loadEmailQueue() {
+  const out = document.getElementById('automation-output');
+  out.innerHTML = '<div class="spinner-border spinner-sm text-danger"></div>';
+  try {
+    const res = await fetch(`${API}/admin_email_queue`, { headers: getHeaders() });
+    const data = await res.json();
+    const q = data.queue || data.emails || [];
+    out.innerHTML = q.length ? `<div class="tbl-wrap"><table class="table table-sm mb-0">
+      <thead><tr><th>From</th><th>Subject</th><th>Draft Response</th><th>Status</th><th>Action</th></tr></thead>
+      <tbody>${q.map(e=>`<tr>
+        <td class="small">${e.fromEmail||''}</td>
+        <td class="small">${(e.subject||'').substring(0,50)}</td>
+        <td class="small text-muted">${(e.draftResponse||'').substring(0,80)}…</td>
+        <td><span class="badge badge-status-${e.status||'pending'}">${e.status||''}</span></td>
+        <td><button class="btn btn-xs btn-outline-success" style="font-size:.7rem;padding:.1rem .5rem" onclick="approveEmail('${e._id}')">Approve</button></td>
+      </tr>`).join('')}</tbody></table></div>` : '<div class="text-muted small">Email queue is empty</div>';
+  } catch(e) { out.innerHTML = '<div class="text-danger small">'+e.message+'</div>'; }
+}
+
+async function runEmailScan() {
+  const out = document.getElementById('automation-output');
+  out.innerHTML = '<div class="spinner-border spinner-sm text-danger"></div> Scanning Gmail…';
+  try {
+    const res = await fetch(`${API}/admin_email_scan`, { method:'POST', headers: getHeaders(), body: JSON.stringify({}) });
+    const data = await res.json();
+    out.innerHTML = `<div class="alert alert-${data.success?'success':'danger'} small">${data.success ? `✅ Scanned: ${data.newEmails||0} new, ${data.responses||0} responses drafted` : (data.error||'Failed')}</div>`;
+    if (data.success) loadEmailQueue();
+  } catch(e) { out.innerHTML = `<div class="alert alert-danger small">${e.message}</div>`; }
+}
+
+async function loadAutoResponses() {
+  const out = document.getElementById('automation-output');
+  out.innerHTML = '<div class="spinner-border spinner-sm text-danger"></div>';
+  try {
+    const res = await fetch(`${API}/admin_auto_responses`, { headers: getHeaders() });
+    const data = await res.json();
+    const rules = data.autoResponses || data.rules || [];
+    out.innerHTML = rules.length ? `<div class="tbl-wrap"><table class="table table-sm mb-0">
+      <thead><tr><th>Trigger</th><th>Type</th><th>Template</th><th>Active</th></tr></thead>
+      <tbody>${rules.map(r=>`<tr>
+        <td class="small fw-bold">${r.trigger||''}</td>
+        <td class="small">${r.type||''}</td>
+        <td class="small text-muted">${(r.template||r.response||'').substring(0,80)}</td>
+        <td><span class="badge ${r.isActive?'bg-success':'bg-secondary'}">${r.isActive?'On':'Off'}</span></td>
+      </tr>`).join('')}</tbody></table></div>` : '<div class="text-muted small">No auto-response rules</div>';
+  } catch(e) { out.innerHTML = '<div class="text-danger small">'+e.message+'</div>'; }
+}
+
+async function approveEmail(queueId) {
+  try {
+    const res = await fetch(`${API}/admin_approve_response`, { method:'POST', headers: getHeaders(), body: JSON.stringify({ queueId }) });
+    const data = await res.json();
+    if (data.success) { showToast('Email sent ✅','success'); loadEmailQueue(); }
+    else showToast(data.error||'Failed','danger');
+  } catch(e) { showToast('Error','danger'); }
+}
+
+// ─── CRM ─────────────────────────────────────────
+async function loadCrmDashboard() {
+  const out = document.getElementById('crm-stats');
+  out.innerHTML = '<div class="col-12 text-center py-3"><div class="spinner-border spinner-sm text-danger"></div></div>';
+  try {
+    const res = await fetch(`${API}/crm_dashboard`, { headers: getHeaders() });
+    const data = await res.json();
+    const s = data.stats || {};
+    out.innerHTML = `
+      <div class="col-6 col-md-3"><div class="stat-card"><div class="num">${s.totalFamilies||0}</div><div class="lbl">Families</div></div></div>
+      <div class="col-6 col-md-3"><div class="stat-card"><div class="num">${s.totalMembers||0}</div><div class="lbl">Members</div></div></div>
+      <div class="col-6 col-md-3"><div class="stat-card"><div class="num">${s.linkedEmails||0}</div><div class="lbl">Linked Emails</div></div></div>
+      <div class="col-6 col-md-3"><div class="stat-card" style="border-color:#ffc107"><div class="num text-warning">${s.dataIssues||0}</div><div class="lbl">Data Issues</div></div></div>`;
+    // load families
+    const fRes = await fetch(`${API}/crm_families?limit=50`, { headers: getHeaders() });
+    const fData = await fRes.json();
+    const ftbl = document.getElementById('crm-families-tbl');
+    document.getElementById('crm-families-output').style.display = '';
+    ftbl.innerHTML = (fData.families||[]).map(f=>`
+      <tr><td class="small fw-bold">${f.familyId||''}</td>
+      <td>${f.headName||f.head||''}</td>
+      <td>${(f.adults||[]).length}</td>
+      <td>${(f.minors||f.children||[]).length}</td>
+      <td><span class="badge badge-status-${f.membershipStatus==='active'?'active':'inactive'}">${f.membershipStatus||'—'}</span></td></tr>`).join('') || '<tr><td colspan="5" class="text-muted small text-center">No families</td></tr>';
+  } catch(e) { out.innerHTML = '<div class="col-12 text-danger small">'+e.message+'</div>'; }
+}
+
+// ─── VENDORS ─────────────────────────────────────
+async function loadVendors() {
+  const out = document.getElementById('vendors-output');
+  document.getElementById('vendor-add-btn').onclick = () => showAddVendorModal('vendor');
+  try {
+    const res = await fetch(`${API}/admin_vendors`, { headers: getHeaders() });
+    const data = await res.json();
+    renderVendorTable(data.vendors||[], ['Name','Contact','Service','Active']);
+  } catch(e) { out.innerHTML = '<div class="text-danger small">'+e.message+'</div>'; }
+}
+
+async function loadSponsors() {
+  try {
+    const res = await fetch(`${API}/admin_sponsors`, { headers: getHeaders() });
+    const data = await res.json();
+    renderVendorTable(data.sponsors||[], ['Name','Tier','Contribution','Active']);
+  } catch(e) {}
+}
+
+async function loadAds() {
+  try {
+    const res = await fetch(`${API}/admin_ads`, { headers: getHeaders() });
+    const data = await res.json();
+    renderVendorTable(data.ads||[], ['Title','Position','Start','End']);
+  } catch(e) {}
+}
+
+function renderVendorTable(items, headers) {
+  const out = document.getElementById('vendors-output');
+  if (!items.length) { out.innerHTML = '<div class="p-3 text-muted small">No data found</div>'; return; }
+  const keys = Object.keys(items[0]).filter(k => !k.startsWith('_') && k!=='id');
+  out.innerHTML = `<table class="table table-sm mb-0"><thead><tr>${keys.slice(0,6).map(k=>`<th>${k}</th>`).join('')}</tr></thead>
+    <tbody>${items.map(it=>`<tr>${keys.slice(0,6).map(k=>`<td class="small">${it[k]!=null?String(it[k]).substring(0,60):''}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+}
+
+function showAddVendorModal() {
+  const name = prompt('Vendor name:'); if (!name) return;
+  const contact = prompt('Contact email:') || '';
+  const service = prompt('Service/notes:') || '';
+  fetch(`${API}/admin_vendor`, { method:'POST', headers: getHeaders(), body: JSON.stringify({ name, contact, service, isActive: true }) })
+    .then(r=>r.json()).then(d=>{ if(d.success){showToast('Vendor added','success');loadVendors();}else showToast(d.error,'danger'); });
+}
+
+// ─── KNOWLEDGE BASE ──────────────────────────────
+async function loadKb() {
+  try {
+    const res = await fetch(`${API}/admin_knowledge_base`, { headers: getHeaders() });
+    const data = await res.json();
+    const tbl = document.getElementById('kb-tbl');
+    tbl.innerHTML = (data.documents||data.items||[]).map(d=>`
+      <tr><td class="fw-bold small">${d.title||''}</td><td class="small">${d.category||''}</td>
+      <td><span class="badge bg-secondary">${d.sensitivity||d.sensitivityLevel||'low'}</span></td>
+      <td class="small">${d._createdDate?new Date(d._createdDate).toLocaleDateString():''}</td></tr>`).join('') || '<tr><td colspan="4" class="text-muted small text-center">No documents</td></tr>';
+  } catch(e) {}
+}
+
+async function searchKb() {
+  const q = document.getElementById('kb-search-q').value.trim();
+  if (!q) return;
+  try {
+    const res = await fetch(`${API}/admin_kb_search`, { method:'POST', headers: getHeaders(), body: JSON.stringify({ query: q }) });
+    const data = await res.json();
+    const out = document.getElementById('kb-search-results');
+    out.innerHTML = (data.results||[]).map(r=>`<div class="card p-2 mb-1"><div class="fw-bold small">${r.title||''}</div><div class="small text-muted">${(r.content||'').substring(0,120)}…</div></div>`).join('') || '<div class="text-muted small">No results</div>';
+  } catch(e) {}
+}
+
+async function addKbDoc() {
+  const title = document.getElementById('kb-title').value.trim();
+  const content = document.getElementById('kb-content').value.trim();
+  const category = document.getElementById('kb-category').value;
+  if (!title || !content) return showToast('Title and content required','danger');
+  try {
+    const res = await fetch(`${API}/admin_kb_add`, { method:'POST', headers: getHeaders(), body: JSON.stringify({ title, content, category }) });
+    const data = await res.json();
+    if (data.success) { showToast('Document added ✅','success'); loadKb(); document.getElementById('kb-title').value=''; document.getElementById('kb-content').value=''; }
+    else showToast(data.error||'Failed','danger');
+  } catch(e) { showToast('Error','danger'); }
+}
+
+// ─── AI AGENTS ───────────────────────────────────
+async function loadAgents() {
+  try {
+    const res = await fetch(`${API}/admin_agents`, { headers: getHeaders() });
+    const data = await res.json();
+    const out = document.getElementById('agents-list');
+    out.innerHTML = (data.agents||[]).map(ag=>`
+      <div class="col-md-4">
+        <div class="card p-3">
+          <div class="d-flex justify-content-between align-items-start mb-2">
+            <h6 class="fw-bold text-danger mb-0">${ag.name||ag.agentId||''}</h6>
+            <span class="badge ${ag.isActive?'bg-success':'bg-secondary'}">${ag.isActive?'Active':'Off'}</span>
+          </div>
+          <p class="small text-muted mb-2">${ag.description||ag.role||''}</p>
+          <div class="small"><strong>Model:</strong> ${ag.model||'—'}<br><strong>Temperature:</strong> ${ag.temperature||'—'}</div>
+          <button class="btn btn-outline-danger btn-sm mt-2" onclick="toggleAgent('${ag._id}',${!ag.isActive})">${ag.isActive?'Disable':'Enable'}</button>
+        </div>
+      </div>`).join('') || '<div class="col-12 text-muted small">No agents found</div>';
+  } catch(e) {}
+}
+
+async function toggleAgent(id, isActive) {
+  try {
+    const res = await fetch(`${API}/admin_agent_update`, { method:'POST', headers: getHeaders(), body: JSON.stringify({ _id: id, isActive }) });
+    const data = await res.json();
+    if (data.success) { showToast('Agent updated','success'); loadAgents(); } else showToast(data.error,'danger');
+  } catch(e) {}
+}
+
+// ─── ROLES ───────────────────────────────────────
+async function loadRoles() {
+  try {
+    const res = await fetch(`${API}/admin_roles`, { headers: getHeaders() });
+    const data = await res.json();
+    const tbl = document.getElementById('roles-tbl');
+    const roleBadge = { super_admin:'bg-danger', admin:'bg-warning text-dark', ec_member:'bg-success', member:'bg-secondary', guest:'bg-light text-dark' };
+    tbl.innerHTML = (data.roles||[]).map(r=>`
+      <tr>
+        <td class="small">${[r.firstName,r.lastName].filter(Boolean).join(' ')||'—'}</td>
+        <td class="small">${r.email||''}</td>
+        <td><span class="badge ${roleBadge[r.role]||'bg-secondary'}">${r.role||''}</span></td>
+        <td class="small">${r.ecTitle?`<span class="badge" style="background:var(--grad);font-size:.7rem">${r.ecTitle}</span>`:''}</td>
+        <td class="small">${r.addedBy||''}</td>
+        <td class="small">${r._createdDate?new Date(r._createdDate).toLocaleDateString():''}</td>
+        <td><span class="badge badge-status-${r.isActive?'active':'inactive'}">${r.isActive?'Active':'Revoked'}</span></td>
+        <td><button class="btn btn-xs btn-outline-danger" style="font-size:.7rem;padding:.1rem .5rem" onclick="revokeRole('${r._id}','${r.email}')">Revoke</button></td>
+      </tr>`).join('') || '<tr><td colspan="8" class="text-muted small text-center">No roles</td></tr>';
+  } catch(e) {}
+}
+
+function toggleEcTitle() {
+  const r = document.getElementById('role-select').value;
+  document.getElementById('ec-title-wrap').style.display = r === 'ec_member' ? '' : 'none';
+}
+
+async function grantRole() {
+  const email = document.getElementById('role-email').value.trim();
+  const role = document.getElementById('role-select').value;
+  const ecTitle = document.getElementById('role-title').value;
+  const firstName = document.getElementById('role-fname').value.trim();
+  const lastName = document.getElementById('role-lname').value.trim();
+  if (!email) return showToast('Email required','danger');
+  try {
+    const res = await fetch(`${API}/admin_role_add`, { method:'POST', headers: getHeaders(), body: JSON.stringify({ email, role, ecTitle, firstName, lastName }) });
+    const data = await res.json();
+    if (data.success) { showToast('Role granted ✅','success'); bootstrap.Modal.getInstance(document.getElementById('modal-role')).hide(); loadRoles(); }
+    else showToast(data.error||'Failed','danger');
+  } catch(e) { showToast('Error','danger'); }
+}
+
+async function revokeRole(id, email) {
+  if (!confirm(`Revoke role for ${email}?`)) return;
+  try {
+    const res = await fetch(`${API}/admin_role_revoke`, { method:'POST', headers: getHeaders(), body: JSON.stringify({ roleId: id }) });
+    const data = await res.json();
+    if (data.success) { showToast('Role revoked','success'); loadRoles(); } else showToast(data.error,'danger');
+  } catch(e) {}
+}
+
+// ─── REPORTS ─────────────────────────────────────
+async function genReport(type) {
+  const labels = { membership:'Membership Report', financial:'Financial Report', events:'Events Report', surveys:'Survey Report', crm:'CRM Audit', comms:'Communication Report' };
+  const out = document.getElementById('report-output');
+  out.style.display = '';
+  document.getElementById('report-title').textContent = labels[type] || type;
+  document.getElementById('report-content').innerHTML = '<div class="spinner-border spinner-sm text-danger"></div> Generating…';
+  try {
+    let data = {};
+    if (type === 'membership') { const r = await fetch(`${API}/admin_members?limit=500`, { headers: getHeaders() }); data = await r.json(); currentReportData = data.members||[]; }
+    else if (type === 'financial') { const r = await fetch(`${API}/admin_payments?limit=500`, { headers: getHeaders() }); data = await r.json(); currentReportData = data.payments||[]; }
+    else if (type === 'events') { const r = await fetch(`${API}/evite_events`, { headers: getHeaders() }); data = await r.json(); currentReportData = data.events||[]; }
+    else if (type === 'surveys') { const r = await fetch(`${API}/survey_list`, { headers: getHeaders() }); data = await r.json(); currentReportData = data.surveys||[]; }
+    else if (type === 'crm') { const r = await fetch(`${API}/crm_dashboard`, { headers: getHeaders() }); data = await r.json(); currentReportData = [data.stats||{}]; }
+    else if (type === 'comms') { const r = await fetch(`${API}/admin_email_queue`, { headers: getHeaders() }); data = await r.json(); currentReportData = data.queue||[]; }
+    if (!currentReportData.length) { document.getElementById('report-content').innerHTML = '<div class="text-muted small">No data available</div>'; return; }
+    const keys = Object.keys(currentReportData[0]).filter(k=>!k.startsWith('_'));
+    document.getElementById('report-content').innerHTML = `
+      <div class="tbl-wrap"><table class="table table-sm">
+        <thead><tr>${keys.slice(0,8).map(k=>`<th>${k}</th>`).join('')}</tr></thead>
+        <tbody>${currentReportData.map(row=>`<tr>${keys.slice(0,8).map(k=>`<td class="small">${row[k]!=null?String(row[k]).substring(0,60):''}</td>`).join('')}</tr>`).join('')}</tbody>
+      </table></div>
+      <div class="small text-muted mt-1">${currentReportData.length} records · Generated ${new Date().toLocaleString()}</div>`;
+  } catch(e) { document.getElementById('report-content').innerHTML = '<div class="text-danger small">'+e.message+'</div>'; }
+}
+
+function exportReport() {
+  if (!currentReportData.length) return;
+  const keys = Object.keys(currentReportData[0]);
+  const csv = [keys.join(','), ...currentReportData.map(r=>keys.map(k=>JSON.stringify(r[k]||'')).join(','))].join('\n');
+  const a = document.createElement('a'); a.href = 'data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+  a.download = 'banf-report-'+Date.now()+'.csv'; a.click();
+}
+
+// ─── SYSTEM TOOLS ────────────────────────────────
+async function runBootstrap() {
+  if (!confirm('Run full system bootstrap? This seeds roles, agents, and knowledge base.')) return;
+  const out = document.getElementById('tools-output');
+  out.innerHTML = '<div class="spinner-border spinner-sm text-danger"></div> Running bootstrap…';
+  try {
+    const res = await fetch(`${API}/admin_bootstrap`, { method:'POST', headers: getHeaders(), body: JSON.stringify({}) });
+    const data = await res.json();
+    out.innerHTML = `<div class="alert alert-${data.success?'success':'danger'} small pre-wrap">${data.success ? '✅ Bootstrap complete!\n' + JSON.stringify(data, null, 2) : (data.error||'Failed')}</div>`;
+  } catch(e) { out.innerHTML = `<div class="alert alert-danger small">${e.message}</div>`; }
+}
+
+async function loadArchive() {
+  const out = document.getElementById('tools-output');
+  out.innerHTML = '<div class="spinner-border spinner-sm text-danger"></div>';
+  try {
+    const res = await fetch(`${API}/admin_archive`, { headers: getHeaders() });
+    const data = await res.json();
+    const items = data.archive || data.items || [];
+    out.innerHTML = `<div class="tbl-wrap"><table class="table table-sm"><thead><tr><th>Type</th><th>Title</th><th>Archived</th><th>By</th></tr></thead>
+      <tbody>${items.map(it=>`<tr><td class="small">${it.type||''}</td><td>${it.title||it.name||''}</td><td class="small">${it.archivedAt?new Date(it.archivedAt).toLocaleDateString():''}</td><td class="small">${it.archivedBy||''}</td></tr>`).join('')}</tbody></table></div>`;
+  } catch(e) { out.innerHTML = '<div class="text-danger small">'+e.message+'</div>'; }
+}
+
+async function runTests() {
+  const out = document.getElementById('tools-output');
+  out.innerHTML = '<div class="spinner-border spinner-sm text-danger"></div> Running test suite…';
+  try {
+    const res = await fetch(`${API}/run_test_suite`, { method:'POST', headers: getHeaders(), body: JSON.stringify({}) });
+    const data = await res.json();
+    const r = data.results || {};
+    out.innerHTML = `<div class="card p-3">
+      <h6 class="fw-bold text-danger">Test Results</h6>
+      <div class="d-flex gap-3 mb-2">
+        <span class="text-success fw-bold">✅ ${r.passed||0} passed</span>
+        <span class="text-warning fw-bold">⚠️ ${r.warnings||0} warnings</span>
+        <span class="text-danger fw-bold">❌ ${r.failed||0} failed</span>
+      </div>
+      <div class="small text-muted">${(r.tests||[]).map(t=>`<div>${t.status==='pass'?'✅':t.status==='warn'?'⚠️':'❌'} ${t.name||t.test||''}</div>`).join('')}</div>
+    </div>`;
+  } catch(e) { out.innerHTML = '<div class="alert alert-danger small">'+e.message+'</div>'; }
+}
+
+// ─── TOAST ───────────────────────────────────────
+function showToast(msg, type='info') {
+  const id = 't'+Date.now();
+  const colors = {success:'#198754',danger:'#dc3545',warning:'#ffc107',info:'#0dcaf0'};
+  const el = document.createElement('div');
+  el.id=id; el.style.cssText=`background:${colors[type]||colors.info};color:${type==='warning'?'#000':'#fff'};padding:.6rem 1rem;border-radius:8px;margin-bottom:.4rem;font-size:.85rem;box-shadow:0 4px 12px rgba(0,0,0,.3);animation:slideIn .2s ease`;
+  el.textContent=msg;
+  document.getElementById('toast-area').prepend(el);
+  setTimeout(()=>el.remove(),4000);
+}
+
+// ─── EMAIL TEMPLATES ────────────────────────────
+async function loadEmailTemplates() {
+  try {
+    const res = await fetch(`${API}/email_templates`, { headers: getHeaders() });
+    const data = await res.json();
+    const tbody = document.getElementById('email-templates-body');
+    if (!data.success || !data.templates) {
+      tbody.innerHTML = `<tr><td colspan="7" class="text-center text-danger">${data.error || 'Failed to load templates'}</td></tr>`;
+      return;
+    }
+    tbody.innerHTML = data.templates.map(t => `
+      <tr>
+        <td><code style="font-size:.8rem">${t.templateId}</code></td>
+        <td>${t.name || ''}</td>
+        <td style="font-size:.8rem;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${t.subject || ''}</td>
+        <td style="font-size:.78rem;color:#6b7280;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${t.description || ''}</td>
+        <td>${(t.isActive === false || t.isActive === 'false') ? '<span class="badge bg-secondary">Inactive</span>' : '<span class="badge bg-success">Active</span>'}</td>
+        <td style="font-size:.78rem;color:#6b7280">${t.lastModifiedBy || '—'}</td>
+        <td><button class="btn btn-outline-danger btn-sm" onclick='editEmailTemplate(${JSON.stringify(t)})'><i class="fas fa-edit me-1"></i>Edit</button></td>
+      </tr>`).join('');
+  } catch (e) {
+    showToast('Error loading email templates: ' + e.message, 'danger');
+  }
+}
+
+function newEmailTemplate() {
+  document.getElementById('editor-title').innerHTML = '<i class="fas fa-plus me-2"></i>New Template';
+  document.getElementById('et-templateId').value = '';
+  document.getElementById('et-templateId').disabled = false;
+  document.getElementById('et-name').value = '';
+  document.getElementById('et-subject').value = '';
+  document.getElementById('et-description').value = '';
+  document.getElementById('et-bodyHtml').value = '';
+  document.getElementById('et-variables').value = '';
+  document.getElementById('et-isActive').value = 'true';
+  document.getElementById('et-preview-area').style.display = 'none';
+  document.getElementById('email-template-editor').style.display = '';
+  document.getElementById('email-template-editor').scrollIntoView({ behavior: 'smooth' });
+}
+
+function editEmailTemplate(t) {
+  document.getElementById('editor-title').innerHTML = `<i class="fas fa-edit me-2"></i>Edit: ${t.name || t.templateId}`;
+  document.getElementById('et-templateId').value = t.templateId || '';
+  document.getElementById('et-templateId').disabled = true; // cannot change templateId
+  document.getElementById('et-name').value = t.name || '';
+  document.getElementById('et-subject').value = t.subject || '';
+  document.getElementById('et-description').value = t.description || '';
+  document.getElementById('et-bodyHtml').value = t.bodyHtml || '';
+  const vars = Array.isArray(t.variables) ? t.variables.join(',') : (t.variables || '');
+  document.getElementById('et-variables').value = vars;
+  document.getElementById('et-isActive').value = (t.isActive === false || t.isActive === 'false') ? 'false' : 'true';
+  document.getElementById('et-preview-area').style.display = 'none';
+  document.getElementById('email-template-editor').style.display = '';
+  document.getElementById('email-template-editor').scrollIntoView({ behavior: 'smooth' });
+}
+
+async function saveEmailTemplate() {
+  const templateId = document.getElementById('et-templateId').value.trim();
+  const name = document.getElementById('et-name').value.trim();
+  const subject = document.getElementById('et-subject').value.trim();
+  const bodyHtml = document.getElementById('et-bodyHtml').value.trim();
+  if (!templateId || !name || !subject || !bodyHtml) {
+    showToast('Template ID, Name, Subject, and Body are required', 'danger'); return;
+  }
+  const varsRaw = document.getElementById('et-variables').value.trim();
+  const variables = varsRaw ? varsRaw.split(',').map(v => v.trim()).filter(Boolean) : [];
+  const isActive = document.getElementById('et-isActive').value === 'true';
+  const description = document.getElementById('et-description').value.trim();
+  try {
+    const res = await fetch(`${API}/email_template_save`, {
+      method: 'POST', headers: getHeaders(),
+      body: JSON.stringify({ templateId, name, subject, bodyHtml, variables, isActive, description })
+    });
+    const data = await res.json();
+    if (data.success) {
+      showToast('Template saved successfully!', 'success');
+      document.getElementById('email-template-editor').style.display = 'none';
+      loadEmailTemplates();
+    } else {
+      showToast('Save failed: ' + (data.error || 'Unknown error'), 'danger');
+    }
+  } catch (e) {
+    showToast('Error saving template: ' + e.message, 'danger');
+  }
+}
+
+function cancelEditTemplate() {
+  document.getElementById('email-template-editor').style.display = 'none';
+  document.getElementById('et-preview-area').style.display = 'none';
+}
+
+function previewEmailTemplate() {
+  const bodyHtml = document.getElementById('et-bodyHtml').value;
+  const subject = document.getElementById('et-subject').value;
+  // Sample data for preview
+  const sampleVars = {
+    firstName: 'Ranadhir', lastName: 'Ghosh', email: 'ranadhir.ghosh@gmail.com',
+    roleLabel: 'EC Member', ecTitle: 'President', phone: '(904) 555-1234',
+    portalUrl: 'https://ranadhir19.github.io/banf1/admin-portal.html?email=ranadhir.ghosh%40gmail.com',
+    grantedBy: 'superadmin@banf.org', grantedAt: new Date().toUTCString(),
+    membershipType: 'Family', membershipYear: '2025-26', renewalDeadline: 'June 30, 2026',
+    eventName: 'Durga Puja 2025', eventDate: 'October 3, 2025', eventVenue: 'Jacksonville Cultural Center',
+    eventDescription: 'Join us for our annual Durga Puja celebration.',
+    amount: '150.00', paymentDescription: 'Annual Family Membership', paymentDate: new Date().toLocaleDateString(), paymentMethod: 'Zelle'
+  };
+  // Simple render for preview (client-side)
+  let rendered = bodyHtml;
+  rendered = rendered.replace(/\{\{#if (\w+)\}\}([\s\S]*?)\{\{\/if \1\}\}/g, (m, k, c) => sampleVars[k] ? c : '');
+  Object.keys(sampleVars).forEach(k => { rendered = rendered.replace(new RegExp('\\{\\{' + k + '\\}\\}', 'g'), sampleVars[k]); });
+  rendered = rendered.replace(/\{\{\w+\}\}/g, '');
+  const frame = document.getElementById('et-preview-frame');
+  frame.srcdoc = rendered;
+  document.getElementById('et-preview-area').style.display = '';
+  showToast(`Preview loaded. Subject: "${subject.replace(/\{\{(\w+)\}\}/g, (m,k) => sampleVars[k]||m)}"`, 'info');
+}
+
+// ─── INIT ────────────────────────────────────────
+(async () => {
+  // Check if email is pre-filled via URL query param (e.g. from welcome email link)
+  const urlParams = new URLSearchParams(window.location.search);
+  const urlEmail = urlParams.get('email');
+  if (urlEmail) {
+    document.getElementById('login-email').value = urlEmail;
+  }
+
+  const email = localStorage.getItem('banf_admin_email');
+  if (email) {
+    adminEmail = email;
+    adminRole = localStorage.getItem('banf_admin_role') || 'admin';
+    try {
+      const res = await fetch(`${API}/admin_dashboard`, { headers: getHeaders() });
+      const data = await res.json();
+      if (data.success) { showPortal(data); return; }
+    } catch(_) {}
+    localStorage.removeItem('banf_admin_email');
+  }
+
+  // If email came from URL param, attempt auto-login
+  if (urlEmail) {
+    setTimeout(() => doLogin(), 300);
+  }
+})();
+
+document.getElementById('ev-free').addEventListener('change', function(){ document.getElementById('ev-price-wrapper').style.display = this.checked ? 'none' : ''; });
+</script>
+</body>
+</html>
