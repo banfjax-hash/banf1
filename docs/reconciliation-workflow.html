@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BANF Financial Reconciliation Workflow</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+  :root { --banf-blue:#1565c0; }
+  body { background:#f0f4fa; font-family:'Segoe UI',system-ui,sans-serif; }
+  .top-bar { background:var(--banf-blue); color:#fff; padding:10px 24px; display:flex; align-items:center; gap:14px; }
+  .top-bar h1 { font-size:1.25rem; font-weight:700; margin:0; }
+  .top-bar .pill { background:rgba(255,255,255,.18); border-radius:20px; padding:3px 14px; font-size:.8rem; }
+  .ctrl-bar { background:#fff; border-bottom:1px solid #c5d5ea; padding:10px 24px; display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+  .step-card { background:#fff; border-radius:10px; border-left:5px solid #ccc; margin-bottom:16px; box-shadow:0 2px 6px rgba(0,0,0,.06); overflow:hidden; }
+  .step-card.pending  { border-left-color:#adb5bd; }
+  .step-card.running  { border-left-color:#f59e0b; }
+  .step-card.done     { border-left-color:#16a34a; }
+  .step-card.skipped  { border-left-color:#6c757d; opacity:.65; }
+  .step-card.blocked  { border-left-color:#dc3545; }
+  .step-header { display:flex; align-items:center; gap:12px; padding:14px 18px; cursor:pointer; user-select:none; }
+  .step-num { width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:.85rem; flex-shrink:0; }
+  .pending  .step-num { background:#e9ecef; color:#495057; }
+  .running  .step-num { background:#fef3c7; color:#92400e; }
+  .done     .step-num { background:#d1fae5; color:#065f46; }
+  .skipped  .step-num { background:#e9ecef; color:#6c757d; }
+  .blocked  .step-num { background:#fee2e2; color:#991b1b; }
+  .step-title { font-weight:700; font-size:.95rem; flex:1; }
+  .step-status { font-size:.72rem; font-weight:700; padding:3px 10px; border-radius:12px; letter-spacing:.5px; text-transform:uppercase; }
+  .badge-pending  { background:#e9ecef; color:#495057; }
+  .badge-running  { background:#fef3c7; color:#92400e; }
+  .badge-done     { background:#d1fae5; color:#065f46; }
+  .badge-skipped  { background:#e2e8f0; color:#64748b; }
+  .badge-blocked  { background:#fee2e2; color:#991b1b; }
+  .step-body { padding:0 18px 16px 60px; display:none; }
+  .step-body.open { display:block; }
+  .step-desc { font-size:.85rem; color:#555; margin-bottom:12px; }
+  .step-actions { display:flex; gap:8px; flex-wrap:wrap; }
+  .btn-auto { background:#1565c0; color:#fff; border:none; border-radius:6px; padding:6px 18px; font-size:.84rem; font-weight:600; cursor:pointer; }
+  .btn-auto:disabled { background:#9ca3af; cursor:not-allowed; }
+  .btn-manual { background:#f59e0b; color:#fff; border:none; border-radius:6px; padding:6px 18px; font-size:.84rem; font-weight:600; cursor:pointer; }
+  .btn-skip { background:#6c757d; color:#fff; border:none; border-radius:6px; padding:6px 14px; font-size:.84rem; cursor:pointer; }
+  .btn-redo { background:#0d6efd; color:#fff; border:none; border-radius:6px; padding:6px 14px; font-size:.84rem; cursor:pointer; }
+  .log-box { background:#111; color:#9fdbfe; font-size:.78rem; font-family:'Consolas',monospace; border-radius:6px; padding:10px 14px; max-height:180px; overflow-y:auto; margin-top:10px; display:none; }
+  .log-box.show { display:block; }
+  .progress-bar-wrap { background:#e9ecef; border-radius:6px; height:8px; margin:0 24px 14px; }
+  .progress-inner { background:var(--banf-blue); height:8px; border-radius:6px; transition:width .5s; }
+  table th { background:#f8f9fa; }
+  .match-confirmed { color:#16a34a; font-weight:700; }
+  .match-discrepancy { color:#dc3545; font-weight:700; }
+  .match-manual { color:#f59e0b; font-weight:700; }
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <i class="fas fa-balance-scale"></i>
+  <h1>Financial Reconciliation Workflow</h1>
+  <span class="pill">7 Steps</span>
+  <a href="https://banfwix.wixsite.com/banf1/_functions/admin_portal" class="btn btn-sm ms-auto" style="background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3)">
+    <i class="fas fa-arrow-left me-1"></i>Admin Portal
+  </a>
+</div>
+
+<div class="ctrl-bar">
+  <div>
+    <span class="text-muted small me-2">Accounting Year:</span>
+    <select id="year-sel" class="form-select form-select-sm d-inline-block" style="width:auto;font-weight:700;border-color:#aaa" onchange="onYearChange()">
+      <option value="FY2022-23">FY2022-23</option>
+      <option value="FY2023-24">FY2023-24</option>
+      <option value="FY2024-25">FY2024-25</option>
+      <option value="FY2025-26">FY2025-26</option>
+      <option value="FY2026-27" selected>FY2026-27</option>
+    </select>
+  </div>
+  <div class="ms-4">
+    <span class="text-muted small me-2">Progress:</span>
+    <span id="overall-pct" class="fw-bold">0%</span>
+    <span class="text-muted small ms-2" id="overall-label">0 / 7 steps</span>
+  </div>
+  <button class="btn btn-outline-secondary btn-sm ms-auto" onclick="resetWorkflow()"><i class="fas fa-redo me-1"></i>Reset</button>
+</div>
+
+<div class="container-fluid" style="max-width:900px;padding:24px">
+
+  <div class="progress-bar-wrap">
+    <div class="progress-inner" id="progress-bar" style="width:0%"></div>
+  </div>
+
+  <!-- Step 1: Select Year + Pull Financial Entries -->
+  <div class="step-card pending" id="step-1" data-step="1">
+    <div class="step-header" onclick="toggleStep(1)">
+      <div class="step-num">1</div>
+      <div class="step-title">Pull Financial Entries</div>
+      <span class="step-status badge-pending" id="status-1">Pending</span>
+      <i class="fas fa-chevron-down ms-2 text-muted" id="chevron-1"></i>
+    </div>
+    <div class="step-body" id="body-1">
+      <div class="step-desc">Fetch all FinancialEntries records for the selected accounting year from WixData. These include bank transactions, Zelle receipts, dues collected, and expenses.</div>
+      <div id="entries-summary" class="alert alert-info py-2 small" style="display:none"></div>
+      <div class="step-actions">
+        <button class="btn-auto" id="auto-1" onclick="runStep(1,'auto')"><i class="fas fa-bolt me-1"></i>Auto: Fetch Entries</button>
+        <button class="btn-manual" onclick="runStep(1,'manual')"><i class="fas fa-hand-pointer me-1"></i>Manual: Open Finance Records</button>
+        <button class="btn-skip" onclick="skipStep(1)"><i class="fas fa-forward me-1"></i>Skip</button>
+      </div>
+      <div class="log-box" id="log-1"></div>
+    </div>
+  </div>
+
+  <!-- Step 2: Pull Membership Registrations -->
+  <div class="step-card pending" id="step-2" data-step="2">
+    <div class="step-header" onclick="toggleStep(2)">
+      <div class="step-num">2</div>
+      <div class="step-title">Pull Membership Registrations</div>
+      <span class="step-status badge-pending" id="status-2">Pending</span>
+      <i class="fas fa-chevron-down ms-2 text-muted" id="chevron-2"></i>
+    </div>
+    <div class="step-body" id="body-2">
+      <div class="step-desc">Fetch confirmed membership registrations for the year. These represent expected payments — each registration should have a matching financial entry.</div>
+      <div id="reg-summary" class="alert alert-info py-2 small" style="display:none"></div>
+      <div class="step-actions">
+        <button class="btn-auto" id="auto-2" onclick="runStep(2,'auto')"><i class="fas fa-bolt me-1"></i>Auto: Fetch Registrations</button>
+        <button class="btn-manual" onclick="runStep(2,'manual')"><i class="fas fa-hand-pointer me-1"></i>Manual: Check Members Page</button>
+        <button class="btn-skip" onclick="skipStep(2)"><i class="fas fa-forward me-1"></i>Skip</button>
+      </div>
+      <div class="log-box" id="log-2"></div>
+    </div>
+  </div>
+
+  <!-- Step 3: Auto-Match Payments -->
+  <div class="step-card pending" id="step-3" data-step="3">
+    <div class="step-header" onclick="toggleStep(3)">
+      <div class="step-num">3</div>
+      <div class="step-title">Auto-Match Payments</div>
+      <span class="step-status badge-pending" id="status-3">Pending</span>
+      <i class="fas fa-chevron-down ms-2 text-muted" id="chevron-3"></i>
+    </div>
+    <div class="step-body" id="body-3">
+      <div class="step-desc">Automatically correlate financial entries with registrations by email, amount, and date (±7 days). Results in three buckets: Confirmed, Discrepancy, and Unmatched.</div>
+      <div id="match-stats" style="display:none" class="row g-2 mt-1 mb-3">
+        <div class="col-4"><div class="text-center border rounded p-2"><div class="fs-4 fw-bold text-success" id="m-matched">—</div><div class="small text-muted">Matched</div></div></div>
+        <div class="col-4"><div class="text-center border rounded p-2"><div class="fs-4 fw-bold text-danger" id="m-disc">—</div><div class="small text-muted">Discrepancies</div></div></div>
+        <div class="col-4"><div class="text-center border rounded p-2"><div class="fs-4 fw-bold text-warning" id="m-unmatched">—</div><div class="small text-muted">Unmatched</div></div></div>
+      </div>
+      <div class="step-actions">
+        <button class="btn-auto" id="auto-3" onclick="runStep(3,'auto')"><i class="fas fa-bolt me-1"></i>Auto: Run Matching Algorithm</button>
+        <button class="btn-skip" onclick="skipStep(3)"><i class="fas fa-forward me-1"></i>Skip</button>
+      </div>
+      <div class="log-box" id="log-3"></div>
+    </div>
+  </div>
+
+  <!-- Step 4: Review Discrepancies -->
+  <div class="step-card pending" id="step-4" data-step="4">
+    <div class="step-header" onclick="toggleStep(4)">
+      <div class="step-num">4</div>
+      <div class="step-title">Review Discrepancies</div>
+      <span class="step-status badge-pending" id="status-4">Pending</span>
+      <i class="fas fa-chevron-down ms-2 text-muted" id="chevron-4"></i>
+    </div>
+    <div class="step-body" id="body-4">
+      <div class="step-desc">Inspect all unmatched or amount-mismatched items side-by-side. Flag each as: <strong class="text-success">Accept</strong>, <strong class="text-warning">Needs Adjustment</strong>, or <strong class="text-danger">Write-off</strong>.</div>
+      <div id="disc-table-wrap" class="table-responsive mt-2 mb-3" style="display:none;max-height:250px;overflow-y:auto">
+        <table class="table table-sm table-hover small mb-0">
+          <thead><tr><th>Name</th><th>Expected</th><th>Found</th><th>Gap</th><th>Issue</th><th>Action</th></tr></thead>
+          <tbody id="disc-tbody"></tbody>
+        </table>
+      </div>
+      <div class="step-actions">
+        <button class="btn-auto" id="auto-4" onclick="runStep(4,'auto')"><i class="fas fa-bolt me-1"></i>Auto: Load Discrepancy Table</button>
+        <button class="btn-skip" onclick="skipStep(4)"><i class="fas fa-forward me-1"></i>Skip</button>
+      </div>
+      <div class="log-box" id="log-4"></div>
+    </div>
+  </div>
+
+  <!-- Step 5: Manual Adjustments -->
+  <div class="step-card pending" id="step-5" data-step="5">
+    <div class="step-header" onclick="toggleStep(5)">
+      <div class="step-num">5</div>
+      <div class="step-title">Manual Adjustments</div>
+      <span class="step-status badge-pending" id="status-5">Pending</span>
+      <i class="fas fa-chevron-down ms-2 text-muted" id="chevron-5"></i>
+    </div>
+    <div class="step-body" id="body-5">
+      <div class="step-desc">Enter manual adjustment entries: late payments, partial dues, refunds, or corrections. Each adjustment requires a note and the admin's name.</div>
+      <div class="mt-2 mb-3">
+        <div class="row g-2" id="adj-rows">
+          <div class="col-12 small text-muted">No adjustments added yet.</div>
+        </div>
+        <button class="btn btn-outline-primary btn-sm mt-2" onclick="addAdjRow()"><i class="fas fa-plus me-1"></i>Add Adjustment</button>
+      </div>
+      <div class="step-actions">
+        <button class="btn-auto" id="auto-5" onclick="runStep(5,'auto')"><i class="fas fa-check me-1"></i>Confirm Adjustments</button>
+        <button class="btn-skip" onclick="skipStep(5)"><i class="fas fa-forward me-1"></i>Skip (no adjustments)</button>
+      </div>
+      <div class="log-box" id="log-5"></div>
+    </div>
+  </div>
+
+  <!-- Step 6: Generate Reconciliation Report -->
+  <div class="step-card pending" id="step-6" data-step="6">
+    <div class="step-header" onclick="toggleStep(6)">
+      <div class="step-num">6</div>
+      <div class="step-title">Generate Reconciliation Report</div>
+      <span class="step-status badge-pending" id="status-6">Pending</span>
+      <i class="fas fa-chevron-down ms-2 text-muted" id="chevron-6"></i>
+    </div>
+    <div class="step-body" id="body-6">
+      <div class="step-desc">Compiles all matched entries, adjustments, and discrepancies into a single reconciliation report. Saves to WixData (ReconciliationReports collection) and returns a report ID.</div>
+      <div id="report-preview" style="display:none" class="border rounded p-3 small bg-light mb-3">
+        <div class="fw-bold mb-2">Report Preview</div>
+        <div id="report-preview-body"></div>
+      </div>
+      <div class="step-actions">
+        <button class="btn-auto" id="auto-6" onclick="runStep(6,'auto')"><i class="fas fa-bolt me-1"></i>Auto: Generate Report</button>
+        <button class="btn-manual" onclick="runStep(6,'manual')"><i class="fas fa-hand-pointer me-1"></i>Manual: Fill Report Form</button>
+        <button class="btn-skip" onclick="skipStep(6)"><i class="fas fa-forward me-1"></i>Skip</button>
+      </div>
+      <div class="log-box" id="log-6"></div>
+    </div>
+  </div>
+
+  <!-- Step 7: Export + Sign Off -->
+  <div class="step-card pending" id="step-7" data-step="7">
+    <div class="step-header" onclick="toggleStep(7)">
+      <div class="step-num">7</div>
+      <div class="step-title">Export &amp; Sign Off</div>
+      <span class="step-status badge-pending" id="status-7">Pending</span>
+      <i class="fas fa-chevron-down ms-2 text-muted" id="chevron-7"></i>
+    </div>
+    <div class="step-body" id="body-7">
+      <div class="step-desc">Download the final reconciliation as a CSV. Sign off with your admin name to mark the year as <strong>reconciled</strong>.</div>
+      <div class="row g-3 mt-1 mb-3">
+        <div class="col-md-6">
+          <label class="form-label small fw-semibold">Treasurer Name (Sign-Off)</label>
+          <input type="text" class="form-control form-control-sm" id="signoff-name" placeholder="Treasurer Full Name">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label small fw-semibold">EC President Approval</label>
+          <input type="text" class="form-control form-control-sm" id="signoff-president" placeholder="EC President Name">
+        </div>
+        <div class="col-12">
+          <label class="form-label small fw-semibold">Notes (optional)</label>
+          <textarea class="form-control form-control-sm" id="signoff-notes" rows="2" placeholder="Any final notes..."></textarea>
+        </div>
+      </div>
+      <div class="step-actions">
+        <button class="btn-auto" id="auto-7" onclick="runStep(7,'auto')"><i class="fas fa-file-csv me-1"></i>Export CSV + Sign Off</button>
+        <button class="btn-manual" onclick="runStep(7,'manual')"><i class="fas fa-hand-pointer me-1"></i>Manual: Print &amp; Archive</button>
+        <button class="btn-skip" onclick="skipStep(7)"><i class="fas fa-forward me-1"></i>Skip</button>
+      </div>
+      <div class="log-box" id="log-7"></div>
+    </div>
+  </div>
+
+  <!-- Completion banner -->
+  <div id="completion-banner" class="text-center py-4 mt-2" style="display:none">
+    <div style="font-size:3rem">✅</div>
+    <h4 class="fw-bold mt-2" style="color:#1565c0">Reconciliation Complete!</h4>
+    <p class="text-muted" id="completion-msg">Year reconciled and signed off. CSV downloaded.</p>
+    <div class="d-flex gap-3 justify-content-center mt-3">
+      <button class="btn btn-outline-secondary" onclick="resetWorkflow()"><i class="fas fa-redo me-1"></i>Start New Year</button>
+      <a href="https://banfwix.wixsite.com/banf1/_functions/admin_portal" class="btn" style="background:#1565c0;color:#fff"><i class="fas fa-arrow-left me-1"></i>Back to Admin Portal</a>
+    </div>
+  </div>
+
+</div><!-- /container -->
+
+<script>
+const API   = 'https://banfwix.wixsite.com/banf1/_functions';
+const TOTAL = 7;
+let steps   = {};
+let state   = { entries: [], registrations: [], matched: [], discrepancies: [], adjustments: [], report: null };
+
+function getYear()    { return document.getElementById('year-sel').value; }
+function getHeaders() {
+  const email = localStorage.getItem('banfAdminEmail') || '';
+  const token = localStorage.getItem('banfAdminToken') || '';
+  return { 'Content-Type': 'application/json', 'x-admin-email': email, 'x-admin-token': token };
+}
+
+function onYearChange() {
+  resetWorkflow();
+}
+
+function toggleStep(n) {
+  const body = document.getElementById('body-' + n);
+  const chev = document.getElementById('chevron-' + n);
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  chev.style.transform = isOpen ? '' : 'rotate(180deg)';
+}
+
+function setStepState(n, st) {
+  steps[n] = st;
+  const card  = document.getElementById('step-' + n);
+  const badge = document.getElementById('status-' + n);
+  card.className = `step-card ${st}`;
+  badge.className = `step-status badge-${st}`;
+  badge.textContent = st.charAt(0).toUpperCase() + st.slice(1);
+}
+
+function appendLog(n, msg, type='info') {
+  const box = document.getElementById('log-' + n);
+  box.classList.add('show');
+  const color = type === 'error' ? '#f87171' : type === 'success' ? '#86efac' : '#9fdbfe';
+  box.innerHTML += `<div style="color:${color}">[${new Date().toLocaleTimeString()}] ${msg}</div>`;
+  box.scrollTop = box.scrollHeight;
+}
+
+function updateProgress() {
+  const done = Object.values(steps).filter(s => s === 'done' || s === 'skipped').length;
+  const pct  = Math.round((done / TOTAL) * 100);
+  document.getElementById('progress-bar').style.width = pct + '%';
+  document.getElementById('overall-pct').textContent = pct + '%';
+  document.getElementById('overall-label').textContent = `${done} / ${TOTAL} steps`;
+  if (done === TOTAL) {
+    document.getElementById('completion-banner').style.display = '';
+  }
+}
+
+async function runStep(n, type) {
+  setStepState(n, 'running');
+  appendLog(n, `Running Step ${n} (${type === 'auto' ? 'automated' : 'manual'}) for ${getYear()}...`);
+  try {
+    if (type === 'manual') {
+      appendLog(n, manualInstructions(n));
+    } else {
+      await executeStep(n);
+    }
+    setStepState(n, 'done');
+    appendLog(n, `Step ${n} completed.`, 'success');
+    if (n < TOTAL) setTimeout(() => toggleStep(n + 1), 300);
+  } catch(e) {
+    setStepState(n, 'blocked');
+    appendLog(n, `Error: ${e.message}`, 'error');
+  }
+  updateProgress();
+}
+
+function skipStep(n) {
+  setStepState(n, 'skipped');
+  appendLog(n, `Step ${n} skipped.`);
+  if (n < TOTAL) setTimeout(() => toggleStep(n + 1), 200);
+  updateProgress();
+}
+
+async function executeStep(n) {
+  const h = getHeaders();
+  const yr = getYear();
+
+  if (n === 1) {
+    // Try real API, fall back to demo data
+    let entries;
+    try {
+      const r = await fetch(`${API}/admin_financial?year=${yr}`, { headers: h });
+      const d = await r.json();
+      entries = d.items || d.entries || [];
+    } catch(_) {
+      entries = getDemoEntries(yr);
+      appendLog(n, 'API not available — using demo financial data.', 'info');
+    }
+    if (!entries.length) {
+      entries = getDemoEntries(yr);
+      appendLog(n, 'No entries found in live data — using demo data.', 'info');
+    }
+    state.entries = entries;
+    const sum = document.getElementById('entries-summary');
+    sum.style.display = '';
+    sum.textContent = `${entries.length} financial entries loaded for ${yr} | Total: $${entries.reduce((s,e)=>s+(e.amount||0),0).toLocaleString()}`;
+    appendLog(n, `${entries.length} financial entries loaded`, 'success');
+  }
+
+  else if (n === 2) {
+    let regs;
+    try {
+      const r = await fetch(`${API}/membership_registrations?year=${yr}`, { headers: h });
+      const d = await r.json();
+      regs = d.items || [];
+    } catch(_) {
+      regs = getDemoRegistrations(yr);
+      appendLog(n, 'API not available — using demo registration data.', 'info');
+    }
+    if (!regs.length) { regs = getDemoRegistrations(yr); appendLog(n, 'No registrations found — using demo data.', 'info'); }
+    state.registrations = regs;
+    const s = document.getElementById('reg-summary');
+    s.style.display = '';
+    s.textContent = `${regs.length} registrations loaded for ${yr} | Total dues expected: $${regs.reduce((s,r)=>s+(r.amount||0),0).toLocaleString()}`;
+    appendLog(n, `${regs.length} registrations pulled`, 'success');
+  }
+
+  else if (n === 3) {
+    const { matched, discrepancies } = autoMatch(state.entries, state.registrations);
+    state.matched       = matched;
+    state.discrepancies = discrepancies;
+    document.getElementById('match-stats').style.display = '';
+    document.getElementById('m-matched').textContent    = matched.length;
+    document.getElementById('m-disc').textContent       = discrepancies.filter(d=>d.issue!=='unmatched').length;
+    document.getElementById('m-unmatched').textContent  = discrepancies.filter(d=>d.issue==='unmatched').length;
+    appendLog(n, `Matching complete: ${matched.length} matched | ${discrepancies.length} need review`, 'success');
+  }
+
+  else if (n === 4) {
+    const tbody = document.getElementById('disc-tbody');
+    document.getElementById('disc-table-wrap').style.display = '';
+    tbody.innerHTML = state.discrepancies.map((d,i) => `
+      <tr>
+        <td>${d.name||'N/A'}</td>
+        <td>$${d.expected||0}</td>
+        <td>$${d.found||0}</td>
+        <td class="${Math.abs((d.expected||0)-(d.found||0))>0?'text-danger':'text-success'}">$${Math.abs((d.expected||0)-(d.found||0))}</td>
+        <td><span class="${d.issue==='amount_mismatch'?'match-discrepancy':'match-manual'}">${d.issue||'unmatched'}</span></td>
+        <td>
+          <select class="form-select form-select-sm" data-idx="${i}" style="font-size:.75rem;min-width:110px" onchange="state.discrepancies[${i}].resolution=this.value">
+            <option value="">Pending</option>
+            <option value="accept">Accept</option>
+            <option value="adjust">Needs Adj.</option>
+            <option value="writeoff">Write-off</option>
+          </select>
+        </td>
+      </tr>`).join('');
+    if (!state.discrepancies.length) tbody.innerHTML = '<tr><td colspan="6" class="text-muted text-center py-3">No discrepancies — all entries matched!</td></tr>';
+    appendLog(n, `${state.discrepancies.length} discrepancies displayed`, 'success');
+  }
+
+  else if (n === 5) {
+    const adjs = collectAdjustments();
+    state.adjustments = adjs;
+    appendLog(n, `${adjs.length} manual adjustments recorded.`, 'success');
+  }
+
+  else if (n === 6) {
+    const yr = getYear();
+    const report = buildReport(yr);
+    state.report = report;
+    const preview = document.getElementById('report-preview');
+    preview.style.display = '';
+    document.getElementById('report-preview-body').innerHTML = `
+      <table class="table table-sm mb-0"><tbody>
+        <tr><td class="text-muted">Year</td><td class="fw-semibold">${report.year}</td></tr>
+        <tr><td class="text-muted">Total Entries</td><td>${report.totalEntries}</td></tr>
+        <tr><td class="text-muted">Total Registrations</td><td>${report.totalRegistrations}</td></tr>
+        <tr><td class="text-muted">Matched Pairs</td><td class="text-success">${report.matched}</td></tr>
+        <tr><td class="text-muted">Discrepancies</td><td class="text-danger">${report.discrepancies}</td></tr>
+        <tr><td class="text-muted">Adjustments</td><td>${report.adjustments}</td></tr>
+        <tr><td class="text-muted">Net Difference</td><td class="fw-bold ${report.netDiff===0?'text-success':'text-warning'}">$${report.netDiff}</td></tr>
+      </tbody></table>`;
+    // Try to save
+    try {
+      const r = await fetch(`${API}/reconciliation_save`, { method:'POST', headers: getHeaders(), body: JSON.stringify(report) });
+      const d = await r.json();
+      if (d.reportId) { state.report.reportId = d.reportId; appendLog(n, `Saved! Report ID: ${d.reportId}`, 'success'); }
+      else appendLog(n, 'Report preview ready (save endpoint returned no ID).', 'info');
+    } catch(_) {
+      appendLog(n, 'Report generated locally (API unavailable — will export from here).', 'info');
+    }
+  }
+
+  else if (n === 7) {
+    const name      = document.getElementById('signoff-name').value     || 'Admin';
+    const president = document.getElementById('signoff-president').value || '';
+    const notes     = document.getElementById('signoff-notes').value     || '';
+    if (!name) throw new Error('Treasurer name is required to sign off.');
+    const report = state.report || buildReport(getYear());
+    report.signoff   = { treasurer: name, president, notes, signedAt: new Date().toISOString() };
+    downloadCSV(buildCSV(report), `BANF_Reconciliation_${report.year}.csv`);
+    document.getElementById('completion-msg').textContent = `${report.year} reconciled by ${name}. CSV downloaded.`;
+    appendLog(n, `CSV export complete. Signed off by: ${name}`, 'success');
+  }
+}
+
+// ── Matching algorithm ───────────────────────────────────────────────────────
+function autoMatch(entries, regs) {
+  const matched = [], discrepancies = [];
+  const usedEntries = new Set();
+  for (const reg of regs) {
+    const candidate = entries.find((e, idx) =>
+      !usedEntries.has(idx) &&
+      e.email === reg.email &&
+      Math.abs((e.amount||0) - (reg.amount||0)) <= (reg.amount||0) * 0.1 // within 10%
+    );
+    if (candidate) {
+      const idx = entries.indexOf(candidate);
+      usedEntries.add(idx);
+      if (candidate.amount === reg.amount) {
+        matched.push({ reg, entry: candidate });
+      } else {
+        discrepancies.push({ name: reg.name||reg.email, expected: reg.amount, found: candidate.amount, issue: 'amount_mismatch' });
+      }
+    } else {
+      discrepancies.push({ name: reg.name||reg.email, expected: reg.amount, found: 0, issue: 'unmatched' });
+    }
+  }
+  // Leftover entries with no matching registration
+  entries.forEach((e, idx) => {
+    if (!usedEntries.has(idx)) {
+      discrepancies.push({ name: e.name||e.email||'Unknown', expected: 0, found: e.amount, issue: 'no_registration' });
+    }
+  });
+  return { matched, discrepancies };
+}
+
+function buildReport(yr) {
+  return {
+    year:               yr,
+    generatedAt:        new Date().toISOString(),
+    totalEntries:       state.entries.length,
+    totalRegistrations: state.registrations.length,
+    matched:            state.matched.length,
+    discrepancies:      state.discrepancies.length,
+    adjustments:        state.adjustments.length,
+    netDiff:            calcNetDiff(),
+    items:              [...state.matched.map(m=>({name:m.reg.name||m.reg.email,tier:m.reg.tier,amount:m.reg.amount,status:'matched',issue:null})),
+                         ...state.discrepancies.map(d=>({name:d.name,tier:'—',amount:d.expected,status:d.resolution||'pending',issue:d.issue})),
+                         ...state.adjustments.map(a=>({name:a.name,tier:'—',amount:a.amount,status:'adjustment',issue:a.note}))],
+  };
+}
+
+function calcNetDiff() {
+  const expected = state.registrations.reduce((s,r)=>s+(r.amount||0),0);
+  const collected = state.entries.reduce((s,e)=>s+(e.amount||0),0);
+  const adj = state.adjustments.reduce((s,a)=>s+(a.amount||0),0);
+  return collected + adj - expected;
+}
+
+function buildCSV(report) {
+  const header = 'Name,Tier,Amount,Status,Issue,Year,GeneratedAt';
+  const rows   = (report.items||[]).map(r => [r.name,r.tier,r.amount,r.status,r.issue||'',report.year,report.generatedAt].join(','));
+  const meta   = [`,,,,,,`, `Treasurer,${report.signoff?.treasurer||''},,,,`, `President,${report.signoff?.president||''},,,,`, `Notes,${report.signoff?.notes||''},,,,`, `Net Diff,$${report.netDiff},,,,`];
+  return [header, ...rows, '', ...meta].join('\n');
+}
+
+function downloadCSV(csv, filename) {
+  const blob = new Blob([csv], { type:'text/csv' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = filename; a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ── Adjustments UI ───────────────────────────────────────────────────────────
+let adjCount = 0;
+function addAdjRow() {
+  const id = ++adjCount;
+  const wrap = document.getElementById('adj-rows');
+  if (id === 1) wrap.innerHTML = '';
+  wrap.insertAdjacentHTML('beforeend', `
+    <div class="col-12" id="adj-${id}">
+      <div class="d-flex gap-2 align-items-center flex-wrap">
+        <input type="text" class="form-control form-control-sm" placeholder="Member Name / Description" id="adj-name-${id}" style="flex:2;min-width:160px">
+        <input type="number" class="form-control form-control-sm" placeholder="Amount ($)" id="adj-amt-${id}" style="width:100px">
+        <select class="form-select form-select-sm" id="adj-type-${id}" style="width:120px">
+          <option value="credit">Credit</option>
+          <option value="debit">Debit</option>
+          <option value="correction">Correction</option>
+        </select>
+        <input type="text" class="form-control form-control-sm" placeholder="Note / Reason" id="adj-note-${id}" style="flex:3;min-width:160px">
+        <button class="btn btn-sm btn-outline-danger" onclick="document.getElementById('adj-${id}').remove()"><i class="fas fa-trash"></i></button>
+      </div>
+    </div>`);
+}
+
+function collectAdjustments() {
+  const adjs = [];
+  document.querySelectorAll('[id^="adj-name-"]').forEach(el => {
+    const id   = el.id.replace('adj-name-', '');
+    const name = el.value;
+    const amt  = parseFloat(document.getElementById('adj-amt-' + id)?.value) || 0;
+    const type = document.getElementById('adj-type-' + id)?.value;
+    const note = document.getElementById('adj-note-' + id)?.value;
+    if (name || amt) adjs.push({ name, amount: type === 'debit' ? -amt : amt, type, note });
+  });
+  return adjs;
+}
+
+// ── Demo data ────────────────────────────────────────────────────────────────
+function getDemoEntries(yr) {
+  return [
+    { email:'alice@example.com', name:'Alice Smith',    amount:50,  date:'2025-01-15', type:'payment', year:yr  },
+    { email:'bob@example.com',   name:'Bob Jones',      amount:80,  date:'2025-01-18', type:'payment', year:yr  },
+    { email:'carol@example.com', name:'Carol Patel',    amount:20,  date:'2025-01-20', type:'payment', year:yr  },
+    { email:'dave@example.com',  name:'Dave Kumar',     amount:150, date:'2025-01-22', type:'payment', year:yr  },
+    { email:'extra@example.com', name:'Extra Payment',  amount:50,  date:'2025-02-01', type:'payment', year:yr  },
+  ];
+}
+function getDemoRegistrations(yr) {
+  return [
+    { email:'alice@example.com', name:'Alice Smith',    amount:50,  tier:'Individual', year:yr },
+    { email:'bob@example.com',   name:'Bob Jones',      amount:80,  tier:'Family',     year:yr },
+    { email:'carol@example.com', name:'Carol Patel',    amount:20,  tier:'Student',    year:yr },
+    { email:'dave@example.com',  name:'Dave Kumar',     amount:150, tier:'Patron',     year:yr },
+    { email:'miss@example.com',  name:'Missing Member', amount:50,  tier:'Individual', year:yr },
+  ];
+}
+
+function manualInstructions(n) {
+  const instr = {
+    1: 'Open Admin Portal → Reports → pull financial ledger for the selected year.',
+    2: 'Open Admin Portal → Members → filter by selected year.',
+    3: 'Manually compare the two lists in a spreadsheet.',
+    4: 'Review the discrepancy table and select a resolution for each row.',
+    5: 'Enter each adjustment manually in the rows above.',
+    6: 'Compose the summary report from your spreadsheet.',
+    7: 'Print and physically sign the reconciliation report.',
+  };
+  return 'MANUAL: ' + (instr[n] || 'Perform this step manually.');
+}
+
+function resetWorkflow() {
+  state = { entries:[], registrations:[], matched:[], discrepancies:[], adjustments:[], report:null };
+  for (let i = 1; i <= TOTAL; i++) {
+    setStepState(i, 'pending');
+    document.getElementById('log-' + i).innerHTML = '';
+    document.getElementById('log-' + i).classList.remove('show');
+    document.getElementById('body-' + i).classList.remove('open');
+    document.getElementById('chevron-' + i).style.transform = '';
+  }
+  document.getElementById('completion-banner').style.display = 'none';
+  ['entries-summary','reg-summary','match-stats','disc-table-wrap','report-preview'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.style.display='none';
+  });
+  updateProgress();
+}
+
+(function() {
+  for (let i = 1; i <= TOTAL; i++) steps[i] = 'pending';
+  updateProgress();
+  toggleStep(1);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BANF Embed Test</title>
+    <style>
+        body { margin: 0; padding: 20px; font-family: Arial, sans-serif; }
+        .test-box { 
+            background: linear-gradient(135deg, #8B0000, #ff6b35); 
+            color: white; 
+            padding: 40px; 
+            border-radius: 10px; 
+            text-align: center;
+            max-width: 600px;
+            margin: 50px auto;
+        }
+        h1 { margin-bottom: 20px; }
+        p { margin: 10px 0; }
+        .status { font-size: 24px; color: #4CAF50; }
+    </style>
+</head>
+<body>
+    <div class="test-box">
+        <h1>🎉 BANF Embed Working!</h1>
+        <p class="status">✅ iframe is loading correctly</p>
+        <p>If you can see this, the embed is working.</p>
+        <p>Page URL: <span id="url"></span></p>
+        <p>Embedded in: <span id="parent"></span></p>
+        <p><a href="wix-embed-landing-v2.html" style="color: yellow;">Go to Full Landing Page →</a></p>
+    </div>
+    <script>
+        document.getElementById('url').textContent = window.location.href;
+        try {
+            document.getElementById('parent').textContent = window.parent !== window ? 'iframe (embedded)' : 'direct access';
+        } catch(e) {
+            document.getElementById('parent').textContent = 'iframe (cross-origin)';
+        }
+        
+        // Notify parent that we loaded
+        if (window.parent !== window) {
+            window.parent.postMessage({ type: 'BANF_LOADED', status: 'success' }, '*');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BANF Survey</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--banf-red:#8B0000;--banf-orange:#FF6B35;--grad:linear-gradient(135deg,#8B0000,#DC143C)}
+*{font-family:'Poppins',sans-serif;box-sizing:border-box}
+body{background:linear-gradient(135deg,#f8e8e8,#fff5f0);min-height:100vh;padding:2rem 1rem}
+.survey-card{max-width:680px;margin:0 auto;background:#fff;border-radius:20px;box-shadow:0 8px 40px rgba(139,0,0,.12);overflow:hidden}
+.survey-header{background:var(--grad);color:#fff;padding:2rem}
+.survey-header h2{font-size:1.4rem;font-weight:700;margin-bottom:.3rem}
+.survey-header p{opacity:.85;margin:0;font-size:.9rem}
+.survey-body{padding:2rem}
+.q-card{background:#fafafa;border-radius:12px;padding:1.2rem 1.5rem;margin-bottom:1.2rem;border-left:4px solid var(--banf-orange)}
+.q-num{font-size:.75rem;color:var(--banf-orange);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:.3rem}
+.q-text{font-size:.95rem;font-weight:600;color:#222;margin-bottom:1rem}
+.rating-row{display:flex;gap:.5rem;flex-wrap:wrap}
+.rating-btn{width:44px;height:44px;border-radius:50%;border:2px solid #ddd;background:#fff;font-weight:600;font-size:.9rem;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center}
+.rating-btn:hover{border-color:var(--banf-orange);background:#fff5f0}
+.rating-btn.selected{background:var(--grad);color:#fff;border-color:var(--banf-red)}
+.yn-row{display:flex;gap:.75rem}
+.yn-btn{flex:1;padding:.6rem;border-radius:10px;border:2px solid #ddd;background:#fff;font-weight:600;cursor:pointer;transition:all .2s}
+.yn-btn:hover{border-color:var(--banf-orange)}
+.yn-btn.selected-yes{background:#d4edda;border-color:#28a745;color:#155724}
+.yn-btn.selected-no{background:#f8d7da;border-color:#dc3545;color:#721c24}
+.progress-bar-banf{background:var(--grad);border-radius:4px;transition:width .4s ease}
+.btn-submit{background:var(--grad);color:#fff;border:none;border-radius:12px;padding:.85rem 2.5rem;font-size:1rem;font-weight:600;width:100%;cursor:pointer;transition:opacity .2s}
+.btn-submit:hover{opacity:.88}
+.btn-submit:disabled{opacity:.5;cursor:not-allowed}
+#state-loading{text-align:center;padding:3rem 1rem}
+#state-error{text-align:center;padding:3rem 1rem}
+#state-thanks{text-align:center;padding:3rem 1rem}
+.spinner{width:48px;height:48px;border:5px solid #f3e8e8;border-top-color:var(--banf-red);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto}
+@keyframes spin{to{transform:rotate(360deg)}}
+.req-star{color:var(--banf-orange);font-weight:700}
+</style>
+</head>
+<body>
+
+<div class="survey-card" id="survey-app">
+
+  <!-- LOADING -->
+  <div id="state-loading">
+    <div class="spinner"></div>
+    <p class="mt-3 text-muted">Loading your survey…</p>
+  </div>
+
+  <!-- ERROR -->
+  <div id="state-error" style="display:none">
+    <div style="font-size:3rem">😕</div>
+    <h5 class="mt-3" id="err-title">Something went wrong</h5>
+    <p class="text-muted small" id="err-msg">Please check your link and try again.</p>
+    <p class="text-muted small">If you need help, contact <a href="mailto:banfjax@gmail.com">banfjax@gmail.com</a></p>
+  </div>
+
+  <!-- SURVEY FORM -->
+  <div id="state-form" style="display:none">
+    <div class="survey-header">
+      <div class="small mb-1 opacity-75">Bengali Association of North Florida</div>
+      <h2 id="sv-title">Survey</h2>
+      <p id="sv-desc"></p>
+      <div class="mt-3">
+        <div class="d-flex justify-content-between mb-1">
+          <span style="font-size:.8rem;opacity:.8">Progress</span>
+          <span id="progress-label" style="font-size:.8rem;opacity:.8">0%</span>
+        </div>
+        <div style="background:rgba(255,255,255,.25);border-radius:4px;height:6px">
+          <div id="progress-bar" class="progress-bar-banf" style="width:0;height:6px"></div>
+        </div>
+      </div>
+    </div>
+    <div class="survey-body">
+      <div class="mb-3 p-2 rounded" style="background:#fff3ee;font-size:.82rem;color:#666">
+        🔒 <strong>Your responses are completely anonymous.</strong> No personal details are linked to your answers.
+      </div>
+      <div id="questions-container"></div>
+      <button class="btn-submit" id="submit-btn" onclick="submitSurvey()">Submit Survey</button>
+      <p class="text-muted small text-center mt-2">By submitting you agree to BANF's privacy policy</p>
+    </div>
+  </div>
+
+  <!-- THANK YOU -->
+  <div id="state-thanks" style="display:none">
+    <div style="font-size:3.5rem">🙏</div>
+    <h4 class="mt-3 fw-bold" style="color:var(--banf-red)">Thank you!</h4>
+    <p class="text-muted">Your response has been recorded anonymously.<br>The EC will review and process all responses.</p>
+    <div class="mt-3 p-3 rounded" style="background:#f8e8e8;font-size:.85rem;color:#555">
+      <strong>What happens next?</strong><br>
+      The EC will review survey responses, identify themes, and follow up on any important issues at the next meeting.
+    </div>
+  </div>
+
+</div>
+
+<script>
+const API = 'https://banfwix.wixsite.com/banf1/_functions';
+let surveyData = null;
+let answers = {};
+let token = '';
+let sid = '';
+
+// ─── INIT ────────────────────────────────────────
+(async () => {
+  const params = new URLSearchParams(window.location.search);
+  token = params.get('token') || '';
+  sid = params.get('sid') || '';
+
+  if (!token || !sid) {
+    showError('Invalid Survey Link', 'This survey link is missing required parameters. Please use the link from your email.');
+    return;
+  }
+
+  try {
+    const res = await fetch(`${API}/survey_form_data?token=${encodeURIComponent(token)}&sid=${encodeURIComponent(sid)}`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' }
+    });
+    const data = await res.json();
+
+    if (!data.success) {
+      showError(
+        data.error === 'Already responded' ? 'Already Submitted' : 'Survey Unavailable',
+        data.error === 'Already responded'
+          ? 'You have already submitted a response to this survey. Each link can only be used once.'
+          : (data.error || 'This survey is not available. It may be closed or the link may have expired.')
+      );
+      return;
+    }
+
+    surveyData = data;
+    renderSurvey(data);
+  } catch (e) {
+    showError('Connection Error', 'Unable to load survey. Please check your internet connection and try again. (' + e.message + ')');
+  }
+})();
+
+// ─── RENDER ──────────────────────────────────────
+function renderSurvey(data) {
+  const sv = data.survey || {};
+  const questions = data.questions || [];
+  const recipient = data.recipient || {};
+
+  document.getElementById('sv-title').textContent = sv.title || 'BANF Survey';
+  document.getElementById('sv-desc').textContent = sv.description || '';
+
+  const container = document.getElementById('questions-container');
+  container.innerHTML = '';
+
+  questions.forEach((q, i) => {
+    const card = document.createElement('div');
+    card.className = 'q-card';
+    card.id = 'qcard-' + (q.id || i);
+
+    const label = q.required ? `${q.text || q.question || ''} <span class="req-star">*</span>` : (q.text || q.question || '');
+
+    let inputHtml = '';
+    const qtype = q.type || 'text';
+
+    if (qtype === 'rating_1_10') {
+      inputHtml = `<div class="rating-row" id="rating-${q.id}">` +
+        [1,2,3,4,5,6,7,8,9,10].map(n => `<button type="button" class="rating-btn" data-qid="${q.id}" data-val="${n}" onclick="selectRating('${q.id}',${n})">${n}</button>`).join('') +
+        '</div><div class="small text-muted mt-1" style="font-size:.75rem"><span>1 = Very Dissatisfied</span> · <span>10 = Very Satisfied</span></div>';
+    } else if (qtype === 'rating_1_5') {
+      const labels5 = ['','Poor','Fair','Good','Very Good','Excellent'];
+      inputHtml = `<div class="rating-row" id="rating-${q.id}">` +
+        [1,2,3,4,5].map(n => `<div class="text-center"><button type="button" class="rating-btn" data-qid="${q.id}" data-val="${n}" onclick="selectRating('${q.id}',${n})">${n}</button><div style="font-size:.65rem;color:#999;margin-top:.2rem">${labels5[n]}</div></div>`).join('') +
+        '</div>';
+    } else if (qtype === 'yes_no') {
+      inputHtml = `<div class="yn-row">
+        <button type="button" class="yn-btn" id="yn-yes-${q.id}" onclick="selectYN('${q.id}','yes')">👍 Yes</button>
+        <button type="button" class="yn-btn" id="yn-no-${q.id}" onclick="selectYN('${q.id}','no')">👎 No</button>
+      </div>`;
+    } else {
+      inputHtml = `<textarea class="form-control form-control-sm" id="text-${q.id}" rows="3" placeholder="Your response…" oninput="updateAnswer('${q.id}',this.value)"></textarea>`;
+    }
+
+    card.innerHTML = `<div class="q-num">Question ${i + 1} of ${questions.length}</div>
+      <div class="q-text">${label}</div>
+      ${inputHtml}`;
+    container.appendChild(card);
+  });
+
+  updateProgress();
+  showState('form');
+}
+
+// ─── ANSWER HELPERS ──────────────────────────────
+function selectRating(qId, val) {
+  answers[qId] = val;
+  document.querySelectorAll(`[data-qid="${qId}"]`).forEach(btn => {
+    btn.classList.toggle('selected', parseInt(btn.dataset.val) === val);
+  });
+  updateProgress();
+}
+
+function selectYN(qId, val) {
+  answers[qId] = val;
+  document.getElementById('yn-yes-'+qId).className = 'yn-btn' + (val==='yes' ? ' selected-yes' : '');
+  document.getElementById('yn-no-'+qId).className = 'yn-btn' + (val==='no' ? ' selected-no' : '');
+  updateProgress();
+}
+
+function updateAnswer(qId, val) {
+  answers[qId] = val;
+  updateProgress();
+}
+
+function updateProgress() {
+  if (!surveyData) return;
+  const questions = surveyData.questions || [];
+  const answered = questions.filter(q => answers[q.id] !== undefined && answers[q.id] !== '').length;
+  const pct = questions.length ? Math.round((answered / questions.length) * 100) : 0;
+  document.getElementById('progress-bar').style.width = pct + '%';
+  document.getElementById('progress-label').textContent = pct + '%';
+}
+
+// ─── SUBMIT ──────────────────────────────────────
+async function submitSurvey() {
+  const questions = surveyData?.questions || [];
+  // Validate required
+  const missing = questions.filter(q => q.required && (answers[q.id] === undefined || answers[q.id] === ''));
+  if (missing.length) {
+    // Highlight missing
+    missing.forEach(q => {
+      const card = document.getElementById('qcard-' + q.id);
+      if (card) { card.style.borderLeftColor = '#dc3545'; card.style.animation = 'shake .3s'; }
+    });
+    showToast('Please answer all required questions (' + missing.length + ' remaining)');
+    return;
+  }
+
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.textContent = 'Submitting…';
+
+  try {
+    const res = await fetch(`${API}/survey_submit`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token, sid, answers })
+    });
+    const data = await res.json();
+    if (data.success) {
+      showState('thanks');
+    } else {
+      btn.disabled = false;
+      btn.textContent = 'Submit Survey';
+      showToast(data.error || 'Submission failed. Please try again.');
+    }
+  } catch (e) {
+    btn.disabled = false;
+    btn.textContent = 'Submit Survey';
+    showToast('Network error. Please check your connection and try again.');
+  }
+}
+
+// ─── HELPERS ─────────────────────────────────────
+function showState(state) {
+  ['loading','error','form','thanks'].forEach(s => {
+    document.getElementById('state-'+s).style.display = s === state ? '' : 'none';
+  });
+}
+
+function showError(title, msg) {
+  document.getElementById('err-title').textContent = title;
+  document.getElementById('err-msg').textContent = msg;
+  showState('error');
+}
+
+function showToast(msg) {
+  let t = document.getElementById('survey-toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'survey-toast';
+    t.style.cssText = 'position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:#dc3545;color:#fff;padding:.6rem 1.5rem;border-radius:20px;font-size:.85rem;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.2)';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.display = '';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => { t.style.display = 'none'; }, 4000);
+}
+</script>
+</body>
+</html>
