@@ -128,6 +128,9 @@
     <button class="btn btn-sm ms-1" id="full-scan-btn" style="background:#1a73e8;color:#fff" onclick="runFullScan()"><i class="fas fa-satellite-dish me-1"></i>Full Scan (All Sources)</button>
   </div>
   <button class="btn btn-outline-secondary btn-sm ms-auto" onclick="exportCSV()"><i class="fas fa-file-csv me-1"></i>Export CSV</button>
+  <button class="btn btn-sm ms-1" id="pdf-report-btn" style="background:#8B0000;color:#fff" onclick="openPdfReport()" title="Generate printable PDF report for current year">
+    <i class="fas fa-file-pdf me-1"></i>PDF Report
+  </button>
   <button class="btn btn-outline-secondary btn-sm ms-1" onclick="document.getElementById('log-panel').classList.toggle('show')"><i class="fas fa-terminal me-1"></i>Log</button>
 </div>
 
@@ -668,6 +671,14 @@ function exportCSV() {
   const a    = document.createElement('a'); a.href=url; a.download=`BANF_Archive_Mapping_${yr}.csv`; a.click();
   URL.revokeObjectURL(url);
   log(`CSV exported: ${rows.length} rows`, 'success');
+}
+
+// ── PDF Report ────────────────────────────────────────────────────────────────
+function openPdfReport() {
+  const yr = YEAR_SEL() || 'FY2024-25';
+  const url = `${API}/archive_scan_report?year=${encodeURIComponent(yr)}`;
+  window.open(url, '_blank');
+  log(`Opening PDF report for ${yr} in new tab…`, 'success');
 }
 
 // ── UI helpers ────────────────────────────────────────────────────────────────
