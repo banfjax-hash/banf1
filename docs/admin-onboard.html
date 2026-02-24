@@ -245,6 +245,7 @@ const EMAIL = (params.get('email') || '').trim();
 const TOKEN = (params.get('token') || '').trim();
 let adminName = '';
 let portalUrl  = 'https://ranadhir19.github.io/banf1/admin-portal.html?email=' + encodeURIComponent(EMAIL);
+let guideUrl   = 'https://ranadhir19.github.io/banf1/admin-guide.html?email=' + encodeURIComponent(EMAIL); // updated after verify
 
 // ── Initialise ──────────────────────────────────────────────
 (async function init() {
@@ -284,7 +285,16 @@ let portalUrl  = 'https://ranadhir19.github.io/banf1/admin-portal.html?email=' +
     }
 
     document.getElementById('done-email').textContent = EMAIL;
-    document.getElementById('btn-go-portal').href = portalUrl;
+
+    // Build guide URL with name + role for the welcome message
+    const fname    = ar.firstName || '';
+    const roleDisp = ar.ecTitle   || (ar.role||'').replace(/_/g,' ');
+    guideUrl = `https://ranadhir19.github.io/banf1/admin-guide.html` +
+      `?email=${encodeURIComponent(EMAIL)}` +
+      `&name=${encodeURIComponent(fname)}` +
+      `&role=${encodeURIComponent(roleDisp)}`;
+    document.getElementById('btn-go-portal').href = guideUrl;
+    document.getElementById('btn-go-portal').innerHTML = '<i class="fas fa-book-open me-2"></i>View Guide &amp; Open Admin Panel';
 
     // If password was already set (user revisiting), go to step 2
     if (ar.passwordSet) {
@@ -381,7 +391,7 @@ function startCountdown() {
   const t = setInterval(() => {
     c--;
     el.textContent = c;
-    if (c <= 0) { clearInterval(t); window.location.href = portalUrl; }
+    if (c <= 0) { clearInterval(t); window.location.href = guideUrl; }
   }, 1000);
 }
 

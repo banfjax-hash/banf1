@@ -674,7 +674,21 @@ async function doLogin() {
     adminRole = data.role || data.adminRole || 'admin';
     localStorage.setItem('banf_admin_email', email);
     localStorage.setItem('banf_admin_role', adminRole);
-    // Load dashboard data
+
+    // First-ever login → show the user guide
+    const guideKey = 'banf_guide_seen_' + email.toLowerCase();
+    if (!localStorage.getItem(guideKey)) {
+      const fname   = data.firstName || '';
+      const roleDisp = data.ecTitle  || adminRole.replace(/_/g,' ');
+      const guideUrl = `https://ranadhir19.github.io/banf1/admin-guide.html` +
+        `?email=${encodeURIComponent(email)}` +
+        `&name=${encodeURIComponent(fname)}` +
+        `&role=${encodeURIComponent(roleDisp)}`;
+      window.location.href = guideUrl;
+      return;
+    }
+
+    // Returning user → load dashboard and open portal directly
     try {
       const dash = await fetch(`${API}/admin_dashboard`, { headers: getHeaders() });
       const dashData = await dash.json();
