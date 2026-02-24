@@ -84,6 +84,7 @@ textarea.form-control{resize:vertical}
   <a class="nav-link" href="#" onclick="show('kb',this)"><i class="fas fa-book fa-fw"></i>Knowledge Base</a>
   <a class="nav-link" href="#" onclick="show('agents',this)"><i class="fas fa-brain fa-fw"></i>AI Agents</a>
   <a class="nav-link" href="#" onclick="show('roles',this)"><i class="fas fa-user-shield fa-fw"></i>Roles &amp; Access</a>
+  <a class="nav-link" href="#" onclick="show('email-templates',this)"><i class="fas fa-envelope-open-text fa-fw"></i>Email Templates</a>
   <a class="nav-link" href="#" onclick="show('reports',this)"><i class="fas fa-chart-bar fa-fw"></i>Reports</a>
   <a class="nav-link" href="#" onclick="show('tools',this)"><i class="fas fa-tools fa-fw"></i>System Tools</a>
   <hr style="margin:.4rem 1rem;border-color:#f0d0d0">
@@ -323,6 +324,74 @@ textarea.form-control{resize:vertical}
         <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>EC Title</th><th>Granted By</th><th>Date</th><th>Status</th><th>Action</th></tr></thead>
         <tbody id="roles-tbl"></tbody>
       </table>
+    </div>
+  </div>
+
+  <!-- EMAIL TEMPLATES -->
+  <div id="sec-email-templates" class="section">
+    <div class="section-title"><i class="fas fa-envelope-open-text me-2"></i>Email Templates</div>
+    <div class="d-flex gap-2 mb-3">
+      <button class="btn btn-banf btn-sm" onclick="newEmailTemplate()"><i class="fas fa-plus me-1"></i>New Template</button>
+      <button class="btn btn-outline-secondary btn-sm" onclick="loadEmailTemplates()"><i class="fas fa-sync me-1"></i>Refresh</button>
+    </div>
+    <p class="text-muted small mb-3">All outgoing BANF emails use these templates. Variables like <code>{{firstName}}</code>, <code>{{lastName}}</code>, <code>{{email}}</code>, <code>{{roleLabel}}</code>, <code>{{ecTitle}}</code>, <code>{{portalUrl}}</code>, <code>{{grantedBy}}</code>, <code>{{grantedAt}}</code> are automatically filled from member profiles and context data.</p>
+    <div class="tbl-wrap mb-4">
+      <table class="table table-hover mb-0">
+        <thead><tr><th>Template ID</th><th>Name</th><th>Subject</th><th>Description</th><th>Status</th><th>Last Modified By</th><th>Action</th></tr></thead>
+        <tbody id="email-templates-body"></tbody>
+      </table>
+    </div>
+    <!-- Template Editor -->
+    <div id="email-template-editor" style="display:none" class="tbl-wrap p-4">
+      <h6 class="fw-bold text-danger mb-3" id="editor-title"><i class="fas fa-edit me-2"></i>Edit Template</h6>
+      <div class="row g-3">
+        <div class="col-md-4">
+          <label class="form-label fw-bold">Template ID <span class="text-danger">*</span></label>
+          <input type="text" class="form-control form-control-sm" id="et-templateId" placeholder="e.g. role_welcome" />
+          <div class="form-text">Unique key (snake_case). Cannot change after creation.</div>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label fw-bold">Template Name <span class="text-danger">*</span></label>
+          <input type="text" class="form-control form-control-sm" id="et-name" placeholder="e.g. Role Grant Welcome Email" />
+        </div>
+        <div class="col-md-4">
+          <label class="form-label fw-bold">Status</label>
+          <select class="form-select form-select-sm" id="et-isActive">
+            <option value="true">Active</option>
+            <option value="false">Inactive</option>
+          </select>
+        </div>
+        <div class="col-12">
+          <label class="form-label fw-bold">Subject Line <span class="text-danger">*</span></label>
+          <input type="text" class="form-control form-control-sm" id="et-subject" placeholder="e.g. BANF: You have been granted {{roleLabel}} access" />
+        </div>
+        <div class="col-12">
+          <label class="form-label fw-bold">Description</label>
+          <input type="text" class="form-control form-control-sm" id="et-description" placeholder="Brief description of when this email is sent" />
+        </div>
+        <div class="col-12">
+          <label class="form-label fw-bold">HTML Body <span class="text-danger">*</span></label>
+          <div class="form-text mb-1">Use <code>{{varName}}</code> for variables. Conditional: <code>{{#if varName}}content{{/if varName}}</code></div>
+          <textarea class="form-control form-control-sm font-monospace" id="et-bodyHtml" rows="18" style="font-size:.78rem;line-height:1.4"></textarea>
+        </div>
+        <div class="col-12">
+          <label class="form-label fw-bold">Variables (comma-separated)</label>
+          <input type="text" class="form-control form-control-sm" id="et-variables" placeholder="firstName,lastName,email,roleLabel,ecTitle,portalUrl,grantedBy,grantedAt" />
+          <div class="form-text">List all variables this template uses, for reference.</div>
+        </div>
+        <div class="col-12 d-flex gap-2 mt-2">
+          <button class="btn btn-banf btn-sm" onclick="saveEmailTemplate()"><i class="fas fa-save me-1"></i>Save Template</button>
+          <button class="btn btn-outline-secondary btn-sm" onclick="previewEmailTemplate()"><i class="fas fa-eye me-1"></i>Preview</button>
+          <button class="btn btn-outline-danger btn-sm" onclick="cancelEditTemplate()"><i class="fas fa-times me-1"></i>Cancel</button>
+        </div>
+      </div>
+      <div id="et-preview-area" style="display:none" class="mt-4">
+        <hr>
+        <h6 class="fw-bold text-muted mb-2"><i class="fas fa-eye me-1"></i>Preview (with sample data)</h6>
+        <div style="border:1px solid #e5e7eb;border-radius:8px;overflow:hidden">
+          <iframe id="et-preview-frame" style="width:100%;min-height:450px;border:none"></iframe>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -602,7 +671,9 @@ function show(sectionId, el) {
     dashboard: loadDashboard, events: loadEvents, rsvps: loadEventsForFilter,
     members: loadMembers, payments: loadPayments, surveys: loadSurveys,
     automation: () => {}, crm: loadCrmDashboard, vendors: loadVendors,
-    kb: loadKb, agents: loadAgents, roles: loadRoles, reports: () => {}, tools: () => {},
+    kb: loadKb, agents: loadAgents, roles: loadRoles,
+    'email-templates': loadEmailTemplates,
+    reports: () => {}, tools: () => {},
     workflows: () => {}
   };
   if (loaders[sectionId]) loaders[sectionId]();
@@ -1345,8 +1416,131 @@ function showToast(msg, type='info') {
   setTimeout(()=>el.remove(),4000);
 }
 
+// ─── EMAIL TEMPLATES ────────────────────────────
+async function loadEmailTemplates() {
+  try {
+    const res = await fetch(`${API}/email_templates`, { headers: getHeaders() });
+    const data = await res.json();
+    const tbody = document.getElementById('email-templates-body');
+    if (!data.success || !data.templates) {
+      tbody.innerHTML = `<tr><td colspan="7" class="text-center text-danger">${data.error || 'Failed to load templates'}</td></tr>`;
+      return;
+    }
+    tbody.innerHTML = data.templates.map(t => `
+      <tr>
+        <td><code style="font-size:.8rem">${t.templateId}</code></td>
+        <td>${t.name || ''}</td>
+        <td style="font-size:.8rem;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${t.subject || ''}</td>
+        <td style="font-size:.78rem;color:#6b7280;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${t.description || ''}</td>
+        <td>${(t.isActive === false || t.isActive === 'false') ? '<span class="badge bg-secondary">Inactive</span>' : '<span class="badge bg-success">Active</span>'}</td>
+        <td style="font-size:.78rem;color:#6b7280">${t.lastModifiedBy || '—'}</td>
+        <td><button class="btn btn-outline-danger btn-sm" onclick='editEmailTemplate(${JSON.stringify(t)})'><i class="fas fa-edit me-1"></i>Edit</button></td>
+      </tr>`).join('');
+  } catch (e) {
+    showToast('Error loading email templates: ' + e.message, 'danger');
+  }
+}
+
+function newEmailTemplate() {
+  document.getElementById('editor-title').innerHTML = '<i class="fas fa-plus me-2"></i>New Template';
+  document.getElementById('et-templateId').value = '';
+  document.getElementById('et-templateId').disabled = false;
+  document.getElementById('et-name').value = '';
+  document.getElementById('et-subject').value = '';
+  document.getElementById('et-description').value = '';
+  document.getElementById('et-bodyHtml').value = '';
+  document.getElementById('et-variables').value = '';
+  document.getElementById('et-isActive').value = 'true';
+  document.getElementById('et-preview-area').style.display = 'none';
+  document.getElementById('email-template-editor').style.display = '';
+  document.getElementById('email-template-editor').scrollIntoView({ behavior: 'smooth' });
+}
+
+function editEmailTemplate(t) {
+  document.getElementById('editor-title').innerHTML = `<i class="fas fa-edit me-2"></i>Edit: ${t.name || t.templateId}`;
+  document.getElementById('et-templateId').value = t.templateId || '';
+  document.getElementById('et-templateId').disabled = true; // cannot change templateId
+  document.getElementById('et-name').value = t.name || '';
+  document.getElementById('et-subject').value = t.subject || '';
+  document.getElementById('et-description').value = t.description || '';
+  document.getElementById('et-bodyHtml').value = t.bodyHtml || '';
+  const vars = Array.isArray(t.variables) ? t.variables.join(',') : (t.variables || '');
+  document.getElementById('et-variables').value = vars;
+  document.getElementById('et-isActive').value = (t.isActive === false || t.isActive === 'false') ? 'false' : 'true';
+  document.getElementById('et-preview-area').style.display = 'none';
+  document.getElementById('email-template-editor').style.display = '';
+  document.getElementById('email-template-editor').scrollIntoView({ behavior: 'smooth' });
+}
+
+async function saveEmailTemplate() {
+  const templateId = document.getElementById('et-templateId').value.trim();
+  const name = document.getElementById('et-name').value.trim();
+  const subject = document.getElementById('et-subject').value.trim();
+  const bodyHtml = document.getElementById('et-bodyHtml').value.trim();
+  if (!templateId || !name || !subject || !bodyHtml) {
+    showToast('Template ID, Name, Subject, and Body are required', 'danger'); return;
+  }
+  const varsRaw = document.getElementById('et-variables').value.trim();
+  const variables = varsRaw ? varsRaw.split(',').map(v => v.trim()).filter(Boolean) : [];
+  const isActive = document.getElementById('et-isActive').value === 'true';
+  const description = document.getElementById('et-description').value.trim();
+  try {
+    const res = await fetch(`${API}/email_template_save`, {
+      method: 'POST', headers: getHeaders(),
+      body: JSON.stringify({ templateId, name, subject, bodyHtml, variables, isActive, description })
+    });
+    const data = await res.json();
+    if (data.success) {
+      showToast('Template saved successfully!', 'success');
+      document.getElementById('email-template-editor').style.display = 'none';
+      loadEmailTemplates();
+    } else {
+      showToast('Save failed: ' + (data.error || 'Unknown error'), 'danger');
+    }
+  } catch (e) {
+    showToast('Error saving template: ' + e.message, 'danger');
+  }
+}
+
+function cancelEditTemplate() {
+  document.getElementById('email-template-editor').style.display = 'none';
+  document.getElementById('et-preview-area').style.display = 'none';
+}
+
+function previewEmailTemplate() {
+  const bodyHtml = document.getElementById('et-bodyHtml').value;
+  const subject = document.getElementById('et-subject').value;
+  // Sample data for preview
+  const sampleVars = {
+    firstName: 'Ranadhir', lastName: 'Ghosh', email: 'ranadhir.ghosh@gmail.com',
+    roleLabel: 'EC Member', ecTitle: 'President', phone: '(904) 555-1234',
+    portalUrl: 'https://ranadhir19.github.io/banf1/admin-portal.html?email=ranadhir.ghosh%40gmail.com',
+    grantedBy: 'superadmin@banf.org', grantedAt: new Date().toUTCString(),
+    membershipType: 'Family', membershipYear: '2025-26', renewalDeadline: 'June 30, 2026',
+    eventName: 'Durga Puja 2025', eventDate: 'October 3, 2025', eventVenue: 'Jacksonville Cultural Center',
+    eventDescription: 'Join us for our annual Durga Puja celebration.',
+    amount: '150.00', paymentDescription: 'Annual Family Membership', paymentDate: new Date().toLocaleDateString(), paymentMethod: 'Zelle'
+  };
+  // Simple render for preview (client-side)
+  let rendered = bodyHtml;
+  rendered = rendered.replace(/\{\{#if (\w+)\}\}([\s\S]*?)\{\{\/if \1\}\}/g, (m, k, c) => sampleVars[k] ? c : '');
+  Object.keys(sampleVars).forEach(k => { rendered = rendered.replace(new RegExp('\\{\\{' + k + '\\}\\}', 'g'), sampleVars[k]); });
+  rendered = rendered.replace(/\{\{\w+\}\}/g, '');
+  const frame = document.getElementById('et-preview-frame');
+  frame.srcdoc = rendered;
+  document.getElementById('et-preview-area').style.display = '';
+  showToast(`Preview loaded. Subject: "${subject.replace(/\{\{(\w+)\}\}/g, (m,k) => sampleVars[k]||m)}"`, 'info');
+}
+
 // ─── INIT ────────────────────────────────────────
 (async () => {
+  // Check if email is pre-filled via URL query param (e.g. from welcome email link)
+  const urlParams = new URLSearchParams(window.location.search);
+  const urlEmail = urlParams.get('email');
+  if (urlEmail) {
+    document.getElementById('login-email').value = urlEmail;
+  }
+
   const email = localStorage.getItem('banf_admin_email');
   if (email) {
     adminEmail = email;
@@ -1357,6 +1551,11 @@ function showToast(msg, type='info') {
       if (data.success) { showPortal(data); return; }
     } catch(_) {}
     localStorage.removeItem('banf_admin_email');
+  }
+
+  // If email came from URL param, attempt auto-login
+  if (urlEmail) {
+    setTimeout(() => doLogin(), 300);
   }
 })();
 
