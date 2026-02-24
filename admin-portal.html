@@ -86,6 +86,9 @@ textarea.form-control{resize:vertical}
   <a class="nav-link" href="#" onclick="show('roles',this)"><i class="fas fa-user-shield fa-fw"></i>Roles &amp; Access</a>
   <a class="nav-link" href="#" onclick="show('reports',this)"><i class="fas fa-chart-bar fa-fw"></i>Reports</a>
   <a class="nav-link" href="#" onclick="show('tools',this)"><i class="fas fa-tools fa-fw"></i>System Tools</a>
+  <hr style="margin:.4rem 1rem;border-color:#f0d0d0">
+  <div style="padding:.25rem 1.2rem;font-size:.7rem;text-transform:uppercase;letter-spacing:1px;color:#bbb;font-weight:600">Workflows</div>
+  <a class="nav-link" href="#" onclick="show('workflows',this)"><i class="fas fa-project-diagram fa-fw"></i>Workflow Hub</a>
 </div>
 
 <!-- MAIN CONTENT -->
@@ -354,6 +357,61 @@ textarea.form-control{resize:vertical}
     <div id="tools-output" class="mt-3"></div>
   </div>
 
+  <!-- WORKFLOW HUB -->
+  <div id="sec-workflows" class="section">
+    <div class="section-title"><i class="fas fa-project-diagram me-2"></i>Workflow Hub</div>
+    <p class="text-muted mb-4" style="font-size:.88rem">Each workflow guides you through a multi-step admin process — run individual steps automatically or manually, in <strong>Demo</strong> or <strong>Live</strong> mode.</p>
+    <div class="row g-4">
+      <div class="col-12 col-md-6 col-lg-4">
+        <div class="card h-100 border-0 shadow-sm" style="border-top:4px solid #8B0000!important">
+          <div class="card-body">
+            <div style="font-size:2rem;color:#8B0000" class="mb-2"><i class="fas fa-users"></i></div>
+            <h5 class="fw-bold mb-1">Annual Membership Drive</h5>
+            <p class="text-muted small mb-3">End-to-end membership drive for FY2026-27: configure tiers, build universe pool, send invitations (demo then live), monitor registrations, confirm payments, close drive.</p>
+            <div class="d-flex gap-2 mb-2">
+              <span class="badge bg-warning text-dark">8 Steps</span>
+              <span class="badge" style="background:#d4edda;color:#155724">Demo + Live</span>
+              <span class="badge bg-secondary">FY2026-27</span>
+            </div>
+            <a href="https://banfwix.wixsite.com/banf1/_functions/membership_drive_workflow" class="btn btn-banf w-100" target="_self" onclick="openWorkflow('membership_drive_workflow')">
+              <i class="fas fa-play me-2"></i>Open Workflow
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="col-12 col-md-6 col-lg-4">
+        <div class="card h-100 border-0 shadow-sm" style="border-top:4px solid #1565c0!important">
+          <div class="card-body">
+            <div style="font-size:2rem;color:#1565c0" class="mb-2"><i class="fas fa-balance-scale"></i></div>
+            <h5 class="fw-bold mb-1">Financial Reconciliation</h5>
+            <p class="text-muted small mb-3">Reconcile financial entries against membership registrations and payments for any accounting year. Flag discrepancies, resolve manually, generate signed report.</p>
+            <div class="d-flex gap-2 mb-2">
+              <span class="badge bg-warning text-dark">7 Steps</span>
+              <span class="badge" style="background:#d4edda;color:#155724">Any Year</span>
+              <span class="badge bg-secondary">Export CSV</span>
+            </div>
+            <a href="https://banfwix.wixsite.com/banf1/_functions/reconciliation_workflow" class="btn w-100" style="background:#1565c0;color:#fff;border:none" onclick="openWorkflow('reconciliation_workflow')">
+              <i class="fas fa-play me-2"></i>Open Workflow
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="col-12 col-md-6 col-lg-4">
+        <div class="card h-100 border-0 shadow-sm" style="border-top:4px solid #555!important;opacity:.6">
+          <div class="card-body">
+            <div style="font-size:2rem;color:#555" class="mb-2"><i class="fas fa-calendar-check"></i></div>
+            <h5 class="fw-bold mb-1">Event Planning Workflow</h5>
+            <p class="text-muted small mb-3">Full event lifecycle: venue booking, vendor management, evite + RSVP, day-of checklist, post-event report.</p>
+            <div class="d-flex gap-2 mb-2">
+              <span class="badge bg-secondary">Coming Soon</span>
+            </div>
+            <button class="btn btn-outline-secondary w-100" disabled><i class="fas fa-clock me-2"></i>Coming Soon</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div><!-- /main-content -->
 
 <!-- TOAST AREA -->
@@ -508,9 +566,15 @@ function show(sectionId, el) {
     dashboard: loadDashboard, events: loadEvents, rsvps: loadEventsForFilter,
     members: loadMembers, payments: loadPayments, surveys: loadSurveys,
     automation: () => {}, crm: loadCrmDashboard, vendors: loadVendors,
-    kb: loadKb, agents: loadAgents, roles: loadRoles, reports: () => {}, tools: () => {}
+    kb: loadKb, agents: loadAgents, roles: loadRoles, reports: () => {}, tools: () => {},
+    workflows: () => {}
   };
   if (loaders[sectionId]) loaders[sectionId]();
+}
+
+function openWorkflow(name) {
+  const base = 'https://banfwix.wixsite.com/banf1/_functions';
+  window.open(`${base}/${name}`, '_self');
 }
 
 // ─── DASHBOARD ──────────────────────────────────
