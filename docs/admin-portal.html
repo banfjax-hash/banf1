@@ -63,7 +63,15 @@ textarea.form-control{resize:vertical}
     </div>
     <div class="mb-3">
       <label class="form-label">Email</label>
-      <input type="email" class="form-control" id="login-email" placeholder="your@email.com" onkeydown="if(event.key==='Enter')doLogin()">
+      <input type="email" class="form-control" id="login-email" placeholder="your@email.com" onkeydown="if(event.key==='Enter')focusPw()">
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Password</label>
+      <div class="input-group">
+        <input type="password" class="form-control" id="login-password" placeholder="Your password" onkeydown="if(event.key==='Enter')doLogin()">
+        <button class="btn btn-outline-secondary" type="button" onclick="toggleLoginPw(this)"><i class="fas fa-eye"></i></button>
+      </div>
+      <div class="text-muted" style="font-size:.78rem;margin-top:4px">New admin? Use the setup link from your welcome email.</div>
     </div>
     <button class="btn btn-banf w-100" onclick="doLogin()"><i class="fas fa-sign-in-alt me-2"></i>Sign In</button>
     <div id="login-err" class="text-danger small mt-2" style="display:none"></div>
@@ -623,25 +631,59 @@ function getHeaders() {
   return { 'Content-Type': 'application/json', 'x-user-email': adminEmail };
 }
 
+function focusPw() { document.getElementById('login-password').focus(); }
+function toggleLoginPw(btn) {
+  const el = document.getElementById('login-password');
+  const show = el.type === 'text';
+  el.type = show ? 'password' : 'text';
+  btn.innerHTML = show ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
+}
+
 async function doLogin() {
-  const email = document.getElementById('login-email').value.trim();
-  if (!email) return showToast('Enter your email', 'danger');
+  const email = document.getElementById('login-email').value.trim().toLowerCase();
+  const password = document.getElementById('login-password').value;
+  const errEl = document.getElementById('login-err');
+  errEl.style.display = 'none';
+  if (!email) { errEl.style.display=''; errEl.textContent='Please enter your email.'; return; }
+
+  const btn = document.querySelector('#login-wall .btn-banf');
+  btn.disabled = true; btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Signing in…';
+
   try {
-    const res = await fetch(`${API}/admin_dashboard`, { headers: { 'x-user-email': email } });
+    const res = await fetch(`${API}/admin_verify_login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
     const data = await res.json();
+    btn.disabled = false; btn.innerHTML = '<i class="fas fa-sign-in-alt me-2"></i>Sign In';
+
+    if (data.needsOnboarding) {
+      // Redirect to onboarding wizard
+      const onboardBase = 'https://ranadhir19.github.io/banf1/admin-onboard.html';
+      const onboardUrl = `${onboardBase}?email=${encodeURIComponent(email)}` + (data.setupToken ? `&token=${data.setupToken}` : '');
+      window.location.href = onboardUrl;
+      return;
+    }
     if (!data.success) {
-      document.getElementById('login-err').style.display = '';
-      document.getElementById('login-err').textContent = data.error || 'Access denied';
+      errEl.style.display = '';
+      errEl.textContent = data.error || 'Access denied. Check your email and password.';
       return;
     }
     adminEmail = email;
-    adminRole = data.adminRole || 'admin';
+    adminRole = data.role || data.adminRole || 'admin';
     localStorage.setItem('banf_admin_email', email);
     localStorage.setItem('banf_admin_role', adminRole);
-    showPortal(data);
+    // Load dashboard data
+    try {
+      const dash = await fetch(`${API}/admin_dashboard`, { headers: getHeaders() });
+      const dashData = await dash.json();
+      showPortal(dashData.success ? dashData : {});
+    } catch(_) { showPortal({}); }
   } catch (e) {
-    document.getElementById('login-err').style.display = '';
-    document.getElementById('login-err').textContent = 'Login failed: ' + e.message;
+    btn.disabled = false; btn.innerHTML = '<i class="fas fa-sign-in-alt me-2"></i>Sign In';
+    errEl.style.display = '';
+    errEl.textContent = 'Login failed: ' + e.message;
   }
 }
 
@@ -1553,10 +1595,8 @@ function previewEmailTemplate() {
     localStorage.removeItem('banf_admin_email');
   }
 
-  // If email came from URL param, attempt auto-login
-  if (urlEmail) {
-    setTimeout(() => doLogin(), 300);
-  }
+  // Pre-fill email from URL param; user must enter password manually
+  // (auto-login removed — password now required)
 })();
 
 document.getElementById('ev-free').addEventListener('change', function(){ document.getElementById('ev-price-wrapper').style.display = this.checked ? 'none' : ''; });
