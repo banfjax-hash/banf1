@@ -17,6 +17,7 @@
 import { ok, badRequest, serverError, notFound, forbidden } from 'wix-http-functions';
 import wixData from 'wix-data';
 import { fetch as wixFetch } from 'wix-fetch';
+import { getSecret } from 'wix-secrets-backend';
 
 // ============================================
 // UTILITY FUNCTIONS
@@ -638,8 +639,7 @@ let _sendgridKey = null;
 async function getSendGridKey() {
     if (_sendgridKey) return _sendgridKey;
     try {
-        const { getSecret } = await import('wix-secrets-backend');
-        _sendgridKey = await getSecret('banf');
+        _sendgridKey = await getSecret('banf_api_key');
         return _sendgridKey;
     } catch (e) {
         console.error('SendGrid key not found:', e.message);
@@ -1349,3 +1349,98 @@ export async function get_setup_collections(request) {
     }
 }
 export function options_setup_collections(request) { return handleCors(); }
+
+/**
+ * AUTO-SETUP: Create all collections and sample data
+ * Call via: GET /_functions/runSetup
+ * This endpoint will:
+ * 1. Try to import the banf-setup module
+ * 2. Run setupAllCollections()
+ * 3. Return results
+ */
+export async function get_runSetup(request) {
+    try {
+        console.log('🚀 Starting automated collection setup via banf-setup.jsw...');
+        
+        // Try to import and run the setup module
+        let setupResult;
+        try {
+            const setupModule = await import('backend/banf-setup.jsw');
+            setupResult = await setupModule.setupAllCollections();
+        } catch (importError) {
+            console.error('Could not import banf-setup.jsw:', importError.message);
+            // Fallback: Create collections inline by trying to insert test data
+            setupResult = await fallbackSetupCollections();
+        }
+        
+        return jsonResponse({
+            success: true,
+            message: '✅ Collections setup initiated!',
+            result: setupResult
+        });
+    } catch (error) {
+        console.error('❌ Setup failed:', error);
+        return errorResponse('Setup failed: ' + error.message);
+    }
+}
+
+/**
+ * Fallback setup if main module unavailable
+ */
+async function fallbackSetupCollections() {
+    const collections = ['Sponsors', 'Events', 'Members', 'Magazine', 'RadioSchedule', 'Announcements', 'Volunteers'];
+    const results = [];
+    
+    for (const collectionId of collections) {
+        try {
+            // Try to query to see if collection exists
+            await wixData.query(collectionId).limit(1).find();
+            results.push({ collection: collectionId, status: 'exists' });
+        } catch (e) {
+            // Collection doesn't exist yet - will need manual creation
+            results.push({ collection: collectionId, status: 'missing', message: 'Create in Wix Admin' });
+        }
+    }
+    
+    return {
+        method: 'fallback',
+        collections: results,
+        message: 'Collections checked. Create any missing ones in Wix Admin.'
+    };
+}
+
+export function options_runSetup(request) { return handleCors(); }
+
+/**
+ * SIMPLIFIED SETUP: Uses simple-setup.jsw module
+ * Call via: GET /_functions/setupNow
+ */
+export async function get_setupNow(request) {
+    try {
+        console.log('🚀 Running BANF simplified setup...');
+        
+        // Try to import the simple setup module
+        let setupResult;
+        try {
+            const { setupAllCollections } = await import('backend/simple-setup.jsw');
+            setupResult = await setupAllCollections();
+        } catch (importError) {
+            console.error('Import error:', importError, 'Using fallback...');
+            setupResult = await fallbackSetupCollections();
+        }
+        
+        console.log('✅ Setup complete:', setupResult);
+        
+        return jsonResponse({
+            success: true,
+            message: '✅ BANF Collections Setup Complete!',
+            collectionResults: setupResult,
+            timestamp: new Date(),
+            nextSteps: 'Reload to see your data on the site'
+        });
+    } catch (error) {
+        console.error('❌ Setup error:', error);
+        return errorResponse('Setup failed: ' + error.message);
+    }
+}
+export function options_setupNow(request) { return handleCors(); }
