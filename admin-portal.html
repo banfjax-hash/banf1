@@ -320,7 +320,7 @@ textarea.form-control{resize:vertical}
     </div>
     <div class="tbl-wrap">
       <table class="table table-hover mb-0">
-        <thead><tr><th>Email</th><th>Role</th><th>Granted By</th><th>Date</th><th>Status</th><th>Action</th></tr></thead>
+        <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>EC Title</th><th>Granted By</th><th>Date</th><th>Status</th><th>Action</th></tr></thead>
         <tbody id="roles-tbl"></tbody>
       </table>
     </div>
@@ -494,13 +494,32 @@ textarea.form-control{resize:vertical}
   <div class="modal-dialog"><div class="modal-content">
     <div class="modal-header" style="background:var(--grad);color:#fff"><h5 class="modal-title">Grant Role</h5><button class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
     <div class="modal-body">
-      <div class="mb-2"><label class="form-label small">Email</label><input type="email" class="form-control form-control-sm" id="role-email"></div>
+      <div class="row g-2 mb-2">
+        <div class="col"><label class="form-label small">First Name</label><input type="text" class="form-control form-control-sm" id="role-fname" placeholder="e.g. Rana"></div>
+        <div class="col"><label class="form-label small">Last Name</label><input type="text" class="form-control form-control-sm" id="role-lname" placeholder="e.g. Dhir"></div>
+      </div>
+      <div class="mb-2"><label class="form-label small">Email</label><input type="email" class="form-control form-control-sm" id="role-email" placeholder="member@email.com"></div>
       <div class="mb-2"><label class="form-label small">Role</label>
-        <select class="form-select form-select-sm" id="role-select">
+        <select class="form-select form-select-sm" id="role-select" onchange="toggleEcTitle()">
           <option value="admin">Admin</option>
           <option value="ec_member">EC Member</option>
           <option value="member">Member</option>
           <option value="super_admin">Super Admin</option>
+        </select>
+      </div>
+      <div class="mb-2" id="ec-title-wrap" style="display:none">
+        <label class="form-label small">EC Designation</label>
+        <select class="form-select form-select-sm" id="role-title">
+          <option value="">— Select Designation —</option>
+          <option value="President">President</option>
+          <option value="Vice President">Vice President</option>
+          <option value="Treasurer">Treasurer</option>
+          <option value="Secretary">Secretary</option>
+          <option value="Joint Secretary">Joint Secretary</option>
+          <option value="Cultural Secretary">Cultural Secretary</option>
+          <option value="Sports Secretary">Sports Secretary</option>
+          <option value="Social Media">Social Media</option>
+          <option value="General Member">General Member</option>
         </select>
       </div>
     </div>
@@ -1194,24 +1213,35 @@ async function loadRoles() {
     const res = await fetch(`${API}/admin_roles`, { headers: getHeaders() });
     const data = await res.json();
     const tbl = document.getElementById('roles-tbl');
+    const roleBadge = { super_admin:'bg-danger', admin:'bg-warning text-dark', ec_member:'bg-success', member:'bg-secondary', guest:'bg-light text-dark' };
     tbl.innerHTML = (data.roles||[]).map(r=>`
       <tr>
+        <td class="small">${[r.firstName,r.lastName].filter(Boolean).join(' ')||'—'}</td>
         <td class="small">${r.email||''}</td>
-        <td><span class="badge bg-danger">${r.role||''}</span></td>
-        <td class="small">${r.grantedBy||''}</td>
+        <td><span class="badge ${roleBadge[r.role]||'bg-secondary'}">${r.role||''}</span></td>
+        <td class="small">${r.ecTitle?`<span class="badge" style="background:var(--grad);font-size:.7rem">${r.ecTitle}</span>`:''}</td>
+        <td class="small">${r.addedBy||''}</td>
         <td class="small">${r._createdDate?new Date(r._createdDate).toLocaleDateString():''}</td>
         <td><span class="badge badge-status-${r.isActive?'active':'inactive'}">${r.isActive?'Active':'Revoked'}</span></td>
         <td><button class="btn btn-xs btn-outline-danger" style="font-size:.7rem;padding:.1rem .5rem" onclick="revokeRole('${r._id}','${r.email}')">Revoke</button></td>
-      </tr>`).join('') || '<tr><td colspan="6" class="text-muted small text-center">No roles</td></tr>';
+      </tr>`).join('') || '<tr><td colspan="8" class="text-muted small text-center">No roles</td></tr>';
   } catch(e) {}
+}
+
+function toggleEcTitle() {
+  const r = document.getElementById('role-select').value;
+  document.getElementById('ec-title-wrap').style.display = r === 'ec_member' ? '' : 'none';
 }
 
 async function grantRole() {
   const email = document.getElementById('role-email').value.trim();
   const role = document.getElementById('role-select').value;
+  const ecTitle = document.getElementById('role-title').value;
+  const firstName = document.getElementById('role-fname').value.trim();
+  const lastName = document.getElementById('role-lname').value.trim();
   if (!email) return showToast('Email required','danger');
   try {
-    const res = await fetch(`${API}/admin_role_add`, { method:'POST', headers: getHeaders(), body: JSON.stringify({ email, role }) });
+    const res = await fetch(`${API}/admin_role_add`, { method:'POST', headers: getHeaders(), body: JSON.stringify({ email, role, ecTitle, firstName, lastName }) });
     const data = await res.json();
     if (data.success) { showToast('Role granted ✅','success'); bootstrap.Modal.getInstance(document.getElementById('modal-role')).hide(); loadRoles(); }
     else showToast(data.error||'Failed','danger');
