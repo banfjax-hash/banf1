@@ -36,7 +36,8 @@
         return;
       }
 
-      fetch(WIX_BASE + '/comms_correction_form?token=' + encodeURIComponent(token))
+      // comms_correction_form now redirects back here — use comms_form_html instead
+      fetch(WIX_BASE + '/comms_form_html?token=' + encodeURIComponent(token))
         .then(function (r) { return r.text(); })
         .then(function (html) {
           document.open('text/html');
