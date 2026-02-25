@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>BANF – Loading your form…</title>
+  <style>
+    body { margin:0; font-family:'Segoe UI',Arial,sans-serif; background:#f5f7fa;
+           display:flex; align-items:center; justify-content:center; min-height:100vh; }
+    .loader { text-align:center; color:#555; }
+    .spinner { width:48px; height:48px; border:5px solid #e0e0e0;
+               border-top-color:#8B0000; border-radius:50%;
+               animation:spin .8s linear infinite; margin:0 auto 20px; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    .err { color:#c0392b; max-width:420px; line-height:1.6; padding:0 20px; }
+  </style>
+</head>
+<body>
+  <div class="loader" id="loader">
+    <div class="spinner"></div>
+    <p>Loading your BANF details form…</p>
+  </div>
+
+  <script>
+    (function () {
+      var WIX_BASE = 'https://banfwix.wixsite.com/banf1/_functions';
+      var token = new URLSearchParams(window.location.search).get('token') || '';
+
+      function showErr(msg) {
+        document.getElementById('loader').innerHTML =
+          '<p class="err">&#9888;&#65039; ' + msg + '</p>';
+      }
+
+      if (!token) {
+        showErr('This link is incomplete. Please use the full link from your BANF email.');
+        return;
+      }
+
+      // comms_correction_form now redirects back here — use comms_form_html instead
+      fetch(WIX_BASE + '/comms_form_html?token=' + encodeURIComponent(token))
+        .then(function (r) { return r.text(); })
+        .then(function (html) {
+          document.open('text/html');
+          document.write(html);
+          document.close();
+        })
+        .catch(function (err) {
+          showErr('Could not load the form. Please try again or contact <a href="mailto:banfjax@gmail.com">banfjax@gmail.com</a>. (' + err.message + ')');
+        });
+    })();
+  </script>
+</body>
+</html>
