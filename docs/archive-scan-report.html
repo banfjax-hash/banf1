@@ -289,7 +289,7 @@ body {
     <button class="btn btn-sm btn-print" onclick="window.print()">
       <i class="fas fa-print me-1"></i>Print / Save as PDF
     </button>
-    <a id="back-link" href="https://banfwix.wixsite.com/banf1/_functions/archive_mapping" class="btn btn-sm" style="background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3)">
+    <a id="back-link" href="./archive-mapping.html" class="btn btn-sm" style="background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3)">
       <i class="fas fa-arrow-left me-1"></i>Back to Mapper
     </a>
   </div>
@@ -689,14 +689,14 @@ function setLoadMsg(m) { document.getElementById('load-msg').textContent = m; }
 
     // Back link preserves year
     document.getElementById('back-link').href =
-      `https://banfwix.wixsite.com/banf1/_functions/archive_mapping?year=${encodeURIComponent(urlYear)}`;
+      `./archive-mapping.html?year=${encodeURIComponent(urlYear)}`;
 
   } catch(e) {
     document.getElementById('loading-overlay').style.display = 'none';
     const ov = document.getElementById('error-overlay');
     ov.style.display = 'flex';
     document.getElementById('err-title').textContent = 'Failed to load report data';
-    document.getElementById('err-detail').innerHTML = `<pre style="text-align:left;font-size:.78rem;background:#f8f8f8;padding:12px;border-radius:6px;max-width:600px;overflow:auto">${esc(e.message)}</pre><br>Make sure you have run a Full Scan first.<br><a href="https://banfwix.wixsite.com/banf1/_functions/archive_mapping" class="text-decoration-none">← Back to Archive Mapper</a>`;
+    document.getElementById('err-detail').innerHTML = `<pre style="text-align:left;font-size:.78rem;background:#f8f8f8;padding:12px;border-radius:6px;max-width:600px;overflow:auto">${esc(e.message)}</pre><br>Make sure you have run a Full Scan first.<br><a href="./archive-mapping.html" class="text-decoration-none">← Back to Archive Mapper</a>`;;
   }
 })();
 </script>

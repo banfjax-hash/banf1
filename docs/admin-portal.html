@@ -105,24 +105,165 @@ textarea.form-control{resize:vertical}
 
   <!-- DASHBOARD -->
   <div id="sec-dashboard" class="section active">
-    <div class="section-title"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</div>
-    <div class="row g-3" id="dash-stats">
-      <div class="col-6 col-md-3"><div class="stat-card"><div class="num" id="s-members">—</div><div class="lbl">Members</div></div></div>
-      <div class="col-6 col-md-3"><div class="stat-card"><div class="num" id="s-payments">—</div><div class="lbl">Payments</div></div></div>
-      <div class="col-6 col-md-3"><div class="stat-card"><div class="num" id="s-complaints">—</div><div class="lbl">Complaints</div></div></div>
-      <div class="col-6 col-md-3"><div class="stat-card" style="border-color:#f39c12"><div class="num text-warning" id="s-queue">—</div><div class="lbl">Email Queue</div></div></div>
+    <div class="d-flex align-items-center justify-content-between mb-3">
+      <div class="section-title mb-0"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</div>
+      <button class="btn btn-outline-secondary btn-sm" onclick="loadDashboard()"><i class="fas fa-sync me-1"></i>Refresh</button>
     </div>
-    <div class="row g-3 mt-1">
+
+    <!-- KPI Stats -->
+    <div class="row g-3 mb-3" id="dash-stats">
+      <div class="col-6 col-md-2"><div class="stat-card text-center"><div class="num" id="s-members">—</div><div class="lbl">Members</div></div></div>
+      <div class="col-6 col-md-2"><div class="stat-card text-center" style="border-color:#28a745"><div class="num text-success" id="s-payments">—</div><div class="lbl">Payments</div></div></div>
+      <div class="col-6 col-md-2"><div class="stat-card text-center" style="border-color:#17a2b8"><div class="num text-info" id="s-events">—</div><div class="lbl">Events</div></div></div>
+      <div class="col-6 col-md-2"><div class="stat-card text-center" style="border-color:#6f42c1"><div class="num" style="color:#6f42c1" id="s-surveys">—</div><div class="lbl">Surveys</div></div></div>
+      <div class="col-6 col-md-2"><div class="stat-card text-center" style="border-color:#fd7e14"><div class="num text-warning" id="s-complaints">—</div><div class="lbl">Feedback</div></div></div>
+      <div class="col-6 col-md-2"><div class="stat-card text-center" style="border-color:#f39c12"><div class="num text-warning" id="s-queue">—</div><div class="lbl">Email Queue</div></div></div>
+    </div>
+
+    <!-- Quick Data -->
+    <div class="row g-3 mb-4">
       <div class="col-md-6">
         <div class="tbl-wrap p-3">
-          <div class="fw-bold mb-2 text-muted small">RECENT PAYMENTS</div>
-          <table class="table table-sm mb-0"><thead><tr><th>Name</th><th>Amount</th><th>Status</th></tr></thead><tbody id="dash-payments"></tbody></table>
+          <div class="d-flex justify-content-between mb-2">
+            <div class="fw-bold text-muted small">RECENT PAYMENTS</div>
+            <a href="#" onclick="show('payments',document.querySelector('[onclick*=payments]'));return false" class="small text-danger">View All →</a>
+          </div>
+          <table class="table table-sm mb-0"><thead><tr><th>Name</th><th>Amount</th><th>Status</th><th>Date</th></tr></thead><tbody id="dash-payments"></tbody></table>
         </div>
       </div>
       <div class="col-md-6">
         <div class="tbl-wrap p-3">
-          <div class="fw-bold mb-2 text-muted small">PENDING EMAIL QUEUE</div>
+          <div class="d-flex justify-content-between mb-2">
+            <div class="fw-bold text-muted small">PENDING EMAIL QUEUE <span class="badge bg-warning text-dark ms-1" id="queue-badge"></span></div>
+            <button class="btn btn-link btn-sm text-danger p-0" onclick="processEmailQueue()">Process All →</button>
+          </div>
           <table class="table table-sm mb-0"><thead><tr><th>From</th><th>Subject</th><th>Action</th></tr></thead><tbody id="dash-queue"></tbody></table>
+          <div class="text-center text-muted small py-2" id="queue-empty" style="display:none">No pending items — you're all caught up ✓</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- All Features Quick Access -->
+    <div class="fw-bold text-muted small text-uppercase mb-3" style="letter-spacing:1px"><i class="fas fa-th me-2"></i>All Features</div>
+    <div class="row g-3 mb-4">
+      <div class="col-6 col-md-3 col-lg-2">
+        <div class="card h-100 border-0 shadow-sm text-center p-3" style="cursor:pointer;transition:.15s" onclick="show('events',getSideLink('events'))" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">
+          <i class="fas fa-calendar-alt fa-2x mb-2" style="color:#8B0000"></i>
+          <div class="small fw-bold">Events (Evite)</div>
+          <div class="text-muted" style="font-size:.7rem">Create &amp; manage events, invitations</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3 col-lg-2">
+        <div class="card h-100 border-0 shadow-sm text-center p-3" style="cursor:pointer;transition:.15s" onclick="show('rsvps',getSideLink('rsvps'))" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">
+          <i class="fas fa-ticket-alt fa-2x mb-2" style="color:#0d6efd"></i>
+          <div class="small fw-bold">RSVPs &amp; Attendance</div>
+          <div class="text-muted" style="font-size:.7rem">Track, QR-scan, override attendance</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3 col-lg-2">
+        <div class="card h-100 border-0 shadow-sm text-center p-3" style="cursor:pointer;transition:.15s" onclick="show('members',getSideLink('members'))" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">
+          <i class="fas fa-users fa-2x mb-2" style="color:#198754"></i>
+          <div class="small fw-bold">Members</div>
+          <div class="text-muted" style="font-size:.7rem">Search, view, update member records</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3 col-lg-2">
+        <div class="card h-100 border-0 shadow-sm text-center p-3" style="cursor:pointer;transition:.15s" onclick="show('payments',getSideLink('payments'))" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">
+          <i class="fas fa-money-bill-wave fa-2x mb-2" style="color:#28a745"></i>
+          <div class="small fw-bold">Payments</div>
+          <div class="text-muted" style="font-size:.7rem">Record, confirm &amp; track payments</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3 col-lg-2">
+        <div class="card h-100 border-0 shadow-sm text-center p-3" style="cursor:pointer;transition:.15s" onclick="show('surveys',getSideLink('surveys'))" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">
+          <i class="fas fa-poll fa-2x mb-2" style="color:#6f42c1"></i>
+          <div class="small fw-bold">Surveys</div>
+          <div class="text-muted" style="font-size:.7rem">Create &amp; analyze member surveys</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3 col-lg-2">
+        <div class="card h-100 border-0 shadow-sm text-center p-3" style="cursor:pointer;transition:.15s" onclick="show('automation',getSideLink('automation'))" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">
+          <i class="fas fa-robot fa-2x mb-2" style="color:#fd7e14"></i>
+          <div class="small fw-bold">Process Automation</div>
+          <div class="text-muted" style="font-size:.7rem">Email queue, Gmail scan, auto-rules</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3 col-lg-2">
+        <div class="card h-100 border-0 shadow-sm text-center p-3" style="cursor:pointer;transition:.15s" onclick="show('crm',getSideLink('crm'))" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">
+          <i class="fas fa-sitemap fa-2x mb-2" style="color:#20c997"></i>
+          <div class="small fw-bold">CRM / Families</div>
+          <div class="text-muted" style="font-size:.7rem">Family units, contacts, demographics</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3 col-lg-2">
+        <div class="card h-100 border-0 shadow-sm text-center p-3" style="cursor:pointer;transition:.15s" onclick="show('vendors',getSideLink('vendors'))" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">
+          <i class="fas fa-store fa-2x mb-2" style="color:#dc3545"></i>
+          <div class="small fw-bold">Vendors &amp; Sponsors</div>
+          <div class="text-muted" style="font-size:.7rem">Manage vendors, sponsors &amp; ads</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3 col-lg-2">
+        <div class="card h-100 border-0 shadow-sm text-center p-3" style="cursor:pointer;transition:.15s" onclick="show('kb',getSideLink('kb'))" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">
+          <i class="fas fa-book fa-2x mb-2" style="color:#0dcaf0"></i>
+          <div class="small fw-bold">Knowledge Base</div>
+          <div class="text-muted" style="font-size:.7rem">Bylaws, policies, documents</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3 col-lg-2">
+        <div class="card h-100 border-0 shadow-sm text-center p-3" style="cursor:pointer;transition:.15s" onclick="show('agents',getSideLink('agents'))" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">
+          <i class="fas fa-brain fa-2x mb-2" style="color:#6610f2"></i>
+          <div class="small fw-bold">AI Agents</div>
+          <div class="text-muted" style="font-size:.7rem">Smart automation, recommendations</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3 col-lg-2">
+        <div class="card h-100 border-0 shadow-sm text-center p-3" style="cursor:pointer;transition:.15s" onclick="show('roles',getSideLink('roles'))" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">
+          <i class="fas fa-user-shield fa-2x mb-2" style="color:#e83e8c"></i>
+          <div class="small fw-bold">Roles &amp; Access</div>
+          <div class="text-muted" style="font-size:.7rem">Grant/revoke EC roles, onboard</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3 col-lg-2">
+        <div class="card h-100 border-0 shadow-sm text-center p-3" style="cursor:pointer;transition:.15s" onclick="show('email-templates',getSideLink('email-templates'))" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">
+          <i class="fas fa-envelope-open-text fa-2x mb-2" style="color:#f59e0b"></i>
+          <div class="small fw-bold">Email Templates</div>
+          <div class="text-muted" style="font-size:.7rem">Customize all outgoing emails</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3 col-lg-2">
+        <div class="card h-100 border-0 shadow-sm text-center p-3" style="cursor:pointer;transition:.15s" onclick="show('reports',getSideLink('reports'))" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">
+          <i class="fas fa-chart-bar fa-2x mb-2" style="color:#495057"></i>
+          <div class="small fw-bold">Reports</div>
+          <div class="text-muted" style="font-size:.7rem">Membership, finance, events CSV</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3 col-lg-2">
+        <div class="card h-100 border-0 shadow-sm text-center p-3" style="cursor:pointer;transition:.15s" onclick="show('tools',getSideLink('tools'))" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">
+          <i class="fas fa-tools fa-2x mb-2" style="color:#6c757d"></i>
+          <div class="small fw-bold">System Tools</div>
+          <div class="text-muted" style="font-size:.7rem">Bootstrap, archive, test suite</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3 col-lg-2">
+        <div class="card h-100 border-0 shadow-sm text-center p-3" style="cursor:pointer;transition:.15s" onclick="show('workflows',getSideLink('workflows'))" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">
+          <i class="fas fa-project-diagram fa-2x mb-2" style="color:#8B0000"></i>
+          <div class="small fw-bold">Workflow Hub</div>
+          <div class="text-muted" style="font-size:.7rem">Membership drive, reconciliation…</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pending items notice  -->
+    <div id="dash-approvals-notice" class="alert" style="background:#fff8e1;border:1px solid #ffe082;border-radius:10px;display:none">
+      <div class="d-flex align-items-start gap-3">
+        <i class="fas fa-bell text-warning mt-1"></i>
+        <div class="flex-grow-1">
+          <div class="fw-bold small">Pending Approvals <span class="badge bg-warning text-dark ms-1" id="approvals-count"></span></div>
+          <div class="text-muted small mt-1" id="approvals-summary"></div>
+        </div>
+        <div class="d-flex gap-2">
+          <button class="btn btn-sm btn-warning" onclick="show('automation',getSideLink('automation'))">Review</button>
+          <button class="btn btn-sm btn-outline-secondary" onclick="document.getElementById('dash-approvals-notice').style.display='none'">Skip for now</button>
         </div>
       </div>
     </div>
@@ -450,7 +591,7 @@ textarea.form-control{resize:vertical}
               <span class="badge" style="background:#d4edda;color:#155724">Demo + Live</span>
               <span class="badge bg-secondary">FY2026-27</span>
             </div>
-            <a href="https://banfwix.wixsite.com/banf1/_functions/membership_drive_workflow" class="btn btn-banf w-100" target="_self" onclick="openWorkflow('membership_drive_workflow')">
+            <a href="./membership-drive-workflow.html" class="btn btn-banf w-100" target="_self" onclick="openWorkflow('membership_drive')">
               <i class="fas fa-play me-2"></i>Open Workflow
             </a>
           </div>
@@ -467,7 +608,7 @@ textarea.form-control{resize:vertical}
               <span class="badge" style="background:#d4edda;color:#155724">Any Year</span>
               <span class="badge bg-secondary">Export CSV</span>
             </div>
-            <a href="https://banfwix.wixsite.com/banf1/_functions/reconciliation_workflow" class="btn w-100" style="background:#1565c0;color:#fff;border:none" onclick="openWorkflow('reconciliation_workflow')">
+            <a href="./reconciliation-workflow.html" class="btn w-100" style="background:#1565c0;color:#fff;border:none" onclick="openWorkflow('reconciliation')">
               <i class="fas fa-play me-2"></i>Open Workflow
             </a>
           </div>
@@ -484,7 +625,7 @@ textarea.form-control{resize:vertical}
               <span class="badge" style="background:#ede9fe;color:#4c1d95">Any Year</span>
               <span class="badge bg-secondary">Editable</span>
             </div>
-            <a href="https://banfwix.wixsite.com/banf1/_functions/archive_mapping" class="btn w-100" style="background:#7c3aed;color:#fff;border:none" onclick="openWorkflow('archive_mapping')">
+            <a href="./archive-mapping.html" class="btn w-100" style="background:#7c3aed;color:#fff;border:none" onclick="openWorkflow('archive_mapping')">
               <i class="fas fa-play me-2"></i>Open Mapper
             </a>
           </div>
@@ -660,7 +801,7 @@ async function doLogin() {
 
     if (data.needsOnboarding) {
       // Redirect to onboarding wizard
-      const onboardBase = 'https://ranadhir19.github.io/banf1/admin-onboard.html';
+      const onboardBase = './admin-onboard.html';
       const onboardUrl = `${onboardBase}?email=${encodeURIComponent(email)}` + (data.setupToken ? `&token=${data.setupToken}` : '');
       window.location.href = onboardUrl;
       return;
@@ -680,7 +821,7 @@ async function doLogin() {
     if (!localStorage.getItem(guideKey)) {
       const fname   = data.firstName || '';
       const roleDisp = data.ecTitle  || adminRole.replace(/_/g,' ');
-      const guideUrl = `https://ranadhir19.github.io/banf1/admin-guide.html` +
+      const guideUrl = `./admin-guide.html` +
         `?email=${encodeURIComponent(email)}` +
         `&name=${encodeURIComponent(fname)}` +
         `&role=${encodeURIComponent(roleDisp)}`;
@@ -736,8 +877,17 @@ function show(sectionId, el) {
 }
 
 function openWorkflow(name) {
-  const base = 'https://banfwix.wixsite.com/banf1/_functions';
-  window.open(`${base}/${name}`, '_self');
+  const pages = {
+    membership_drive: './membership-drive-workflow.html',
+    reconciliation: './reconciliation-workflow.html',
+    archive_mapping: './archive-mapping.html'
+  };
+  window.location.href = pages[name] || './admin-portal.html';
+}
+
+// Returns the sidebar nav-link element for a section (used by dashboard quick-access cards)
+function getSideLink(sectionId) {
+  return document.querySelector(`.nav-link[onclick*="'${sectionId}'"]`);
 }
 
 // ─── DASHBOARD ──────────────────────────────────
@@ -751,18 +901,38 @@ async function loadDashboard() {
 
 function renderDashboard(data) {
   const s = data.stats || {};
-  document.getElementById('s-members').textContent = s.members || 0;
-  document.getElementById('s-payments').textContent = s.payments || 0;
+  document.getElementById('s-members').textContent    = s.members || 0;
+  document.getElementById('s-payments').textContent   = s.payments || 0;
   document.getElementById('s-complaints').textContent = s.complaints || 0;
-  document.getElementById('s-queue').textContent = s.emailQueuePending || 0;
+  document.getElementById('s-queue').textContent      = s.emailQueuePending || 0;
+  const evEl = document.getElementById('s-events');
+  if (evEl) evEl.textContent = s.events || 0;
+  const svEl = document.getElementById('s-surveys');
+  if (svEl) svEl.textContent = s.surveys || 0;
+  const qCount = s.emailQueuePending || 0;
+  const qBadge = document.getElementById('queue-badge');
+  if (qBadge) { qBadge.textContent = qCount > 0 ? qCount : ''; qBadge.style.display = qCount > 0 ? '' : 'none'; }
+  const qEmpty = document.getElementById('queue-empty');
   const pTbl = document.getElementById('dash-payments');
   pTbl.innerHTML = (data.recentPayments || []).map(p => `
     <tr><td>${p.memberName||''}</td><td>$${(p.amount||0).toFixed(2)}</td>
-    <td><span class="badge badge-status-${p.status||'pending'}">${p.status||''}</span></td></tr>`).join('') || '<tr><td colspan="3" class="text-muted small text-center">No data</td></tr>';
+    <td><span class="badge badge-status-${p.status||'pending'}">${p.status||''}</span></td>
+    <td class="small text-muted">${p._createdDate ? new Date(p._createdDate).toLocaleDateString() : ''}</td></tr>`).join('') || '<tr><td colspan="4" class="text-muted small text-center py-2">No payments yet</td></tr>';
   const qTbl = document.getElementById('dash-queue');
-  qTbl.innerHTML = (data.pendingEmailQueue || []).map(q => `
+  const qItems = data.pendingEmailQueue || [];
+  if (qEmpty) qEmpty.style.display = qItems.length === 0 ? '' : 'none';
+  qTbl.innerHTML = qItems.map(q => `
     <tr><td class="small">${q.fromEmail||''}</td><td class="small">${(q.subject||'').substring(0,40)}</td>
-    <td><button class="btn btn-xs btn-outline-success" style="font-size:.7rem;padding:.1rem .4rem" onclick="approveEmail('${q._id}')">Approve</button></td></tr>`).join('') || '<tr><td colspan="3" class="text-muted small text-center">Queue empty</td></tr>';
+    <td><button class="btn btn-xs btn-outline-success" style="font-size:.7rem;padding:.1rem .4rem" onclick="approveEmail('${q._id}')">Approve</button></td></tr>`).join('');
+  // Show approvals notice if queue > 0
+  const notice = document.getElementById('dash-approvals-notice');
+  if (notice) {
+    if (qItems.length > 0) {
+      notice.style.display = '';
+      document.getElementById('approvals-count').textContent = qItems.length;
+      document.getElementById('approvals-summary').textContent = `${qItems.length} email(s) in the queue awaiting review. You can skip this and handle it later from Process Automation.`;
+    } else { notice.style.display = 'none'; }
+  }
 }
 
 // ─── EVENTS ─────────────────────────────────────
@@ -1193,9 +1363,14 @@ async function approveEmail(queueId) {
   try {
     const res = await fetch(`${API}/admin_approve_response`, { method:'POST', headers: getHeaders(), body: JSON.stringify({ queueId }) });
     const data = await res.json();
-    if (data.success) { showToast('Email sent ✅','success'); loadEmailQueue(); }
+    if (data.success) { showToast('Email sent ✅','success'); loadEmailQueue(); loadDashboard(); }
     else showToast(data.error||'Failed','danger');
   } catch(e) { showToast('Error','danger'); }
+}
+
+async function processEmailQueue() {
+  show('automation', getSideLink('automation'));
+  setTimeout(loadEmailQueue, 200);
 }
 
 // ─── CRM ─────────────────────────────────────────
@@ -1570,7 +1745,7 @@ function previewEmailTemplate() {
   const sampleVars = {
     firstName: 'Ranadhir', lastName: 'Ghosh', email: 'ranadhir.ghosh@gmail.com',
     roleLabel: 'EC Member', ecTitle: 'President', phone: '(904) 555-1234',
-    portalUrl: 'https://ranadhir19.github.io/banf1/admin-portal.html?email=ranadhir.ghosh%40gmail.com',
+    portalUrl: './admin-portal.html?email=ranadhir.ghosh%40gmail.com',
     grantedBy: 'superadmin@banf.org', grantedAt: new Date().toUTCString(),
     membershipType: 'Family', membershipYear: '2025-26', renewalDeadline: 'June 30, 2026',
     eventName: 'Durga Puja 2025', eventDate: 'October 3, 2025', eventVenue: 'Jacksonville Cultural Center',

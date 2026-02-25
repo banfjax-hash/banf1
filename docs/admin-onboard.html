@@ -244,8 +244,8 @@ const params = new URLSearchParams(window.location.search);
 const EMAIL = (params.get('email') || '').trim();
 const TOKEN = (params.get('token') || '').trim();
 let adminName = '';
-let portalUrl  = 'https://ranadhir19.github.io/banf1/admin-portal.html?email=' + encodeURIComponent(EMAIL);
-let guideUrl   = 'https://ranadhir19.github.io/banf1/admin-guide.html?email=' + encodeURIComponent(EMAIL); // updated after verify
+let portalUrl  = './admin-portal.html?email=' + encodeURIComponent(EMAIL);
+let guideUrl   = './admin-guide.html?email=' + encodeURIComponent(EMAIL); // updated after verify
 
 // ── Initialise ──────────────────────────────────────────────
 (async function init() {
@@ -289,7 +289,7 @@ let guideUrl   = 'https://ranadhir19.github.io/banf1/admin-guide.html?email=' + 
     // Build guide URL with name + role for the welcome message
     const fname    = ar.firstName || '';
     const roleDisp = ar.ecTitle   || (ar.role||'').replace(/_/g,' ');
-    guideUrl = `https://ranadhir19.github.io/banf1/admin-guide.html` +
+    guideUrl = `./admin-guide.html` +
       `?email=${encodeURIComponent(EMAIL)}` +
       `&name=${encodeURIComponent(fname)}` +
       `&role=${encodeURIComponent(roleDisp)}`;
