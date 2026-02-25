@@ -42,12 +42,17 @@
           return r.text();
         })
         .then(function (html) {
-          var iframe = document.createElement('iframe');
-          iframe.setAttribute('srcdoc', html);
-          iframe.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;border:none;margin:0;padding:0;z-index:9999;background:#f5f7fa;';
-          document.body.innerHTML = '';
-          document.body.style.cssText = 'margin:0;padding:0;overflow:hidden;';
-          document.body.appendChild(iframe);
+          var parser = new DOMParser();
+          var doc = parser.parseFromString(html, 'text/html');
+          document.head.innerHTML = doc.head.innerHTML;
+          document.body.innerHTML = doc.body.innerHTML;
+          var scripts = document.querySelectorAll('script');
+          for (var i = 0; i < scripts.length; i++) {
+            var old = scripts[i];
+            var ns = document.createElement('script');
+            ns.textContent = old.textContent;
+            old.parentNode.replaceChild(ns, old);
+          }
         })
         .catch(function (err) {
           showErr('Could not load the form. Please try again or contact <a href="mailto:banfjax@gmail.com">banfjax@gmail.com</a>. (' + err.message + ')');
