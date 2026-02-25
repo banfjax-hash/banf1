@@ -37,11 +37,17 @@
       }
 
       fetch(WIX_BASE + '/comms_form_html?token=' + encodeURIComponent(token))
-        .then(function (r) { return r.text(); })
+        .then(function (r) {
+          if (!r.ok) throw new Error('Server returned ' + r.status);
+          return r.text();
+        })
         .then(function (html) {
-          document.open('text/html');
-          document.write(html);
-          document.close();
+          // Use Blob URL navigation so the form page is treated as a proper
+          // top-level document — inline onclick handlers and scripts work
+          // reliably, unlike document.write() from a fetch callback.
+          var blob = new Blob([html], { type: 'text/html; charset=utf-8' });
+          var url  = URL.createObjectURL(blob);
+          window.location.replace(url);
         })
         .catch(function (err) {
           showErr('Could not load the form. Please try again or contact <a href="mailto:banfjax@gmail.com">banfjax@gmail.com</a>. (' + err.message + ')');
