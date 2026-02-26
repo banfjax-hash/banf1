@@ -16,7 +16,7 @@
 ## Step 1: Clone the Wix Repository
 
 ```bash
-git clone https://github.com/ranadhir19/banf1-wix.git
+git clone https://github.com/banfjax-hash/banf1-wix.git
 cd banf1-wix
 ```
 
@@ -179,7 +179,7 @@ Verify `wix.config.json` has siteId `c13ae8c5-7053-4f2d-9a9a-371869be4395`
 ## Quick One-Liner (Copy-Paste Everything)
 
 ```bash
-git clone https://github.com/ranadhir19/banf1-wix.git && cd banf1-wix && npm install && npm install @wix/cli@latest --save-dev && npx wix login && npx wix publish -y
+git clone https://github.com/banfjax-hash/banf1-wix.git && cd banf1-wix && npm install && npm install @wix/cli@latest --save-dev && npx wix login && npx wix publish -y
 ```
 
 ---
@@ -217,4 +217,4 @@ npx wix publish -y
 
 *Generated: February 20, 2026*  
 *Site: banfwix.wixsite.com/banf1*  
-*Repo: github.com/ranadhir19/banf1-wix*
+*Repo: github.com/banfjax-hash/banf1-wix*

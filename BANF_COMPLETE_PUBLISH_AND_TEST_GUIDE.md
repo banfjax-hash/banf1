@@ -2,8 +2,8 @@
 
 > **Last Updated:** February 20, 2026  
 > **Site:** https://banfwix.wixsite.com/banf1  
-> **Repo (primary):** https://github.com/ranadhir19/banf1-wix.git  
-> **Repo (mirror):** https://github.com/ranadhir19/banf1.git  
+> **Repo (primary):** https://github.com/banfjax-hash/banf1-wix.git  
+> **Repo (mirror):** https://github.com/banfjax-hash/banf1.git  
 > **Wix Account:** banfjax@gmail.com  
 > **SiteId:** `c13ae8c5-7053-4f2d-9a9a-371869be4395`
 
@@ -50,13 +50,13 @@ git --version     # Should show 2.x+
 
 ### Option A: Clone the Wix repo (recommended)
 ```bash
-git clone https://github.com/ranadhir19/banf1-wix.git
+git clone https://github.com/banfjax-hash/banf1-wix.git
 cd banf1-wix
 ```
 
 ### Option B: Clone from the mirror
 ```bash
-git clone https://github.com/ranadhir19/banf1.git
+git clone https://github.com/banfjax-hash/banf1.git
 cd banf1
 ```
 
@@ -679,7 +679,7 @@ npm install --registry=https://registry.npmjs.org/
 
 ### One-liner: Clone → Install → Login → Publish
 ```bash
-git clone https://github.com/ranadhir19/banf1-wix.git && \
+git clone https://github.com/banfjax-hash/banf1-wix.git && \
 cd banf1-wix && \
 mv .npmrc .npmrc.corporate_bak 2>/dev/null; \
 npm install && \
@@ -690,7 +690,7 @@ npx wix publish -y
 
 ### Windows PowerShell version:
 ```powershell
-git clone https://github.com/ranadhir19/banf1-wix.git
+git clone https://github.com/banfjax-hash/banf1-wix.git
 cd banf1-wix
 if (Test-Path .npmrc) { Rename-Item .npmrc .npmrc.corporate_bak }
 npm install
@@ -780,5 +780,5 @@ Fields: title (Text), issueNumber (Number), coverImage (Image),
 ---
 
 *Guide generated: February 20, 2026*  
-*Both repos synced: `ranadhir19/banf1` and `ranadhir19/banf1-wix`*  
+*Both repos synced: `banfjax-hash/banf1` and `banfjax-hash/banf1-wix`*  
 *Latest commit: `0e6e760` on all remotes*
