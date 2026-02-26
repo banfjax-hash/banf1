@@ -11,7 +11,7 @@
             --banf-red: #DC143C;
             --banf-orange: #FF6B35;
         }
-        
+
         body {
             min-height: 100vh;
             background: linear-gradient(135deg, #DC143C 0%, #8B0000 50%, #1a1a2e 100%);
@@ -21,12 +21,12 @@
             padding: 20px;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        
+
         .login-container {
             max-width: 450px;
             width: 100%;
         }
-        
+
         .login-card {
             background: white;
             border-radius: 20px;
@@ -34,12 +34,12 @@
             overflow: hidden;
             padding: 40px;
         }
-        
+
         .login-header {
             text-align: center;
             margin-bottom: 30px;
         }
-        
+
         .login-header .logo {
             width: 80px;
             height: 80px;
@@ -52,18 +52,18 @@
             font-size: 2rem;
             color: white;
         }
-        
+
         .login-header h2 {
             color: var(--banf-red);
             font-weight: 700;
             margin-bottom: 5px;
         }
-        
+
         .login-header p {
             color: #666;
             font-size: 0.95rem;
         }
-        
+
         .admin-badge {
             background: var(--banf-red);
             color: white;
@@ -74,25 +74,25 @@
             display: inline-block;
             margin-top: 8px;
         }
-        
+
         .form-control {
             padding: 14px 18px;
             border-radius: 12px;
             border: 2px solid #e0e0e0;
             font-size: 1rem;
         }
-        
+
         .form-control:focus {
             border-color: var(--banf-red);
             box-shadow: 0 0 0 3px rgba(220,20,60,0.15);
         }
-        
+
         .form-label {
             font-weight: 600;
             color: #333;
             margin-bottom: 8px;
         }
-        
+
         .btn-login {
             background: linear-gradient(135deg, var(--banf-red) 0%, #8B0000 100%);
             border: none;
@@ -104,14 +104,20 @@
             width: 100%;
             transition: all 0.3s ease;
         }
-        
+
         .btn-login:hover {
             background: linear-gradient(135deg, #B22222 0%, #DC143C 100%);
             color: white;
             transform: translateY(-2px);
             box-shadow: 0 5px 20px rgba(220,20,60,0.3);
         }
-        
+
+        .btn-login:disabled {
+            opacity: 0.7;
+            transform: none;
+            cursor: wait;
+        }
+
         .error-message {
             background: #fff0f0;
             color: #dc3545;
@@ -121,28 +127,19 @@
             display: none;
             text-align: center;
         }
-        
-        .test-credentials {
-            background: #fff5f5;
-            border: 1px dashed var(--banf-red);
+
+        .info-box {
+            background: #f0f7ff;
+            border: 1px solid #b8d4f0;
             border-radius: 10px;
             padding: 15px;
             margin-top: 25px;
+            font-size: 0.88rem;
+            color: #3a5a7c;
         }
-        
-        .test-credentials h6 {
-            color: var(--banf-red);
-            font-weight: 600;
-            margin-bottom: 10px;
-        }
-        
-        .test-credentials code {
-            background: white;
-            padding: 2px 8px;
-            border-radius: 4px;
-            color: #333;
-        }
-        
+
+        .info-box i { color: #5a8ab5; }
+
         .back-link {
             display: block;
             text-align: center;
@@ -151,18 +148,18 @@
             text-decoration: none;
             opacity: 0.8;
         }
-        
+
         .back-link:hover {
             opacity: 1;
             color: white;
         }
-        
+
         .input-group-text {
             background: transparent;
             border-left: none;
             cursor: pointer;
         }
-        
+
         .security-notice {
             background: #fff3cd;
             border: 1px solid #ffc107;
@@ -172,6 +169,18 @@
             font-size: 0.85rem;
             margin-bottom: 20px;
         }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+            text-align: center;
+        }
+
+        .spinner-border-sm { width: 1rem; height: 1rem; border-width: .15em; }
     </style>
 </head>
 <body>
@@ -185,70 +194,51 @@
                 <p>Executive Committee Access Only</p>
                 <span class="admin-badge"><i class="fas fa-lock me-1"></i>RESTRICTED ACCESS</span>
             </div>
-            
+
             <div class="security-notice">
                 <i class="fas fa-exclamation-triangle me-1"></i>
                 This portal is for Executive Committee members only
             </div>
-            
-            <div class="error-message" id="errorMessage">
-                Invalid username or password
-            </div>
-            
+
+            <div class="error-message" id="errorMessage"></div>
+            <div class="success-message" id="successMessage"></div>
+
             <form id="loginForm" onsubmit="handleLogin(event)">
                 <div class="mb-3">
-                    <label class="form-label">Admin Username</label>
-                    <input type="text" class="form-control" id="username" required placeholder="Enter admin username" autocomplete="username">
+                    <label class="form-label"><i class="fas fa-envelope me-1"></i>Email Address</label>
+                    <input type="email" class="form-control" id="email" required placeholder="your.email@example.com" autocomplete="email">
                 </div>
                 <div class="mb-4">
-                    <label class="form-label">Password</label>
+                    <label class="form-label"><i class="fas fa-key me-1"></i>Password</label>
                     <div class="input-group">
-                        <input type="password" class="form-control" id="password" required placeholder="Enter password" autocomplete="current-password">
+                        <input type="password" class="form-control" id="password" required placeholder="Enter your password" autocomplete="current-password">
                         <span class="input-group-text" onclick="togglePassword()">
                             <i class="fas fa-eye" id="eyeIcon"></i>
                         </span>
                     </div>
                 </div>
-                <button type="submit" class="btn btn-login">
-                    <i class="fas fa-sign-in-alt me-2"></i>Login as Admin
+                <button type="submit" class="btn btn-login" id="loginBtn">
+                    <i class="fas fa-sign-in-alt me-2"></i>Sign In
                 </button>
             </form>
-            
-            <div class="test-credentials">
-                <h6><i class="fas fa-info-circle me-1"></i> Test Credentials</h6>
-                <p class="mb-1">Username: <code>admin_test</code></p>
-                <p class="mb-0">Password: <code>admin_test</code></p>
+
+            <div class="info-box">
+                <p class="mb-1"><i class="fas fa-info-circle me-1"></i> <strong>New EC Member?</strong></p>
+                <p class="mb-0">Use the setup link from your welcome email to create your password and complete onboarding first.</p>
             </div>
         </div>
-        
+
         <a href="wix-embed-landing-v2.html" class="back-link">
             <i class="fas fa-arrow-left me-1"></i> Back to Home
         </a>
     </div>
 
     <script>
-        // Test credentials
-        const TEST_ADMINS = {
-            'admin_test': {
-                password: 'admin_test',
-                data: {
-                    id: 'admin_001',
-                    name: 'Test Admin',
-                    firstName: 'Test',
-                    lastName: 'Admin',
-                    email: 'admin@banf.org',
-                    phone: '(904) 555-0001',
-                    role: 'President',
-                    permissions: ['all'],
-                    isAdmin: true
-                }
-            }
-        };
-        
+        const API = 'https://banfwix.wixsite.com/banf1/_functions';
+
         function togglePassword() {
             const input = document.getElementById('password');
             const icon = document.getElementById('eyeIcon');
-            
             if (input.type === 'password') {
                 input.type = 'text';
                 icon.classList.replace('fa-eye', 'fa-eye-slash');
@@ -257,44 +247,98 @@
                 icon.classList.replace('fa-eye-slash', 'fa-eye');
             }
         }
-        
-        function handleLogin(e) {
+
+        function showError(msg) {
+            const el = document.getElementById('errorMessage');
+            el.textContent = msg;
+            el.style.display = 'block';
+            document.getElementById('successMessage').style.display = 'none';
+        }
+
+        function showSuccess(msg) {
+            const el = document.getElementById('successMessage');
+            el.textContent = msg;
+            el.style.display = 'block';
+            document.getElementById('errorMessage').style.display = 'none';
+        }
+
+        function hideMessages() {
+            document.getElementById('errorMessage').style.display = 'none';
+            document.getElementById('successMessage').style.display = 'none';
+        }
+
+        async function handleLogin(e) {
             e.preventDefault();
-            
-            const username = document.getElementById('username').value.trim();
+            hideMessages();
+
+            const email = document.getElementById('email').value.trim().toLowerCase();
             const password = document.getElementById('password').value;
-            const errorDiv = document.getElementById('errorMessage');
-            
-            // Check credentials
-            const admin = TEST_ADMINS[username];
-            
-            if (admin && admin.password === password) {
-                // Store admin data in sessionStorage
-                sessionStorage.setItem('banf_admin_data', JSON.stringify(admin.data));
-                localStorage.setItem('banf_admin_token', 'admin_token_' + Date.now());
-                
-                // Redirect to admin portal
-                window.location.href = 'admin-portal.html';
-            } else {
-                // Show error
-                errorDiv.style.display = 'block';
-                document.getElementById('password').value = '';
-                
-                // Hide error after 3 seconds
+            const btn = document.getElementById('loginBtn');
+
+            if (!email) { showError('Please enter your email address.'); return; }
+            if (!password) { showError('Please enter your password.'); return; }
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Signing in…';
+
+            try {
+                const res = await fetch(`${API}/admin_verify_login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                const data = await res.json();
+
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-sign-in-alt me-2"></i>Sign In';
+
+                // Needs onboarding — redirect to setup wizard
+                if (data.needsOnboarding) {
+                    showSuccess('Redirecting to account setup…');
+                    const onboardUrl = `admin-onboard.html?email=${encodeURIComponent(email)}` +
+                        (data.setupToken ? `&token=${data.setupToken}` : '');
+                    setTimeout(() => { window.location.href = onboardUrl; }, 600);
+                    return;
+                }
+
+                // Login failed
+                if (!data.success) {
+                    showError(data.error || 'Access denied. Check your email and password.');
+                    document.getElementById('password').value = '';
+                    return;
+                }
+
+                // Login success — store session and redirect to portal
+                showSuccess('Login successful! Redirecting to admin portal…');
+                localStorage.setItem('banf_admin_email', email);
+                localStorage.setItem('banf_admin_role', data.adminRole || 'admin');
+
                 setTimeout(() => {
-                    errorDiv.style.display = 'none';
-                }, 3000);
+                    window.location.href = `admin-portal.html?email=${encodeURIComponent(email)}`;
+                }, 800);
+
+            } catch (err) {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-sign-in-alt me-2"></i>Sign In';
+                showError('Login failed: ' + err.message);
             }
         }
-        
-        // Check if already logged in
-        document.addEventListener('DOMContentLoaded', () => {
-            const adminData = sessionStorage.getItem('banf_admin_data');
-            if (adminData) {
-                // Already logged in, redirect to portal
-                window.location.href = 'admin-portal.html';
+
+        // Pre-fill email from URL param
+        (function init() {
+            const params = new URLSearchParams(window.location.search);
+            const emailParam = params.get('email');
+            if (emailParam) {
+                document.getElementById('email').value = emailParam;
+                document.getElementById('password').focus();
             }
-        });
+
+            // If already logged in, redirect to portal
+            const savedEmail = localStorage.getItem('banf_admin_email');
+            if (savedEmail) {
+                window.location.href = `admin-portal.html?email=${encodeURIComponent(savedEmail)}`;
+            }
+        })();
     </script>
 </body>
 </html>
