@@ -43,6 +43,15 @@ body{background:#f4f0ed;min-height:100vh;display:flex;flex-direction:column;alig
 .dietary-option label{display:inline-block;padding:8px 16px;border:2px solid #e0e0e0;border-radius:20px;cursor:pointer;font-size:.82rem;transition:all .2s}
 .dietary-option label:hover{border-color:var(--banf-orange)}
 .dietary-option input:checked+label{border-color:var(--banf-red);background:rgba(139,0,0,.08);color:var(--banf-red);font-weight:600}
+.food-note{background:#fff8f0;border:1px solid #f0dcc8;border-radius:12px;padding:14px 16px;margin-top:8px;font-size:.78rem;color:#8B6914;line-height:1.5}
+.food-note strong{color:#7a5d10}
+.section-divider{border:none;border-top:1px dashed #e0d8d0;margin:20px 0 16px}
+.veg-inputs{display:flex;gap:16px;margin-top:8px}
+.veg-input{flex:1;text-align:center}
+.veg-input label{display:block;font-size:.78rem;font-weight:500;color:#666;margin-bottom:4px}
+.veg-input input{width:100%;padding:10px 14px;border:2px solid #e0e0e0;border-radius:10px;font-size:.95rem;text-align:center;transition:border-color .2s}
+.veg-input input:focus{outline:none;border-color:var(--banf-orange)}
+.allergy-hint{font-size:.75rem;color:#999;margin-top:4px;line-height:1.4}
 textarea{width:100%;padding:12px 14px;border:2px solid #e0e0e0;border-radius:10px;font-size:.9rem;resize:vertical;min-height:80px;transition:border-color .2s}
 textarea:focus{outline:none;border-color:var(--banf-orange)}
 .submit-btn{width:100%;padding:14px;background:var(--grad);color:#fff;border:none;border-radius:30px;font-size:1rem;font-weight:700;cursor:pointer;letter-spacing:.5px;transition:transform .15s,box-shadow .2s;box-shadow:0 4px 16px rgba(139,0,0,.25);margin-top:8px}
@@ -124,31 +133,34 @@ textarea:focus{outline:none;border-color:var(--banf-orange)}
             </div>
           </div>
 
-          <div class="form-group">
-            <label>Dietary Preference</label>
-            <div class="dietary-options">
-              <div class="dietary-option">
-                <input type="radio" name="dietary" id="diet-veg" value="vegetarian">
-                <label for="diet-veg">&#129367; Vegetarian</label>
-              </div>
-              <div class="dietary-option">
-                <input type="radio" name="dietary" id="diet-nonveg" value="non_vegetarian">
-                <label for="diet-nonveg">&#127830; Non-Vegetarian</label>
-              </div>
-              <div class="dietary-option">
-                <input type="radio" name="dietary" id="diet-mixed" value="mixed">
-                <label for="diet-mixed">&#127869; Mixed</label>
-              </div>
-              <div class="dietary-option">
-                <input type="radio" name="dietary" id="diet-vegan" value="vegan">
-                <label for="diet-vegan">&#127793; Vegan</label>
-              </div>
-            </div>
-          </div>
+          <hr class="section-divider">
 
           <div class="form-group">
-            <label>Special Requests or Notes (optional)</label>
-            <textarea id="notes" placeholder="Allergies, accessibility needs, anything we should know..."></textarea>
+            <label>&#127858; Food Preference - How many are Vegetarian vs Non-Vegetarian?</label>
+            <div class="hint" style="margin-bottom:8px">Please provide counts for your entire party (adults + kids combined)</div>
+            <div class="veg-inputs">
+              <div class="veg-input">
+                <label for="vegCount">&#129367; Vegetarian</label>
+                <input type="number" id="vegCount" min="0" max="40" value="0">
+              </div>
+              <div class="veg-input">
+                <label for="nonVegCount">&#127830; Non-Vegetarian</label>
+                <input type="number" id="nonVegCount" min="0" max="40" value="0">
+              </div>
+            </div>
+            <div class="hint" id="food-count-hint" style="margin-top:6px;color:#c0392b;display:none">Veg + Non-Veg count should match total guests</div>
+          </div>
+
+          <hr class="section-divider">
+
+          <div class="form-group">
+            <label>&#9888;&#65039; Allergies &amp; Dietary Restrictions (optional)</label>
+            <textarea id="notes" placeholder="Please list any food allergies (e.g., nuts, gluten, dairy, shellfish), dietary restrictions, or other special food needs for anyone in your party..."></textarea>
+            <div class="allergy-hint">Examples: "2 people are gluten-free", "1 child has nut allergy", "Need Jain food (no onion/garlic)"</div>
+          </div>
+
+          <div class="food-note">
+            <strong>Please Note:</strong> We sincerely apologize, but we may not always be able to accommodate every special food request due to logistical constraints. Our team will try our very best, and you will be informed closer to the event date whether your specific request can be fulfilled. We appreciate your understanding and patience!
           </div>
         </div>
 
@@ -263,6 +275,26 @@ document.querySelectorAll('input[name="rsvpStatus"]').forEach(radio => {
     });
 });
 
+// ── Auto-update food count hint ──
+function checkFoodCounts() {
+    const adults = parseInt(document.getElementById('adults').value) || 0;
+    const kids = parseInt(document.getElementById('kids').value) || 0;
+    const veg = parseInt(document.getElementById('vegCount').value) || 0;
+    const nonVeg = parseInt(document.getElementById('nonVegCount').value) || 0;
+    const total = adults + kids;
+    const foodTotal = veg + nonVeg;
+    const hint = document.getElementById('food-count-hint');
+    if (total > 0 && foodTotal > 0 && foodTotal !== total) {
+        hint.textContent = 'Veg (' + veg + ') + Non-Veg (' + nonVeg + ') = ' + foodTotal + ', but total guests = ' + total;
+        hint.style.display = 'block';
+    } else {
+        hint.style.display = 'none';
+    }
+}
+['adults', 'kids', 'vegCount', 'nonVegCount'].forEach(id => {
+    document.getElementById(id).addEventListener('input', checkFoodCounts);
+});
+
 // ── Form submit ──
 document.getElementById('rsvp-form').addEventListener('submit', async function(e) {
     e.preventDefault();
@@ -273,14 +305,36 @@ document.getElementById('rsvp-form').addEventListener('submit', async function(e
     btn.disabled = true;
     btn.textContent = 'Submitting...';
 
-    const dietary = document.querySelector('input[name="dietary"]:checked');
+    const adultsVal = parseInt(document.getElementById('adults').value) || 0;
+    const kidsVal = parseInt(document.getElementById('kids').value) || 0;
+    const vegVal = parseInt(document.getElementById('vegCount').value) || 0;
+    const nonVegVal = parseInt(document.getElementById('nonVegCount').value) || 0;
+    const totalGuests = adultsVal + kidsVal;
+    const totalFood = vegVal + nonVegVal;
+
+    // Warn if veg+nonveg doesn't match total guests (but don't block)
+    if (rsvpStatus.value === 'yes' && totalGuests > 0 && totalFood > 0 && totalFood !== totalGuests) {
+        if (!confirm('The vegetarian + non-vegetarian count (' + totalFood + ') does not match your total guests (' + totalGuests + '). Submit anyway?')) {
+            btn.disabled = false;
+            btn.textContent = labels[rsvpStatus.value] || 'Submit RSVP';
+            return;
+        }
+    }
+
+    // Determine dietary category
+    let dietaryLabel = 'unknown';
+    if (vegVal > 0 && nonVegVal > 0) dietaryLabel = 'mixed';
+    else if (vegVal > 0) dietaryLabel = 'vegetarian';
+    else if (nonVegVal > 0) dietaryLabel = 'non_vegetarian';
 
     const payload = {
         token: TOKEN,
         rsvpStatus: rsvpStatus.value,
-        adults: parseInt(document.getElementById('adults').value) || 0,
-        kids: parseInt(document.getElementById('kids').value) || 0,
-        dietary: dietary ? dietary.value : '',
+        adults: adultsVal,
+        kids: kidsVal,
+        vegCount: vegVal,
+        nonVegCount: nonVegVal,
+        dietary: dietaryLabel,
         notes: document.getElementById('notes').value.trim()
     };
 
