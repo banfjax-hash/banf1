@@ -92,6 +92,11 @@
       </div>
     </div>
 
+    <div class="mb">
+      <label for="nickname">Nickname <span style="font-weight:400;color:var(--muted);font-size:.82rem">(optional — what friends/family call you)</span></label>
+      <input type="text" id="nickname" value="" placeholder="e.g. Bablu, Rinku, etc." style="max-width:320px">
+    </div>
+
     <div class="section-title"><span>&#128222; Contact Details</span></div>
     <div class="row2 mb">
       <div>
@@ -135,9 +140,9 @@
       &#128274; Your preference is stored securely. BANF does not share your contact details with any third party.
     </p>
 
-    <div class="section-title"><span>&#127968; Other Adults in Household</span></div>
+    <div class="section-title"><span>&#127968; Spouse / Other Adults in Household</span></div>
     <p style="font-size:.88rem;color:var(--muted);margin:0 0 12px;line-height:1.6">
-      Please list all other adults currently in your household and their relationship to you.
+      Please list your spouse and any other adults currently in your household.
     </p>
     <div id="adultsContainer"></div>
     <button type="button" id="btnAddAdult" class="btn-add">&#65291; Add adult</button>
@@ -217,6 +222,7 @@
       var m = data.member || {};
       document.getElementById('firstName').value      = m.firstName || '';
       document.getElementById('lastName').value       = m.lastName || '';
+      document.getElementById('nickname').value       = m.nickname || '';
       document.getElementById('phone').value          = m.phone || '';
       document.getElementById('preferredEmail').value = m.email || '';
       if (m.emailOptIn === false) {
@@ -333,6 +339,7 @@
       token:          TOKEN,
       firstName:      document.getElementById('firstName').value.trim(),
       lastName:       document.getElementById('lastName').value.trim(),
+      nickname:       document.getElementById('nickname').value.trim(),
       phone:          document.getElementById('phone').value.trim(),
       preferredEmail: document.getElementById('preferredEmail').value.trim(),
       emailOptIn:     document.getElementById('optIn').checked,
