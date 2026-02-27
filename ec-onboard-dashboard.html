@@ -191,6 +191,9 @@
                     <div class="card-body">
                         <h6 class="text-muted mb-3"><i class="fas fa-cogs me-2"></i>Super Admin Actions</h6>
                         <div class="d-grid gap-2">
+                            <button id="btn-reminder" class="btn btn-outline-info" onclick="sendReminders()" disabled>
+                                <i class="fas fa-envelope me-2"></i>Send Reminder to Pending EC
+                            </button>
                             <button id="btn-complete" class="btn btn-banf" onclick="markComplete()" disabled>
                                 <i class="fas fa-check-circle me-2"></i>Mark EC Onboarding Complete
                             </button>
@@ -476,19 +479,29 @@
             const btnComplete = document.getElementById('btn-complete');
             const btnForce = document.getElementById('btn-force');
             const btnReset = document.getElementById('btn-reset');
+            const btnReminder = document.getElementById('btn-reminder');
 
             if (yearStatus.ecOnboardComplete) {
                 btnComplete.disabled = true;
                 btnComplete.innerHTML = '<i class="fas fa-check me-2"></i>EC Onboarding Already Complete';
                 btnForce.disabled = true;
                 btnReset.disabled = false;
+                btnReminder.disabled = true;
                 document.getElementById('action-status').innerHTML =
                     '<span class="text-success"><i class="fas fa-check-circle me-1"></i>Drive is open for membership registration</span>';
             } else {
                 const canComplete = summary.pendingOnboarding === 0;
+                const hasPending = summary.pendingOnboarding > 0;
                 btnComplete.disabled = !canComplete;
                 btnForce.disabled = false;
                 btnReset.disabled = true;
+                btnReminder.disabled = !hasPending;
+                
+                // Update reminder button text with pending count
+                if (hasPending) {
+                    btnReminder.innerHTML = `<i class="fas fa-envelope me-2"></i>Send Reminder (${summary.pendingOnboarding})`;
+                }
+                
                 if (canComplete) {
                     document.getElementById('action-status').innerHTML =
                         '<span class="text-success"><i class="fas fa-check me-1"></i>All EC members onboarded — ready to mark complete</span>';
@@ -538,6 +551,36 @@
                     setTimeout(() => loadDashboard(), 1500);
                 } else {
                     showToast(json.error || 'Failed', 'danger');
+                }
+            } catch (e) {
+                showToast('Error: ' + e.message, 'danger');
+            }
+        }
+
+        async function sendReminders() {
+            const pending = dashboardData?.summary?.pendingOnboarding || 0;
+            if (pending === 0) {
+                showToast('No pending EC members to remind!', 'info');
+                return;
+            }
+            
+            if (!confirm(`Send reminder emails to ${pending} pending EC member(s)?\\n\\nNote: Emails are sent via Gmail from banfjax@gmail.com`)) return;
+
+            try {
+                showToast('Sending reminders...', 'info');
+                const resp = await fetch(`${API_BASE}/ec_send_reminder`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'x-user-email': adminEmail },
+                    body: JSON.stringify({ sendAll: true })
+                });
+                const json = await resp.json();
+                if (json.success) {
+                    let msg = json.message;
+                    if (json.testMode) msg += ' (TEST MODE - sent to admin only)';
+                    showToast(msg, 'success');
+                    setTimeout(() => loadDashboard(), 2000);
+                } else {
+                    showToast(json.error || 'Failed to send reminders', 'danger');
                 }
             } catch (e) {
                 showToast('Error: ' + e.message, 'danger');

@@ -91,6 +91,7 @@ textarea.form-control{resize:vertical}
   <a class="nav-link" href="#" onclick="show('vendors',this)"><i class="fas fa-store fa-fw"></i>Vendors &amp; Sponsors</a>
   <a class="nav-link" href="#" onclick="show('kb',this)"><i class="fas fa-book fa-fw"></i>Knowledge Base</a>
   <a class="nav-link" href="#" onclick="show('agents',this)"><i class="fas fa-brain fa-fw"></i>AI Agents</a>
+  <a class="nav-link" href="#" onclick="show('ec-mgmt',this)"><i class="fas fa-id-badge fa-fw"></i>EC Management</a>
   <a class="nav-link" href="#" onclick="show('roles',this)"><i class="fas fa-user-shield fa-fw"></i>Roles &amp; Access</a>
   <a class="nav-link" href="#" onclick="show('email-templates',this)"><i class="fas fa-envelope-open-text fa-fw"></i>Email Templates</a>
   <a class="nav-link" href="#" onclick="show('reports',this)"><i class="fas fa-chart-bar fa-fw"></i>Reports</a>
@@ -643,6 +644,52 @@ textarea.form-control{resize:vertical}
             <button class="btn btn-outline-secondary w-100" disabled><i class="fas fa-clock me-2"></i>Coming Soon</button>
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EC MANAGEMENT (super_admin only) -->
+  <div id="sec-ec-mgmt" class="section">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+      <div class="section-title mb-0"><i class="fas fa-id-badge me-2"></i>EC Management</div>
+      <button class="btn btn-outline-secondary btn-sm" onclick="loadEcManagement()"><i class="fas fa-sync me-1"></i>Refresh</button>
+    </div>
+
+    <!-- Onboarding Summary Cards -->
+    <div class="row g-3 mb-4" id="ec-summary-cards">
+      <div class="col-6 col-md-2"><div class="stat-card text-center"><div class="num" id="ec-total">—</div><div class="lbl">Total EC</div></div></div>
+      <div class="col-6 col-md-2"><div class="stat-card text-center" style="border-color:#28a745"><div class="num text-success" id="ec-active">—</div><div class="lbl">Active</div></div></div>
+      <div class="col-6 col-md-2"><div class="stat-card text-center" style="border-color:#17a2b8"><div class="num text-info" id="ec-onboarded">—</div><div class="lbl">Onboarded</div></div></div>
+      <div class="col-6 col-md-2"><div class="stat-card text-center" style="border-color:#6f42c1"><div class="num" style="color:#6f42c1" id="ec-pwd-done">—</div><div class="lbl">Password Set</div></div></div>
+      <div class="col-6 col-md-2"><div class="stat-card text-center" style="border-color:#fd7e14"><div class="num text-warning" id="ec-pending">—</div><div class="lbl">Pending</div></div></div>
+    </div>
+
+    <!-- EC Member Status Table -->
+    <div class="card mb-4">
+      <div class="card-header d-flex justify-content-between align-items-center" style="background:var(--grad);color:#fff">
+        <strong><i class="fas fa-users me-2"></i>EC Member Onboarding Status</strong>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0" style="font-size:.85rem">
+            <thead class="table-light"><tr>
+              <th>Name</th><th>Email</th><th>Designation</th><th>Role</th>
+              <th class="text-center">Password</th><th class="text-center">Onboarded</th><th>Last Login</th><th class="text-center">Active</th>
+            </tr></thead>
+            <tbody id="ec-members-tbody"><tr><td colspan="8" class="text-center text-muted py-3">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Feature Assignment Config -->
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center" style="background:linear-gradient(135deg,#1565c0,#0d47a1);color:#fff">
+        <strong><i class="fas fa-puzzle-piece me-2"></i>Feature Assignment Config</strong>
+        <span class="badge bg-light text-dark" id="ec-feature-note">Assign portal features to each EC member</span>
+      </div>
+      <div class="card-body" id="ec-feature-config-area">
+        <p class="text-muted">Loading feature configuration…</p>
       </div>
     </div>
   </div>
