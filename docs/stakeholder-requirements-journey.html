@@ -8,398 +8,734 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
   <style>
     :root {
-      --banf-orange: #FF6B35;
-      --banf-deep-red: #DC143C;
       --banf-green: #006A4E;
-      --banf-charcoal: #222;
-      --bg: #f6f8fb;
+      --banf-green-lt: #00856F;
+      --banf-deep-red: #DC143C;
+      --banf-orange: #FF6B35;
+      --bg: #f4f6fa;
       --card: #fff;
       --muted: #6c757d;
-      --line: #e9ecef;
+      --line: #e5e8ee;
       --ok: #198754;
       --warn: #fd7e14;
       --danger: #dc3545;
       --info: #0d6efd;
-      --grad-main: linear-gradient(135deg, #006A4E, #00856F);
     }
+    *, *::before, *::after { box-sizing: border-box; }
+    body { background: var(--bg); color: #1e293b; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; margin: 0; }
 
-    body { background: var(--bg); color: var(--banf-charcoal); }
-    .header {
-      background: var(--grad-main);
+    /* ─── Header ─────────────────────────── */
+    .top-header {
+      background: linear-gradient(135deg, var(--banf-green), var(--banf-green-lt));
       color: #fff;
-      padding: 1.1rem 0;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14);
-      position: sticky;
-      top: 0;
-      z-index: 100;
+      padding: 0;
+      position: sticky; top: 0; z-index: 200;
+      box-shadow: 0 4px 20px rgba(0,0,0,.15);
     }
-    .header h1 { font-size: 1.35rem; margin: 0; font-weight: 700; }
-    .header p { margin: .2rem 0 0; opacity: .9; font-size: .9rem; }
-
-    .panel {
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      box-shadow: 0 5px 14px rgba(14, 23, 38, 0.05);
-      padding: 1rem;
-      height: 100%;
+    .top-header .inner {
+      max-width: 1320px; margin: 0 auto; padding: .85rem 1.25rem;
+      display: flex; flex-wrap: wrap; gap: .75rem;
+      justify-content: space-between; align-items: center;
     }
-    .section-title { font-size: 1.02rem; font-weight: 700; margin-bottom: .9rem; }
-
-    .kpi-value { font-size: 1.4rem; font-weight: 700; line-height: 1; margin-bottom: .25rem; }
-    .kpi-label { color: var(--muted); font-size: .82rem; }
-
-    .gate {
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      padding: .8rem;
-      height: 100%;
-      background: #fff;
+    .top-header h1 { font-size: 1.15rem; margin: 0; font-weight: 700; }
+    .top-header .sub { opacity: .85; font-size: .8rem; margin: .1rem 0 0; }
+    .nav-links a {
+      color: #fff; font-size: .78rem; text-decoration: none; padding: .35rem .7rem;
+      border: 1px solid rgba(255,255,255,.35); border-radius: 6px; display: inline-block;
     }
-    .gate h4 { font-size: .95rem; margin: 0 0 .35rem; }
-    .gate p { margin: 0; color: var(--muted); font-size: .78rem; }
-    .stage-badge {
-      display: inline-block;
-      border-radius: 999px;
-      font-size: .72rem;
-      padding: .2rem .6rem;
-      font-weight: 600;
-      margin-right: .25rem;
-      margin-bottom: .2rem;
-    }
-    .stage-approval { background: #e6f4ff; color: #0b5ed7; }
-    .stage-tech { background: #fff4e6; color: #b45309; }
-    .stage-devops { background: #ede9fe; color: #6d28d9; }
-    .stage-acceptance { background: #e8f5e9; color: #166534; }
+    .nav-links a:hover { background: rgba(255,255,255,.15); }
 
-    table td, table th { font-size: .84rem; vertical-align: middle; }
-    .risk-high { color: var(--danger); font-weight: 600; }
-    .risk-med { color: var(--warn); font-weight: 600; }
-    .risk-low { color: var(--ok); font-weight: 600; }
-
-    .timeline-item {
-      border-left: 3px solid #dce3eb;
-      padding-left: .8rem;
-      margin-left: .25rem;
-      margin-bottom: .8rem;
-      position: relative;
+    /* ─── Stakeholder Identity Bar ────────── */
+    .identity-bar {
+      background: #fff; border-bottom: 1px solid var(--line);
+      box-shadow: 0 2px 8px rgba(0,0,0,.04);
     }
-    .timeline-item::before {
-      content: '';
-      width: 9px;
-      height: 9px;
-      background: var(--info);
-      border-radius: 50%;
-      position: absolute;
-      left: -6px;
-      top: .35rem;
+    .identity-bar .inner {
+      max-width: 1320px; margin: 0 auto; padding: .7rem 1.25rem;
+      display: flex; flex-wrap: wrap; gap: .75rem;
+      justify-content: space-between; align-items: center;
     }
-    .timeline-item .meta { color: var(--muted); font-size: .75rem; }
+    .identity-greeting { font-size: 1.05rem; font-weight: 600; color: #1e293b; }
+    .identity-greeting .role { color: var(--banf-green); font-weight: 700; }
+    .identity-meta { font-size: .78rem; color: var(--muted); }
+    .stakeholder-select {
+      font-size: .82rem; padding: .3rem .6rem; border-radius: 6px;
+      border: 1px solid var(--line); background: #f9fafb; cursor: pointer;
+    }
 
-    .small-note { color: var(--muted); font-size: .78rem; }
+    /* ─── Container ──────────────────────── */
+    .main-wrap { max-width: 1320px; margin: 0 auto; padding: 1.25rem; }
+
+    /* ─── Cards / Panels ─────────────────── */
+    .card-panel {
+      background: var(--card); border: 1px solid var(--line);
+      border-radius: 14px; padding: 1.15rem;
+      box-shadow: 0 2px 10px rgba(14,23,38,.04);
+      margin-bottom: 1rem;
+    }
+    .card-panel h2 {
+      font-size: .95rem; font-weight: 700; margin: 0 0 .85rem;
+      display: flex; align-items: center; gap: .45rem;
+    }
+    .card-panel h2 .cnt {
+      font-size: .7rem; background: var(--banf-green); color: #fff;
+      border-radius: 999px; padding: .1rem .5rem; font-weight: 600;
+    }
+
+    /* ─── KPI Strip ──────────────────────── */
+    .kpi-strip {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: .75rem; margin-bottom: 1rem;
+    }
+    .kpi-card {
+      background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+      padding: .85rem 1rem; text-align: center;
+    }
+    .kpi-card .val { font-size: 1.55rem; font-weight: 800; line-height: 1.1; }
+    .kpi-card .lbl { font-size: .72rem; color: var(--muted); margin-top: .2rem; }
+    .kpi-card.green .val { color: var(--ok); }
+    .kpi-card.red .val { color: var(--danger); }
+    .kpi-card.orange .val { color: var(--warn); }
+    .kpi-card.blue .val { color: var(--info); }
+
+    /* ─── Pipeline Stage Swim Lanes ──────── */
+    .pipeline-lanes {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: .6rem; margin-bottom: 1rem;
+    }
+    .lane {
+      border-radius: 12px; padding: .7rem .65rem; min-height: 72px;
+      border: 2px solid transparent; position: relative;
+    }
+    .lane.stage-req     { background: #f0f4ff; border-color: #bfdbfe; }
+    .lane.stage-approve  { background: #eef2ff; border-color: #c7d2fe; }
+    .lane.stage-tech     { background: #fef9ee; border-color: #fde68a; }
+    .lane.stage-devops   { background: #f5f3ff; border-color: #ddd6fe; }
+    .lane.stage-live     { background: #ecfdf5; border-color: #86efac; }
+    .lane h4 {
+      font-size: .72rem; text-transform: uppercase; letter-spacing: .6px;
+      font-weight: 700; margin: 0 0 .45rem; opacity: .75;
+    }
+    .lane .count { font-size: 1.35rem; font-weight: 800; line-height: 1; }
+    .lane .items { font-size: .7rem; color: var(--muted); margin-top: .2rem; }
+    .lane-arrow {
+      display: flex; align-items: center; justify-content: center;
+      color: #94a3b8; font-size: .65rem;
+    }
+    @media (max-width: 768px) {
+      .pipeline-lanes { grid-template-columns: 1fr; }
+      .lane-arrow { transform: rotate(90deg); }
+    }
+
+    /* ─── Approval Action Cards ──────────── */
+    .approval-card {
+      border: 1px solid var(--line); border-radius: 10px;
+      padding: .85rem; margin-bottom: .65rem;
+      display: flex; gap: .75rem; align-items: flex-start;
+      transition: border-color .2s;
+    }
+    .approval-card:hover { border-color: var(--banf-green); }
+    .approval-card .icon-col {
+      width: 38px; height: 38px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .9rem; flex-shrink: 0;
+    }
+    .approval-card .icon-col.pending { background: #fef3c7; color: #b45309; }
+    .approval-card .icon-col.approved { background: #d1fae5; color: #065f46; }
+    .approval-card .icon-col.stuck { background: #fee2e2; color: #991b1b; }
+    .approval-card .body-col { flex: 1; min-width: 0; }
+    .approval-card .title-row {
+      font-size: .85rem; font-weight: 600;
+      display: flex; gap: .4rem; flex-wrap: wrap; align-items: center;
+    }
+    .approval-card .meta-row { font-size: .73rem; color: var(--muted); margin-top: .2rem; }
+    .approval-card .action-col { flex-shrink: 0; }
+
+    /* ─── Status Chips ───────────────────── */
+    .chip {
+      display: inline-block; font-size: .65rem; font-weight: 600;
+      padding: .15rem .5rem; border-radius: 999px;
+    }
+    .chip-green  { background: #d1fae5; color: #065f46; }
+    .chip-blue   { background: #dbeafe; color: #1d4ed8; }
+    .chip-orange { background: #fef3c7; color: #92400e; }
+    .chip-purple { background: #ede9fe; color: #6d28d9; }
+    .chip-red    { background: #fee2e2; color: #991b1b; }
+    .chip-gray   { background: #f1f5f9; color: #475569; }
+
+    /* ─── Requirements Table ─────────────── */
+    .req-table { width: 100%; border-collapse: separate; border-spacing: 0; }
+    .req-table th {
+      font-size: .7rem; text-transform: uppercase; letter-spacing: .5px;
+      color: var(--muted); font-weight: 600; padding: .5rem .6rem;
+      border-bottom: 2px solid var(--line); white-space: nowrap;
+    }
+    .req-table td {
+      font-size: .82rem; padding: .65rem .6rem;
+      border-bottom: 1px solid #f1f5f9; vertical-align: middle;
+    }
+    .req-table tr:last-child td { border-bottom: none; }
+    .progress-thin { height: 6px; border-radius: 3px; background: #e2e8f0; overflow: hidden; }
+    .progress-thin .fill { height: 100%; border-radius: 3px; }
+
+    /* ─── Blocker Table ──────────────────── */
+    .blocker-row {
+      display: flex; gap: .65rem; padding: .7rem 0;
+      border-bottom: 1px solid #f1f5f9; align-items: flex-start;
+    }
+    .blocker-row:last-child { border-bottom: none; }
+    .blocker-row .b-icon {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: #fee2e2; color: #dc2626; display: flex;
+      align-items: center; justify-content: center; font-size: .8rem; flex-shrink: 0;
+    }
+    .blocker-row .b-body { flex: 1; min-width: 0; }
+    .blocker-row .b-title { font-size: .82rem; font-weight: 600; }
+    .blocker-row .b-meta { font-size: .72rem; color: var(--muted); margin-top: .1rem; }
+
+    /* ─── Timeline ───────────────────────── */
+    .tl-item {
+      display: flex; gap: .6rem; padding: .55rem 0;
+      border-bottom: 1px solid #f8fafc;
+    }
+    .tl-item:last-child { border-bottom: none; }
+    .tl-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--info); margin-top: .35rem; flex-shrink: 0;
+    }
+    .tl-text { font-size: .8rem; }
+    .tl-when { font-size: .7rem; color: var(--muted); }
+
+    .small-note { color: var(--muted); font-size: .76rem; }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    @media (max-width: 992px) { .two-col { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
-  <header class="header">
-    <div class="container">
-      <div class="d-flex flex-wrap gap-3 justify-content-between align-items-center">
-        <div>
-          <h1><i class="fas fa-route me-2"></i>Stakeholder Requirements Journey</h1>
-          <p>Approval → Technical Validation → DevOps → Final Stakeholder Acceptance</p>
+
+<!-- ══════ Sticky Header ══════ -->
+<header class="top-header">
+  <div class="inner">
+    <div>
+      <h1><i class="fas fa-route me-2"></i>Stakeholder Requirements Journey</h1>
+      <div class="sub">Requirement → Approval → Technical Validation → DevOps → Live Production</div>
+    </div>
+    <div class="nav-links">
+      <a href="member-portal.html"><i class="fas fa-user me-1"></i>Member Portal</a>
+      <a href="unified-ecosystem-dashboard.html"><i class="fas fa-chart-line me-1"></i>Dashboard</a>
+      <a href="admin-portal.html"><i class="fas fa-shield-halved me-1"></i>Admin</a>
+    </div>
+  </div>
+</header>
+
+<!-- ══════ Identity Bar ══════ -->
+<div class="identity-bar">
+  <div class="inner">
+    <div>
+      <div class="identity-greeting">
+        Welcome, <span id="stakeholderName" class="role">—</span>
+      </div>
+      <div class="identity-meta" id="stakeholderMeta">Select your role to see your personalised view</div>
+    </div>
+    <div>
+      <select id="stakeholderPicker" class="stakeholder-select">
+        <option value="">— Select Stakeholder —</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ Main Content ══════ -->
+<div class="main-wrap">
+
+  <!-- KPI Strip -->
+  <div class="kpi-strip" id="kpiStrip"></div>
+
+  <!-- Pipeline Swim Lanes -->
+  <div class="card-panel" style="padding:.85rem;">
+    <h2><i class="fas fa-stream" style="color:var(--banf-green)"></i> Pipeline Snapshot</h2>
+    <div class="pipeline-lanes" id="pipelineLanes"></div>
+  </div>
+
+  <!-- Pending YOUR Approval -->
+  <div class="card-panel" id="pendingApprovalPanel">
+    <h2>
+      <i class="fas fa-bell" style="color:var(--banf-orange)"></i>
+      Pending Your Approval
+      <span class="cnt" id="pendingCnt">0</span>
+    </h2>
+    <div id="pendingApprovalList"></div>
+  </div>
+
+  <!-- Full Requirements Board -->
+  <div class="card-panel">
+    <h2><i class="fas fa-clipboard-list" style="color:var(--info)"></i> All Requirements — End-to-End Tracking</h2>
+    <div style="overflow-x:auto;">
+      <table class="req-table">
+        <thead>
+          <tr>
+            <th style="min-width:220px;">Requirement</th>
+            <th>Owner</th>
+            <th>Stage</th>
+            <th style="min-width:130px;">Progress</th>
+            <th>ETA</th>
+            <th>Risk</th>
+            <th>Approval Status</th>
+          </tr>
+        </thead>
+        <tbody id="reqTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Two-column: Blockers + Timeline -->
+  <div class="two-col">
+    <div class="card-panel">
+      <h2><i class="fas fa-exclamation-triangle" style="color:var(--danger)"></i> Stuck / Blockers <span class="cnt" id="blockerCnt">0</span></h2>
+      <div id="blockerList"></div>
+    </div>
+    <div class="card-panel">
+      <h2><i class="fas fa-clock-rotate-left" style="color:var(--info)"></i> Recent Transitions</h2>
+      <div id="timelineList"></div>
+    </div>
+  </div>
+
+</div><!-- /main-wrap -->
+
+<script>
+/* ═══════════════════════════════════════════
+   DATA MODEL
+   ═══════════════════════════════════════════ */
+
+const STAKEHOLDERS = [
+  { id: 'president',   name: 'Ranadhir Ghosh',   role: 'President',          email: 'ranadhir.ghosh@gmail.com', domains: ['policy','budget','final-acceptance'] },
+  { id: 'gen_sec',     name: 'Suvro Banerjee',   role: 'General Secretary',  email: 'suvro.b@banf.org',         domains: ['operations','compliance','event-ops'] },
+  { id: 'treasurer',   name: 'Abhijit Das',      role: 'Treasurer',          email: 'abhijit.d@banf.org',       domains: ['budget','payments','finance'] },
+  { id: 'tech_admin',  name: 'Technical Admin',   role: 'Technical Admin',    email: 'techadmin@banf.org',       domains: ['platform','devops','architecture','security'] },
+  { id: 'ec_member',   name: 'EC Member',         role: 'EC Committee',       email: 'ec@banf.org',              domains: ['policy','membership','event-ops','community'] }
+];
+
+const STAGES = [
+  { key: 'requirement',  label: 'Requirement',           icon: 'fa-file-lines',     cls: 'stage-req' },
+  { key: 'approval',     label: 'Stakeholder Approval',  icon: 'fa-stamp',          cls: 'stage-approve' },
+  { key: 'tech',         label: 'Tech Validation',       icon: 'fa-microchip',      cls: 'stage-tech' },
+  { key: 'devops',       label: 'DevOps / Deploy',       icon: 'fa-rocket',         cls: 'stage-devops' },
+  { key: 'live',         label: 'Live in Production',    icon: 'fa-check-double',   cls: 'stage-live' }
+];
+
+const REQUIREMENTS = [
+  {
+    id: 'SN-001', title: 'Wix Velo HTTP Functions Framework',
+    owner: 'Platform Team', domain: 'platform',
+    stage: 'live', progress: 100, eta: 'Completed', risk: 'Low',
+    approvedBy: 'Technical Admin', approvedDate: '2025-11-15',
+    needsApprovalFrom: [],
+    stuckReason: null,
+    updates: ['Framework deployed and serving 50+ endpoints in production']
+  },
+  {
+    id: 'SN-002', title: 'RBAC and Super Admin Role System',
+    owner: 'Platform Team', domain: 'platform',
+    stage: 'live', progress: 100, eta: 'Completed', risk: 'Low',
+    approvedBy: 'Technical Admin', approvedDate: '2025-12-01',
+    needsApprovalFrom: [],
+    stuckReason: null,
+    updates: ['Multi-role RBAC with super_admin, admin, ec_member, member live']
+  },
+  {
+    id: 'SN-003', title: 'Gmail API Email Integration',
+    owner: 'Platform Team', domain: 'platform',
+    stage: 'live', progress: 100, eta: 'Completed', risk: 'Low',
+    approvedBy: 'Technical Admin', approvedDate: '2025-12-10',
+    needsApprovalFrom: [],
+    stuckReason: null,
+    updates: ['OAuth2 refresh token flow, branded HTML templates, all outbound via Gmail API']
+  },
+  {
+    id: 'SN-004', title: 'EC Onboarding Gate & Password Setup',
+    owner: 'Platform Team', domain: 'platform',
+    stage: 'live', progress: 100, eta: 'Completed', risk: 'Low',
+    approvedBy: 'Technical Admin', approvedDate: '2026-01-08',
+    needsApprovalFrom: [],
+    stuckReason: null,
+    updates: ['Onboarding wizard with token auth, HMAC password hashing, profile completion']
+  },
+  {
+    id: 'SN-005', title: 'Membership Drive — Registration, Payment, Welcome',
+    owner: 'Membership Team', domain: 'membership',
+    stage: 'live', progress: 100, eta: 'Completed', risk: 'Low',
+    approvedBy: 'Technical Admin', approvedDate: '2026-01-20',
+    needsApprovalFrom: [],
+    stuckReason: null,
+    updates: ['Full reg flow with invite codes, Square payment, tiered pricing, welcome emails']
+  },
+  {
+    id: 'SN-006', title: 'CRM Admin Portal & Member Management',
+    owner: 'CRM Engineering', domain: 'platform',
+    stage: 'live', progress: 100, eta: 'Completed', risk: 'Low',
+    approvedBy: 'Technical Admin', approvedDate: '2026-01-25',
+    needsApprovalFrom: [],
+    stuckReason: null,
+    updates: ['CRM with search, filters, edit, family linking, payment history, export']
+  },
+  {
+    id: 'SN-007', title: 'Admin Portal — Super Admin Operations Console',
+    owner: 'Platform Team', domain: 'platform',
+    stage: 'live', progress: 100, eta: 'Completed', risk: 'Low',
+    approvedBy: 'Technical Admin', approvedDate: '2026-02-01',
+    needsApprovalFrom: [],
+    stuckReason: null,
+    updates: ['Full admin portal: role management, email builder, drive control, diagnostics']
+  },
+  {
+    id: 'SN-008', title: 'Multi-role Identity & Access Workflow',
+    owner: 'Platform Team', domain: 'platform',
+    stage: 'live', progress: 100, eta: 'Completed', risk: 'Low',
+    approvedBy: 'Technical Admin', approvedDate: '2026-02-05',
+    needsApprovalFrom: [],
+    stuckReason: null,
+    updates: ['Identity workflow with login, password verification, role-based portal routing live']
+  },
+  {
+    id: 'TK-046', title: 'Membership Drive Analytics by Tier',
+    owner: 'Data & Insights', domain: 'platform',
+    stage: 'live', progress: 100, eta: 'Completed', risk: 'Low',
+    approvedBy: 'Technical Admin', approvedDate: '2026-02-18',
+    needsApprovalFrom: [],
+    stuckReason: null,
+    updates: ['KPI panel with tier breakdown, invite vs response analytics, live in unified dashboard']
+  },
+  {
+    id: 'SN-009', title: 'Evite / Event Invitation System',
+    owner: 'Events Team', domain: 'event-ops',
+    stage: 'live', progress: 100, eta: 'Completed', risk: 'Low',
+    approvedBy: 'Technical Admin', approvedDate: '2026-02-10',
+    needsApprovalFrom: [],
+    stuckReason: null,
+    updates: ['Event creation, branded invitation emails, RSVP tracking, attendance reporting']
+  },
+  {
+    id: 'SN-010', title: 'Survey Engine & Distribution',
+    owner: 'Platform Team', domain: 'community',
+    stage: 'live', progress: 100, eta: 'Completed', risk: 'Low',
+    approvedBy: 'Technical Admin', approvedDate: '2026-02-12',
+    needsApprovalFrom: [],
+    stuckReason: null,
+    updates: ['Multi-question surveys, email distribution to members, response analytics']
+  },
+  {
+    id: 'SN-011', title: 'Communication Consent & GDPR Compliance',
+    owner: 'Compliance Team', domain: 'compliance',
+    stage: 'live', progress: 100, eta: 'Completed', risk: 'Low',
+    approvedBy: 'Technical Admin', approvedDate: '2026-02-14',
+    needsApprovalFrom: [],
+    stuckReason: null,
+    updates: ['Opt-in form, consent tracking, unsubscribe flow, GDPR-ready data handling']
+  },
+  {
+    id: 'SN-012', title: 'Unified Ecosystem Dashboard',
+    owner: 'Platform Team', domain: 'platform',
+    stage: 'live', progress: 100, eta: 'Completed', risk: 'Low',
+    approvedBy: 'Technical Admin', approvedDate: '2026-02-20',
+    needsApprovalFrom: [],
+    stuckReason: null,
+    updates: ['17 quick links, system health, KPIs, stakeholder journey link — live on GitHub Pages + Wix']
+  },
+  {
+    id: 'SN-013', title: 'Email Template System (DB-driven)',
+    owner: 'Platform Team', domain: 'platform',
+    stage: 'live', progress: 100, eta: 'Completed', risk: 'Low',
+    approvedBy: 'Technical Admin', approvedDate: '2026-02-22',
+    needsApprovalFrom: [],
+    stuckReason: null,
+    updates: ['DB-backed templates with {{variable}} rendering, admin CRUD, template preview']
+  },
+  {
+    id: 'SN-014', title: 'RAG Knowledge Base & AI Agent Support',
+    owner: 'AI Team', domain: 'platform',
+    stage: 'live', progress: 100, eta: 'Completed', risk: 'Low',
+    approvedBy: 'Technical Admin', approvedDate: '2026-02-15',
+    needsApprovalFrom: [],
+    stuckReason: null,
+    updates: ['RAG engine with document upload, vector search, 6 AI agent profiles deployed']
+  },
+  {
+    id: 'SN-021', title: 'Family Profile Correction Automation',
+    owner: 'CRM Engineering', domain: 'platform',
+    stage: 'devops', progress: 78, eta: 'Mar 06, 2026', risk: 'Medium',
+    approvedBy: 'Technical Admin', approvedDate: '2026-02-24',
+    needsApprovalFrom: ['president'],
+    stuckReason: 'Deployment window conflict with migration freeze',
+    updates: ['Approval completed', 'Tech validation passed', 'DevOps pre-prod checks in progress — waiting for release slot']
+  },
+  {
+    id: 'SN-030', title: 'Automated Feedback-to-Ticket Routing',
+    owner: 'Automation Team', domain: 'operations',
+    stage: 'tech', progress: 52, eta: 'Mar 12, 2026', risk: 'Medium',
+    approvedBy: null, approvedDate: null,
+    needsApprovalFrom: ['gen_sec', 'tech_admin'],
+    stuckReason: 'Notification schema extension pending design board vote',
+    updates: ['Requirement approved', 'Validation open: schema compatibility review underway']
+  },
+  {
+    id: 'SN-034', title: 'Stakeholder SLA Breach Alerts',
+    owner: 'DevOps', domain: 'operations',
+    stage: 'approval', progress: 24, eta: 'Mar 18, 2026', risk: 'High',
+    approvedBy: null, approvedDate: null,
+    needsApprovalFrom: ['president', 'gen_sec'],
+    stuckReason: 'Alert threshold policy not finalized by compliance',
+    updates: ['In approval review queue — awaiting policy owner sign-off']
+  },
+  {
+    id: 'SN-040', title: 'Finance Module — Budget Tracking & Reporting',
+    owner: 'Finance Team', domain: 'finance',
+    stage: 'approval', progress: 15, eta: 'Mar 25, 2026', risk: 'Medium',
+    approvedBy: null, approvedDate: null,
+    needsApprovalFrom: ['treasurer', 'president'],
+    stuckReason: null,
+    updates: ['Requirements drafted — awaiting treasurer and president approval']
+  }
+];
+
+const TRANSITIONS = [
+  { when: 'Today 09:45',       text: 'SN-021 entered DevOps gate after tech validation pass.' },
+  { when: 'Today 08:20',       text: 'TK-046 final stakeholder acceptance logged — live.' },
+  { when: 'Yesterday 17:30',   text: 'SN-030 updated with schema risk note and decision request.' },
+  { when: 'Yesterday 14:10',   text: 'SN-034 moved to approval review with high-risk tag.' },
+  { when: 'Feb 25, 2026',      text: 'SN-013 email template system deployed to production.' },
+  { when: 'Feb 22, 2026',      text: 'SN-012 unified dashboard published with 17 links.' },
+  { when: 'Feb 20, 2026',      text: 'Requirements Journey CTA added across all admin email templates.' }
+];
+
+/* ═══════════════════════════════════════════
+   RENDERING
+   ═══════════════════════════════════════════ */
+
+let currentStakeholder = null;
+
+function init() {
+  const picker = document.getElementById('stakeholderPicker');
+  STAKEHOLDERS.forEach(s => {
+    const opt = document.createElement('option');
+    opt.value = s.id;
+    opt.textContent = `${s.name} — ${s.role}`;
+    picker.appendChild(opt);
+  });
+
+  // Auto-select from URL param ?stakeholder=president
+  const urlSh = new URLSearchParams(location.search).get('stakeholder');
+  if (urlSh && STAKEHOLDERS.find(s => s.id === urlSh)) {
+    picker.value = urlSh;
+  }
+
+  picker.addEventListener('change', () => {
+    currentStakeholder = STAKEHOLDERS.find(s => s.id === picker.value) || null;
+    renderAll();
+  });
+
+  // Trigger initial render
+  currentStakeholder = STAKEHOLDERS.find(s => s.id === picker.value) || null;
+  renderAll();
+}
+
+function renderAll() {
+  renderIdentity();
+  renderKpis();
+  renderPipeline();
+  renderPendingApprovals();
+  renderReqTable();
+  renderBlockers();
+  renderTimeline();
+}
+
+function renderIdentity() {
+  const nameEl = document.getElementById('stakeholderName');
+  const metaEl = document.getElementById('stakeholderMeta');
+  if (currentStakeholder) {
+    nameEl.textContent = currentStakeholder.name;
+    metaEl.textContent = `Role: ${currentStakeholder.role}  •  Domain(s): ${currentStakeholder.domains.join(', ')}  •  ${new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}`;
+  } else {
+    nameEl.textContent = '—';
+    metaEl.textContent = 'Select your role to see your personalised view';
+  }
+}
+
+function renderKpis() {
+  const total = REQUIREMENTS.length;
+  const live = REQUIREMENTS.filter(r => r.stage === 'live').length;
+  const stuck = REQUIREMENTS.filter(r => r.stuckReason).length;
+  const highRisk = REQUIREMENTS.filter(r => r.risk === 'High').length;
+  const avgProg = Math.round(REQUIREMENTS.reduce((a,r)=>a+r.progress,0)/total);
+  const pending = currentStakeholder
+    ? REQUIREMENTS.filter(r => r.needsApprovalFrom.includes(currentStakeholder.id)).length
+    : REQUIREMENTS.filter(r => r.needsApprovalFrom.length > 0).length;
+
+  const cards = [
+    { val: total,      lbl: 'Total Requirements',      cls: '' },
+    { val: live,       lbl: 'Live in Production',       cls: 'green' },
+    { val: pending,    lbl: currentStakeholder ? 'Needs Your Approval' : 'Pending Approvals', cls: pending > 0 ? 'orange' : 'green' },
+    { val: stuck,      lbl: 'Stuck / Blocked',          cls: stuck > 0 ? 'red' : 'green' },
+    { val: highRisk,   lbl: 'High Risk',                cls: highRisk > 0 ? 'red' : 'green' },
+    { val: avgProg+'%', lbl: 'Overall Progress',        cls: 'blue' }
+  ];
+
+  document.getElementById('kpiStrip').innerHTML = cards.map(c => `
+    <div class="kpi-card ${c.cls}">
+      <div class="val">${c.val}</div>
+      <div class="lbl">${c.lbl}</div>
+    </div>
+  `).join('');
+}
+
+function renderPipeline() {
+  const counts = {};
+  STAGES.forEach(s => counts[s.key] = REQUIREMENTS.filter(r => r.stage === s.key).length);
+
+  document.getElementById('pipelineLanes').innerHTML = STAGES.map((s, i) => {
+    const items = REQUIREMENTS.filter(r => r.stage === s.key);
+    const ids = items.map(r => r.id).join(', ') || '—';
+    return `
+      <div class="lane ${s.cls}">
+        <h4><i class="fas ${s.icon} me-1"></i>${s.label}</h4>
+        <div class="count">${counts[s.key]}</div>
+        <div class="items">${ids}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+function stageChip(stage) {
+  const map = {
+    requirement: ['Requirement','chip-gray'],
+    approval: ['Approval','chip-blue'],
+    tech: ['Tech Validation','chip-orange'],
+    devops: ['DevOps','chip-purple'],
+    live: ['Live','chip-green']
+  };
+  const [label, cls] = map[stage] || ['Unknown','chip-gray'];
+  return `<span class="chip ${cls}">${label}</span>`;
+}
+
+function riskChip(risk) {
+  const cls = risk === 'High' ? 'chip-red' : risk === 'Medium' ? 'chip-orange' : 'chip-green';
+  return `<span class="chip ${cls}">${risk}</span>`;
+}
+
+function renderPendingApprovals() {
+  const panel = document.getElementById('pendingApprovalPanel');
+  let items;
+
+  if (currentStakeholder) {
+    items = REQUIREMENTS.filter(r => r.needsApprovalFrom.includes(currentStakeholder.id));
+  } else {
+    items = REQUIREMENTS.filter(r => r.needsApprovalFrom.length > 0);
+  }
+
+  document.getElementById('pendingCnt').textContent = items.length;
+
+  if (items.length === 0) {
+    document.getElementById('pendingApprovalList').innerHTML =
+      '<div class="small-note" style="padding:.5rem 0;">No approvals pending from you. All clear!</div>';
+    return;
+  }
+
+  document.getElementById('pendingApprovalList').innerHTML = items.map(req => {
+    const isStuck = !!req.stuckReason;
+    const iconCls = isStuck ? 'stuck' : 'pending';
+    const iconFa = isStuck ? 'fa-ban' : 'fa-hourglass-half';
+    const neededFrom = req.needsApprovalFrom.map(id => {
+      const s = STAKEHOLDERS.find(x => x.id === id);
+      return s ? s.role : id;
+    }).join(', ');
+
+    return `
+      <div class="approval-card">
+        <div class="icon-col ${iconCls}"><i class="fas ${iconFa}"></i></div>
+        <div class="body-col">
+          <div class="title-row">
+            <strong>${req.id}</strong> — ${req.title}
+            ${stageChip(req.stage)}
+            ${riskChip(req.risk)}
+          </div>
+          <div class="meta-row">
+            Owner: ${req.owner} • ETA: ${req.eta} • Needed from: <strong>${neededFrom}</strong>
+            ${isStuck ? `<br><i class="fas fa-exclamation-circle text-danger me-1"></i><strong class="text-danger">Stuck:</strong> ${req.stuckReason}` : ''}
+          </div>
         </div>
-        <div class="d-flex gap-2">
-          <a class="btn btn-light btn-sm" href="member-portal.html"><i class="fas fa-user me-1"></i>Member Portal</a>
-          <a class="btn btn-outline-light btn-sm" href="unified-ecosystem-dashboard.html"><i class="fas fa-chart-line me-1"></i>Unified Dashboard</a>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderReqTable() {
+  document.getElementById('reqTableBody').innerHTML = REQUIREMENTS.map(req => {
+    const fillColor = req.progress === 100 ? '#16a34a' : req.progress >= 70 ? '#2563eb' : req.progress >= 40 ? '#f59e0b' : '#ef4444';
+    const approvalHtml = req.approvedBy
+      ? `<span class="chip chip-green"><i class="fas fa-check me-1"></i>Approved</span><br><span style="font-size:.68rem;color:var(--muted);">by ${req.approvedBy}<br>${req.approvedDate}</span>`
+      : req.needsApprovalFrom.length > 0
+        ? `<span class="chip chip-orange"><i class="fas fa-clock me-1"></i>Pending</span><br><span style="font-size:.68rem;color:var(--muted);">from ${req.needsApprovalFrom.map(id => { const s=STAKEHOLDERS.find(x=>x.id===id); return s?s.role:id; }).join(', ')}</span>`
+        : '<span class="chip chip-gray">N/A</span>';
+
+    return `
+      <tr${req.stuckReason ? ' style="background:#fef2f2;"' : ''}>
+        <td>
+          <div style="font-weight:600;">${req.id} — ${req.title}</div>
+          <div class="small-note">${req.updates[req.updates.length-1]}</div>
+          ${req.stuckReason ? `<div style="font-size:.72rem;color:var(--danger);margin-top:.2rem;"><i class="fas fa-exclamation-circle me-1"></i>${req.stuckReason}</div>` : ''}
+        </td>
+        <td>${req.owner}</td>
+        <td>${stageChip(req.stage)}</td>
+        <td>
+          <div class="progress-thin"><div class="fill" style="width:${req.progress}%;background:${fillColor}"></div></div>
+          <div class="small-note" style="margin-top:.2rem;">${req.progress}%</div>
+        </td>
+        <td>${req.eta}</td>
+        <td>${riskChip(req.risk)}</td>
+        <td>${approvalHtml}</td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function renderBlockers() {
+  const stuck = REQUIREMENTS.filter(r => r.stuckReason);
+  document.getElementById('blockerCnt').textContent = stuck.length;
+
+  if (stuck.length === 0) {
+    document.getElementById('blockerList').innerHTML = '<div class="small-note">No blockers — all requirements flowing.</div>';
+    return;
+  }
+
+  document.getElementById('blockerList').innerHTML = stuck.map(r => `
+    <div class="blocker-row">
+      <div class="b-icon"><i class="fas fa-hand"></i></div>
+      <div class="b-body">
+        <div class="b-title">${r.id} — ${r.title}</div>
+        <div class="b-meta">
+          ${stageChip(r.stage)} ${riskChip(r.risk)}<br>
+          <i class="fas fa-ban me-1 text-danger"></i>${r.stuckReason}<br>
+          Owner: ${r.owner} • ETA: ${r.eta}
         </div>
       </div>
     </div>
-  </header>
+  `).join('');
+}
 
-  <main class="container py-4">
-    <div class="row g-3 mb-1" id="kpiRow"></div>
-
-    <div class="panel mt-3">
-      <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2 class="section-title mb-0">Lifecycle Gate Health</h2>
-        <span class="small-note">Real-time requirement flow checkpoints</span>
-      </div>
-      <div class="row g-3" id="gateRow"></div>
-    </div>
-
-    <div class="row g-3 mt-1">
-      <div class="col-12 col-xl-8">
-        <div class="panel">
-          <div class="d-flex justify-content-between align-items-center mb-3">
-            <h2 class="section-title mb-0">Requirements Progress Board</h2>
-            <span class="small-note">Each row tracks end-to-end approval and delivery</span>
-          </div>
-          <div class="table-responsive">
-            <table class="table table-sm align-middle">
-              <thead>
-                <tr>
-                  <th>Requirement</th>
-                  <th>Owner</th>
-                  <th>Stage</th>
-                  <th>Progress</th>
-                  <th>ETA</th>
-                  <th>Risk</th>
-                </tr>
-              </thead>
-              <tbody id="reqTable"></tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-12 col-xl-4">
-        <div class="panel mb-3">
-          <h2 class="section-title">Decision Queue</h2>
-          <div id="decisionQueue"></div>
-        </div>
-        <div class="panel">
-          <h2 class="section-title">Recent Transitions</h2>
-          <div id="timeline"></div>
-        </div>
+function renderTimeline() {
+  document.getElementById('timelineList').innerHTML = TRANSITIONS.map(t => `
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div>
+        <div class="tl-text">${t.text}</div>
+        <div class="tl-when">${t.when}</div>
       </div>
     </div>
+  `).join('');
+}
 
-    <div class="panel mt-3">
-      <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2 class="section-title mb-0">Risk & Blocker Queue</h2>
-        <span class="small-note">Escalations requiring cross-team follow-up</span>
-      </div>
-      <div class="table-responsive">
-        <table class="table table-sm align-middle mb-0">
-          <thead>
-            <tr>
-              <th>Ticket</th>
-              <th>Blocker</th>
-              <th>Stage</th>
-              <th>Impact</th>
-              <th>Mitigation Owner</th>
-            </tr>
-          </thead>
-          <tbody id="riskTable"></tbody>
-        </table>
-      </div>
-    </div>
-  </main>
-
-  <script>
-    const REQUIREMENTS = [
-      {
-        id: 'SN-008',
-        title: 'Multi-role identity and access workflow',
-        owner: 'Platform Team',
-        stage: 'acceptance',
-        progress: 100,
-        eta: 'Completed',
-        risk: 'Low',
-        decision: 'Accepted by stakeholder board',
-        updates: [
-          'Approval granted by EC committee',
-          'Tech validation passed with test sign-off',
-          'DevOps deployed to production',
-          'Final acceptance recorded'
-        ]
-      },
-      {
-        id: 'TK-046',
-        title: 'Membership drive analytics by tier',
-        owner: 'Data & Insights',
-        stage: 'acceptance',
-        progress: 100,
-        eta: 'Completed',
-        risk: 'Low',
-        decision: 'KPI panel approved and in use',
-        updates: [
-          'Approval and scope freeze completed',
-          'Validation against source invite/response records done',
-          'DevOps rollout completed',
-          'Stakeholder acceptance completed'
-        ]
-      },
-      {
-        id: 'SN-021',
-        title: 'Family profile correction automation',
-        owner: 'CRM Engineering',
-        stage: 'devops',
-        progress: 78,
-        eta: 'Mar 06, 2026',
-        risk: 'Medium',
-        decision: 'Needs release-window confirmation',
-        updates: [
-          'Approval completed',
-          'Technical validation completed',
-          'DevOps pre-prod checks in progress'
-        ]
-      },
-      {
-        id: 'SN-030',
-        title: 'Automated feedback-to-ticket routing',
-        owner: 'Automation Team',
-        stage: 'tech',
-        progress: 52,
-        eta: 'Mar 12, 2026',
-        risk: 'Medium',
-        decision: 'Schema extension decision pending',
-        updates: [
-          'Approval completed',
-          'Validation open: schema compatibility review'
-        ]
-      },
-      {
-        id: 'SN-034',
-        title: 'Stakeholder SLA breach alerts',
-        owner: 'DevOps',
-        stage: 'approval',
-        progress: 24,
-        eta: 'Mar 18, 2026',
-        risk: 'High',
-        decision: 'Awaiting policy owner sign-off',
-        updates: [
-          'In approval review queue'
-        ]
-      }
-    ];
-
-    const BLOCKERS = [
-      { ticket: 'SN-034', issue: 'Alert threshold policy not finalized', stage: 'Approval', impact: 'Timeline risk to stakeholder SLA monitoring', owner: 'Compliance + EC' },
-      { ticket: 'SN-030', issue: 'Notification schema extension pending design board vote', stage: 'Tech Validation', impact: 'Routing automation release delayed', owner: 'Architecture Board' },
-      { ticket: 'SN-021', issue: 'Deployment window conflict with migration freeze', stage: 'DevOps', impact: 'Go-live moved to next release slot', owner: 'Release Manager' }
-    ];
-
-    const TRANSITIONS = [
-      { when: 'Today 09:45', text: 'SN-021 passed technical validation and entered DevOps gate.' },
-      { when: 'Today 08:20', text: 'TK-046 final stakeholder acceptance logged.' },
-      { when: 'Yesterday 17:30', text: 'SN-030 updated with schema risk note and decision request.' },
-      { when: 'Yesterday 14:10', text: 'SN-034 moved to approval review with high-risk tag.' }
-    ];
-
-    function stageBadge(stage) {
-      if (stage === 'approval') return '<span class="stage-badge stage-approval">Approval</span>';
-      if (stage === 'tech') return '<span class="stage-badge stage-tech">Technical Validation</span>';
-      if (stage === 'devops') return '<span class="stage-badge stage-devops">DevOps</span>';
-      return '<span class="stage-badge stage-acceptance">Final Acceptance</span>';
-    }
-
-    function riskClass(risk) {
-      return risk === 'High' ? 'risk-high' : risk === 'Medium' ? 'risk-med' : 'risk-low';
-    }
-
-    function renderKpis() {
-      const total = REQUIREMENTS.length;
-      const accepted = REQUIREMENTS.filter(r => r.stage === 'acceptance').length;
-      const blocked = BLOCKERS.length;
-      const highRisk = REQUIREMENTS.filter(r => r.risk === 'High').length;
-      const avgProgress = Math.round(REQUIREMENTS.reduce((a, r) => a + r.progress, 0) / total);
-      const inDelivery = REQUIREMENTS.filter(r => ['devops', 'acceptance'].includes(r.stage)).length;
-
-      const cards = [
-        { icon: 'fa-list-check', value: total, label: 'Tracked Requirements' },
-        { icon: 'fa-flag-checkered', value: accepted, label: 'Final Acceptance Complete' },
-        { icon: 'fa-triangle-exclamation', value: blocked, label: 'Open Blockers' },
-        { icon: 'fa-shield-halved', value: highRisk, label: 'High-Risk Items' },
-        { icon: 'fa-gauge-high', value: avgProgress + '%', label: 'Average Delivery Progress' },
-        { icon: 'fa-rocket', value: inDelivery, label: 'In DevOps / Accepted' }
-      ];
-
-      document.getElementById('kpiRow').innerHTML = cards.map(card => `
-        <div class="col-6 col-lg-4 col-xl-2">
-          <div class="panel">
-            <div class="d-flex align-items-center gap-2 mb-2">
-              <i class="fas ${card.icon}" style="color: var(--banf-green)"></i>
-              <div class="kpi-label">${card.label}</div>
-            </div>
-            <div class="kpi-value">${card.value}</div>
-          </div>
-        </div>
-      `).join('');
-    }
-
-    function renderGates() {
-      const gates = [
-        { key: 'approval', name: 'Approval', desc: 'Business and stakeholder sign-off', cls: 'stage-approval' },
-        { key: 'tech', name: 'Technical Validation', desc: 'Architecture, QA, and feasibility checks', cls: 'stage-tech' },
-        { key: 'devops', name: 'DevOps', desc: 'Release readiness and production promotion', cls: 'stage-devops' },
-        { key: 'acceptance', name: 'Final Acceptance', desc: 'Stakeholder acceptance and closure', cls: 'stage-acceptance' }
-      ];
-
-      document.getElementById('gateRow').innerHTML = gates.map(g => {
-        const count = REQUIREMENTS.filter(r => r.stage === g.key).length;
-        return `
-          <div class="col-12 col-md-6 col-xl-3">
-            <div class="gate">
-              <h4>${g.name}</h4>
-              <div class="mb-2"><span class="stage-badge ${g.cls}">${count} item(s)</span></div>
-              <p>${g.desc}</p>
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    function renderRequirements() {
-      document.getElementById('reqTable').innerHTML = REQUIREMENTS.map(req => `
-        <tr>
-          <td>
-            <div><strong>${req.id}</strong> — ${req.title}</div>
-            <div class="small-note mt-1">${req.updates[req.updates.length - 1]}</div>
-          </td>
-          <td>${req.owner}</td>
-          <td>${stageBadge(req.stage)}</td>
-          <td style="min-width:160px;">
-            <div class="progress" style="height:8px;">
-              <div class="progress-bar bg-success" style="width:${req.progress}%;"></div>
-            </div>
-            <div class="small-note mt-1">${req.progress}%</div>
-          </td>
-          <td>${req.eta}</td>
-          <td><span class="${riskClass(req.risk)}">${req.risk}</span></td>
-        </tr>
-      `).join('');
-    }
-
-    function renderDecisions() {
-      const pending = REQUIREMENTS.filter(r => r.stage !== 'acceptance');
-      document.getElementById('decisionQueue').innerHTML = pending.map(item => `
-        <div class="mb-3 pb-3" style="border-bottom:1px solid var(--line);">
-          <div class="d-flex justify-content-between gap-2 mb-1">
-            <strong>${item.id}</strong>
-            ${stageBadge(item.stage)}
-          </div>
-          <div style="font-size:.83rem;">${item.decision}</div>
-        </div>
-      `).join('') || '<div class="small-note">No pending decisions.</div>';
-    }
-
-    function renderTimeline() {
-      document.getElementById('timeline').innerHTML = TRANSITIONS.map(t => `
-        <div class="timeline-item">
-          <div>${t.text}</div>
-          <div class="meta">${t.when}</div>
-        </div>
-      `).join('');
-    }
-
-    function renderRisks() {
-      document.getElementById('riskTable').innerHTML = BLOCKERS.map(r => `
-        <tr>
-          <td><strong>${r.ticket}</strong></td>
-          <td>${r.issue}</td>
-          <td>${r.stage}</td>
-          <td>${r.impact}</td>
-          <td>${r.owner}</td>
-        </tr>
-      `).join('');
-    }
-
-    renderKpis();
-    renderGates();
-    renderRequirements();
-    renderDecisions();
-    renderTimeline();
-    renderRisks();
-  </script>
+init();
+</script>
 </body>
 </html>
