@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BANF - Stakeholder Requirements Journey</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+  <style>
+    :root {
+      --banf-orange: #FF6B35;
+      --banf-deep-red: #DC143C;
+      --banf-green: #006A4E;
+      --banf-charcoal: #222;
+      --bg: #f6f8fb;
+      --card: #fff;
+      --muted: #6c757d;
+      --line: #e9ecef;
+      --ok: #198754;
+      --warn: #fd7e14;
+      --danger: #dc3545;
+      --info: #0d6efd;
+      --grad-main: linear-gradient(135deg, #006A4E, #00856F);
+    }
+
+    body { background: var(--bg); color: var(--banf-charcoal); }
+    .header {
+      background: var(--grad-main);
+      color: #fff;
+      padding: 1.1rem 0;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .header h1 { font-size: 1.35rem; margin: 0; font-weight: 700; }
+    .header p { margin: .2rem 0 0; opacity: .9; font-size: .9rem; }
+
+    .panel {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      box-shadow: 0 5px 14px rgba(14, 23, 38, 0.05);
+      padding: 1rem;
+      height: 100%;
+    }
+    .section-title { font-size: 1.02rem; font-weight: 700; margin-bottom: .9rem; }
+
+    .kpi-value { font-size: 1.4rem; font-weight: 700; line-height: 1; margin-bottom: .25rem; }
+    .kpi-label { color: var(--muted); font-size: .82rem; }
+
+    .gate {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: .8rem;
+      height: 100%;
+      background: #fff;
+    }
+    .gate h4 { font-size: .95rem; margin: 0 0 .35rem; }
+    .gate p { margin: 0; color: var(--muted); font-size: .78rem; }
+    .stage-badge {
+      display: inline-block;
+      border-radius: 999px;
+      font-size: .72rem;
+      padding: .2rem .6rem;
+      font-weight: 600;
+      margin-right: .25rem;
+      margin-bottom: .2rem;
+    }
+    .stage-approval { background: #e6f4ff; color: #0b5ed7; }
+    .stage-tech { background: #fff4e6; color: #b45309; }
+    .stage-devops { background: #ede9fe; color: #6d28d9; }
+    .stage-acceptance { background: #e8f5e9; color: #166534; }
+
+    table td, table th { font-size: .84rem; vertical-align: middle; }
+    .risk-high { color: var(--danger); font-weight: 600; }
+    .risk-med { color: var(--warn); font-weight: 600; }
+    .risk-low { color: var(--ok); font-weight: 600; }
+
+    .timeline-item {
+      border-left: 3px solid #dce3eb;
+      padding-left: .8rem;
+      margin-left: .25rem;
+      margin-bottom: .8rem;
+      position: relative;
+    }
+    .timeline-item::before {
+      content: '';
+      width: 9px;
+      height: 9px;
+      background: var(--info);
+      border-radius: 50%;
+      position: absolute;
+      left: -6px;
+      top: .35rem;
+    }
+    .timeline-item .meta { color: var(--muted); font-size: .75rem; }
+
+    .small-note { color: var(--muted); font-size: .78rem; }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="container">
+      <div class="d-flex flex-wrap gap-3 justify-content-between align-items-center">
+        <div>
+          <h1><i class="fas fa-route me-2"></i>Stakeholder Requirements Journey</h1>
+          <p>Approval → Technical Validation → DevOps → Final Stakeholder Acceptance</p>
+        </div>
+        <div class="d-flex gap-2">
+          <a class="btn btn-light btn-sm" href="member-portal.html"><i class="fas fa-user me-1"></i>Member Portal</a>
+          <a class="btn btn-outline-light btn-sm" href="unified-ecosystem-dashboard.html"><i class="fas fa-chart-line me-1"></i>Unified Dashboard</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container py-4">
+    <div class="row g-3 mb-1" id="kpiRow"></div>
+
+    <div class="panel mt-3">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="section-title mb-0">Lifecycle Gate Health</h2>
+        <span class="small-note">Real-time requirement flow checkpoints</span>
+      </div>
+      <div class="row g-3" id="gateRow"></div>
+    </div>
+
+    <div class="row g-3 mt-1">
+      <div class="col-12 col-xl-8">
+        <div class="panel">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="section-title mb-0">Requirements Progress Board</h2>
+            <span class="small-note">Each row tracks end-to-end approval and delivery</span>
+          </div>
+          <div class="table-responsive">
+            <table class="table table-sm align-middle">
+              <thead>
+                <tr>
+                  <th>Requirement</th>
+                  <th>Owner</th>
+                  <th>Stage</th>
+                  <th>Progress</th>
+                  <th>ETA</th>
+                  <th>Risk</th>
+                </tr>
+              </thead>
+              <tbody id="reqTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-xl-4">
+        <div class="panel mb-3">
+          <h2 class="section-title">Decision Queue</h2>
+          <div id="decisionQueue"></div>
+        </div>
+        <div class="panel">
+          <h2 class="section-title">Recent Transitions</h2>
+          <div id="timeline"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel mt-3">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="section-title mb-0">Risk & Blocker Queue</h2>
+        <span class="small-note">Escalations requiring cross-team follow-up</span>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-sm align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Ticket</th>
+              <th>Blocker</th>
+              <th>Stage</th>
+              <th>Impact</th>
+              <th>Mitigation Owner</th>
+            </tr>
+          </thead>
+          <tbody id="riskTable"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const REQUIREMENTS = [
+      {
+        id: 'SN-008',
+        title: 'Multi-role identity and access workflow',
+        owner: 'Platform Team',
+        stage: 'acceptance',
+        progress: 100,
+        eta: 'Completed',
+        risk: 'Low',
+        decision: 'Accepted by stakeholder board',
+        updates: [
+          'Approval granted by EC committee',
+          'Tech validation passed with test sign-off',
+          'DevOps deployed to production',
+          'Final acceptance recorded'
+        ]
+      },
+      {
+        id: 'TK-046',
+        title: 'Membership drive analytics by tier',
+        owner: 'Data & Insights',
+        stage: 'acceptance',
+        progress: 100,
+        eta: 'Completed',
+        risk: 'Low',
+        decision: 'KPI panel approved and in use',
+        updates: [
+          'Approval and scope freeze completed',
+          'Validation against source invite/response records done',
+          'DevOps rollout completed',
+          'Stakeholder acceptance completed'
+        ]
+      },
+      {
+        id: 'SN-021',
+        title: 'Family profile correction automation',
+        owner: 'CRM Engineering',
+        stage: 'devops',
+        progress: 78,
+        eta: 'Mar 06, 2026',
+        risk: 'Medium',
+        decision: 'Needs release-window confirmation',
+        updates: [
+          'Approval completed',
+          'Technical validation completed',
+          'DevOps pre-prod checks in progress'
+        ]
+      },
+      {
+        id: 'SN-030',
+        title: 'Automated feedback-to-ticket routing',
+        owner: 'Automation Team',
+        stage: 'tech',
+        progress: 52,
+        eta: 'Mar 12, 2026',
+        risk: 'Medium',
+        decision: 'Schema extension decision pending',
+        updates: [
+          'Approval completed',
+          'Validation open: schema compatibility review'
+        ]
+      },
+      {
+        id: 'SN-034',
+        title: 'Stakeholder SLA breach alerts',
+        owner: 'DevOps',
+        stage: 'approval',
+        progress: 24,
+        eta: 'Mar 18, 2026',
+        risk: 'High',
+        decision: 'Awaiting policy owner sign-off',
+        updates: [
+          'In approval review queue'
+        ]
+      }
+    ];
+
+    const BLOCKERS = [
+      { ticket: 'SN-034', issue: 'Alert threshold policy not finalized', stage: 'Approval', impact: 'Timeline risk to stakeholder SLA monitoring', owner: 'Compliance + EC' },
+      { ticket: 'SN-030', issue: 'Notification schema extension pending design board vote', stage: 'Tech Validation', impact: 'Routing automation release delayed', owner: 'Architecture Board' },
+      { ticket: 'SN-021', issue: 'Deployment window conflict with migration freeze', stage: 'DevOps', impact: 'Go-live moved to next release slot', owner: 'Release Manager' }
+    ];
+
+    const TRANSITIONS = [
+      { when: 'Today 09:45', text: 'SN-021 passed technical validation and entered DevOps gate.' },
+      { when: 'Today 08:20', text: 'TK-046 final stakeholder acceptance logged.' },
+      { when: 'Yesterday 17:30', text: 'SN-030 updated with schema risk note and decision request.' },
+      { when: 'Yesterday 14:10', text: 'SN-034 moved to approval review with high-risk tag.' }
+    ];
+
+    function stageBadge(stage) {
+      if (stage === 'approval') return '<span class="stage-badge stage-approval">Approval</span>';
+      if (stage === 'tech') return '<span class="stage-badge stage-tech">Technical Validation</span>';
+      if (stage === 'devops') return '<span class="stage-badge stage-devops">DevOps</span>';
+      return '<span class="stage-badge stage-acceptance">Final Acceptance</span>';
+    }
+
+    function riskClass(risk) {
+      return risk === 'High' ? 'risk-high' : risk === 'Medium' ? 'risk-med' : 'risk-low';
+    }
+
+    function renderKpis() {
+      const total = REQUIREMENTS.length;
+      const accepted = REQUIREMENTS.filter(r => r.stage === 'acceptance').length;
+      const blocked = BLOCKERS.length;
+      const highRisk = REQUIREMENTS.filter(r => r.risk === 'High').length;
+      const avgProgress = Math.round(REQUIREMENTS.reduce((a, r) => a + r.progress, 0) / total);
+      const inDelivery = REQUIREMENTS.filter(r => ['devops', 'acceptance'].includes(r.stage)).length;
+
+      const cards = [
+        { icon: 'fa-list-check', value: total, label: 'Tracked Requirements' },
+        { icon: 'fa-flag-checkered', value: accepted, label: 'Final Acceptance Complete' },
+        { icon: 'fa-triangle-exclamation', value: blocked, label: 'Open Blockers' },
+        { icon: 'fa-shield-halved', value: highRisk, label: 'High-Risk Items' },
+        { icon: 'fa-gauge-high', value: avgProgress + '%', label: 'Average Delivery Progress' },
+        { icon: 'fa-rocket', value: inDelivery, label: 'In DevOps / Accepted' }
+      ];
+
+      document.getElementById('kpiRow').innerHTML = cards.map(card => `
+        <div class="col-6 col-lg-4 col-xl-2">
+          <div class="panel">
+            <div class="d-flex align-items-center gap-2 mb-2">
+              <i class="fas ${card.icon}" style="color: var(--banf-green)"></i>
+              <div class="kpi-label">${card.label}</div>
+            </div>
+            <div class="kpi-value">${card.value}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderGates() {
+      const gates = [
+        { key: 'approval', name: 'Approval', desc: 'Business and stakeholder sign-off', cls: 'stage-approval' },
+        { key: 'tech', name: 'Technical Validation', desc: 'Architecture, QA, and feasibility checks', cls: 'stage-tech' },
+        { key: 'devops', name: 'DevOps', desc: 'Release readiness and production promotion', cls: 'stage-devops' },
+        { key: 'acceptance', name: 'Final Acceptance', desc: 'Stakeholder acceptance and closure', cls: 'stage-acceptance' }
+      ];
+
+      document.getElementById('gateRow').innerHTML = gates.map(g => {
+        const count = REQUIREMENTS.filter(r => r.stage === g.key).length;
+        return `
+          <div class="col-12 col-md-6 col-xl-3">
+            <div class="gate">
+              <h4>${g.name}</h4>
+              <div class="mb-2"><span class="stage-badge ${g.cls}">${count} item(s)</span></div>
+              <p>${g.desc}</p>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderRequirements() {
+      document.getElementById('reqTable').innerHTML = REQUIREMENTS.map(req => `
+        <tr>
+          <td>
+            <div><strong>${req.id}</strong> — ${req.title}</div>
+            <div class="small-note mt-1">${req.updates[req.updates.length - 1]}</div>
+          </td>
+          <td>${req.owner}</td>
+          <td>${stageBadge(req.stage)}</td>
+          <td style="min-width:160px;">
+            <div class="progress" style="height:8px;">
+              <div class="progress-bar bg-success" style="width:${req.progress}%;"></div>
+            </div>
+            <div class="small-note mt-1">${req.progress}%</div>
+          </td>
+          <td>${req.eta}</td>
+          <td><span class="${riskClass(req.risk)}">${req.risk}</span></td>
+        </tr>
+      `).join('');
+    }
+
+    function renderDecisions() {
+      const pending = REQUIREMENTS.filter(r => r.stage !== 'acceptance');
+      document.getElementById('decisionQueue').innerHTML = pending.map(item => `
+        <div class="mb-3 pb-3" style="border-bottom:1px solid var(--line);">
+          <div class="d-flex justify-content-between gap-2 mb-1">
+            <strong>${item.id}</strong>
+            ${stageBadge(item.stage)}
+          </div>
+          <div style="font-size:.83rem;">${item.decision}</div>
+        </div>
+      `).join('') || '<div class="small-note">No pending decisions.</div>';
+    }
+
+    function renderTimeline() {
+      document.getElementById('timeline').innerHTML = TRANSITIONS.map(t => `
+        <div class="timeline-item">
+          <div>${t.text}</div>
+          <div class="meta">${t.when}</div>
+        </div>
+      `).join('');
+    }
+
+    function renderRisks() {
+      document.getElementById('riskTable').innerHTML = BLOCKERS.map(r => `
+        <tr>
+          <td><strong>${r.ticket}</strong></td>
+          <td>${r.issue}</td>
+          <td>${r.stage}</td>
+          <td>${r.impact}</td>
+          <td>${r.owner}</td>
+        </tr>
+      `).join('');
+    }
+
+    renderKpis();
+    renderGates();
+    renderRequirements();
+    renderDecisions();
+    renderTimeline();
+    renderRisks();
+  </script>
+</body>
+</html>

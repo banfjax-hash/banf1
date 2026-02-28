@@ -1,13 +1,13 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>BANF - Unified Development Ecosystem Dashboard</title>
+<title>BANF — Unified Development Ecosystem Dashboard</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
 <style>
-/* â•â•â•â•â•â•â• DESIGN TOKENS â•â•â•â•â•â•â• */
+/* ═══════ DESIGN TOKENS ═══════ */
 :root{
   --bg:#060a10;--bg2:#0b1120;--panel:#111827;--card:#0f172a;
   --line:#1e293b;--line2:#334155;--text:#e2e8f0;--muted:#94a3b8;--dim:#475569;
@@ -20,7 +20,7 @@
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,-apple-system,sans-serif;line-height:1.5;overflow-x:hidden}
 
-/* â•â•â•â•â•â•â• SIDEBAR â•â•â•â•â•â•â• */
+/* ═══════ SIDEBAR ═══════ */
 .sidebar{position:fixed;left:0;top:0;bottom:0;width:62px;background:#070b14;border-right:1px solid var(--line);z-index:1000;display:flex;flex-direction:column;align-items:center;padding:12px 0;gap:4px;transition:width .2s}
 .sidebar .logo{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#f97316,#ea580c);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.9rem;color:#fff;margin-bottom:14px}
 .sidebar .nav-item{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;color:var(--muted);cursor:pointer;font-size:1rem;position:relative;transition:all .15s}
@@ -33,7 +33,7 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:'Segoe UI',syst
 .sidebar .nav-divider .div-tip{position:absolute;left:56px;top:-8px;background:rgba(30,41,59,.95);color:var(--dim);padding:2px 8px;border-radius:4px;font-size:.58rem;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .15s;text-transform:uppercase;letter-spacing:.5px;font-weight:700}
 .sidebar .nav-divider:hover .div-tip{opacity:1}
 
-/* â•â•â•â•â•â•â• MAIN â•â•â•â•â•â•â• */
+/* ═══════ MAIN ═══════ */
 .main{margin-left:62px;min-height:100vh}
 .top-bar{background:#070b14;border-bottom:1px solid var(--line);padding:12px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:500;backdrop-filter:blur(12px)}
 .top-bar h1{font-size:1.1rem;font-weight:700;margin:0;background:linear-gradient(90deg,#f97316,#fb923c);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
@@ -46,17 +46,17 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:'Segoe UI',syst
 
 .content{padding:20px 28px 40px}
 
-/* â•â•â•â•â•â•â• SECTIONS â•â•â•â•â•â•â• */
+/* ═══════ SECTIONS ═══════ */
 .section{display:none}.section.active{display:block;animation:fadeIn .25s ease}
 @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 
-/* â•â•â•â•â•â•â• CARDS â•â•â•â•â•â•â• */
+/* ═══════ CARDS ═══════ */
 .card-d{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px;margin-bottom:16px}
 .card-d h2{font-size:.95rem;font-weight:700;color:#fff;margin:0 0 14px;display:flex;align-items:center;gap:8px}
 .card-d h2 i{color:var(--accent);font-size:.85rem}
 .card-d h3{font-size:.84rem;color:var(--accent);margin:12px 0 6px}
 
-/* â•â•â•â•â•â•â• KPI GRID â•â•â•â•â•â•â• */
+/* ═══════ KPI GRID ═══════ */
 .kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:12px;margin-bottom:16px}
 .kpi{background:var(--bg2);border:1px solid var(--line);border-radius:var(--radius-sm);padding:16px;text-align:center;transition:all .2s;cursor:default}
 .kpi:hover{border-color:var(--accent);transform:translateY(-2px)}
@@ -64,13 +64,13 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:'Segoe UI',syst
 .kpi .k{font-size:.72rem;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:.4px}
 .kpi.green .v{color:var(--green)} .kpi.red .v{color:var(--red)} .kpi.blue .v{color:var(--blue)} .kpi.orange .v{color:var(--accent)} .kpi.purple .v{color:var(--purple)} .kpi.cyan .v{color:var(--cyan)} .kpi.yellow .v{color:var(--yellow)} .kpi.pink .v{color:var(--pink)}
 
-/* â•â•â•â•â•â•â• TABLE â•â•â•â•â•â•â• */
+/* ═══════ TABLE ═══════ */
 .t{color:var(--text);width:100%;border-collapse:collapse;font-size:.8rem}
 .t thead th{background:rgba(249,115,22,.06);color:#ffd7c2;padding:8px 10px;border-bottom:1px solid var(--line2);font-weight:600;text-align:left;font-size:.75rem;text-transform:uppercase;letter-spacing:.3px;white-space:nowrap}
 .t td{padding:7px 10px;border-bottom:1px solid rgba(30,41,59,.6);vertical-align:top}
 .t tbody tr:hover td{background:rgba(249,115,22,.03)}
 
-/* â•â•â•â•â•â•â• BADGES â•â•â•â•â•â•â• */
+/* ═══════ BADGES ═══════ */
 .badge-s{display:inline-block;padding:2px 8px;border-radius:999px;font-size:.68rem;font-weight:600}
 .badge-green{background:rgba(34,197,94,.15);color:var(--green)}
 .badge-red{background:rgba(239,68,68,.15);color:var(--red)}
@@ -81,7 +81,7 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:'Segoe UI',syst
 .badge-cyan{background:rgba(6,182,212,.15);color:var(--cyan)}
 .badge-dim{background:rgba(71,85,105,.2);color:var(--dim)}
 
-/* â•â•â•â•â•â•â• PIPELINE â•â•â•â•â•â•â• */
+/* ═══════ PIPELINE ═══════ */
 .pipeline{display:flex;gap:4px;margin:16px 0;flex-wrap:wrap}
 .pipe-step{flex:1;min-width:115px;padding:14px 10px;text-align:center;border-radius:var(--radius-sm);position:relative}
 .pipe-step .pipe-icon{font-size:1.3rem;margin-bottom:4px}
@@ -98,7 +98,7 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:'Segoe UI',syst
 .ps-ops{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25)}.ps-ops .pipe-icon{color:var(--red)}
 .ps-mlo{background:rgba(6,182,212,.1);border:1px solid rgba(6,182,212,.25)}.ps-mlo .pipe-icon{color:var(--cyan)}
 
-/* â•â•â•â•â•â•â• AGENT CARD â•â•â•â•â•â•â• */
+/* ═══════ AGENT CARD ═══════ */
 .agent-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
 .agent-card{background:var(--bg2);border:1px solid var(--line);border-radius:var(--radius-sm);padding:14px;transition:all .2s}
 .agent-card:hover{border-color:var(--accent);transform:translateY(-1px)}
@@ -110,7 +110,7 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:'Segoe UI',syst
 .agent-card .a-cap{font-size:.64rem;padding:2px 6px;border-radius:4px;background:rgba(255,255,255,.05);color:var(--muted)}
 .agent-card .a-gate{font-size:.7rem;color:var(--yellow);margin-top:6px}
 
-/* â•â•â•â•â•â•â• ENDPOINT LIST â•â•â•â•â•â•â• */
+/* ═══════ ENDPOINT LIST ═══════ */
 .ep-group{margin-bottom:12px}
 .ep-group-hdr{display:flex;align-items:center;gap:8px;padding:8px 12px;background:rgba(249,115,22,.04);border:1px solid var(--line);border-radius:var(--radius-sm);cursor:pointer;user-select:none}
 .ep-group-hdr:hover{background:rgba(249,115,22,.08)}
@@ -124,14 +124,14 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:'Segoe UI',syst
 .ep-item .ep-method{font-weight:700;display:inline-block;width:36px}
 .ep-item .ep-method.get{color:var(--green)}.ep-item .ep-method.post{color:var(--blue)}
 
-/* â•â•â•â•â•â•â• COLLECTION SCHEMA â•â•â•â•â•â•â• */
+/* ═══════ COLLECTION SCHEMA ═══════ */
 .coll-card{background:var(--bg2);border:1px solid var(--line);border-radius:var(--radius-sm);padding:14px;margin-bottom:10px}
 .coll-card h4{font-size:.84rem;color:var(--accent);margin:0 0 6px;font-weight:700}
 .coll-card .coll-desc{font-size:.74rem;color:var(--muted);margin-bottom:8px}
 .coll-card .coll-fields{display:flex;flex-wrap:wrap;gap:4px}
 .coll-card .coll-field{font-size:.68rem;padding:2px 7px;border-radius:4px;background:rgba(255,255,255,.04);color:var(--dim);font-family:Consolas,monospace}
 
-/* â•â•â•â•â•â•â• SPRINT TRACKER â•â•â•â•â•â•â• */
+/* ═══════ SPRINT TRACKER ═══════ */
 .sprint-track{display:flex;gap:12px;overflow-x:auto;padding-bottom:8px}
 .sprint-col{min-width:210px;background:var(--bg2);border:1px solid var(--line);border-radius:var(--radius-sm);padding:12px}
 .sprint-col h5{font-size:.8rem;color:var(--accent);margin:0 0 8px;font-weight:700}
@@ -140,7 +140,7 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:'Segoe UI',syst
 .sprint-item .si-title{color:var(--text)}
 .sprint-item .si-pts{float:right;color:var(--yellow);font-weight:700}
 
-/* â•â•â•â•â•â•â• ROLE TABS â•â•â•â•â•â•â• */
+/* ═══════ ROLE TABS ═══════ */
 .role-tabs{display:flex;gap:4px;margin-bottom:14px;flex-wrap:wrap}
 .role-tab{padding:6px 14px;border-radius:8px;font-size:.78rem;cursor:pointer;border:1px solid var(--line);color:var(--muted);transition:.15s}
 .role-tab:hover{color:var(--text);border-color:var(--line2)}
@@ -151,7 +151,7 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:'Segoe UI',syst
 .widget h6{font-size:.8rem;color:var(--accent);margin:0 0 4px}
 .widget p{font-size:.74rem;color:var(--muted);margin:0}
 
-/* â•â•â•â•â•â•â• QUICK LINKS â•â•â•â•â•â•â• */
+/* ═══════ QUICK LINKS ═══════ */
 .link-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px}
 .link-card{display:flex;align-items:center;gap:12px;background:var(--bg2);border:1px solid var(--line);border-radius:var(--radius-sm);padding:12px;text-decoration:none;color:var(--text);transition:.2s}
 .link-card:hover{border-color:var(--accent);transform:translateY(-1px);color:var(--text)}
@@ -159,7 +159,7 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:'Segoe UI',syst
 .link-card .lc-title{font-weight:600;font-size:.82rem}
 .link-card .lc-desc{font-size:.7rem;color:var(--muted)}
 
-/* â•â•â•â•â•â•â• OBSERVABILITY â•â•â•â•â•â•â• */
+/* ═══════ OBSERVABILITY ═══════ */
 .otel-tabs{display:flex;gap:4px;margin-bottom:14px}.otel-tab{padding:6px 14px;border-radius:8px;font-size:.78rem;cursor:pointer;border:1px solid var(--line);color:var(--muted);transition:.15s}.otel-tab:hover{color:var(--text);border-color:var(--line2)}.otel-tab.active{background:rgba(6,182,212,.12);border-color:var(--cyan);color:var(--cyan)}
 .otel-panel{display:none}.otel-panel.active{display:block}
 .log-entry{font-family:Consolas,monospace;font-size:.72rem;padding:4px 8px;border-bottom:1px solid rgba(30,41,59,.4);display:flex;gap:10px;align-items:baseline;transition:background .1s}.log-entry:hover{background:rgba(255,255,255,.02)}
@@ -172,7 +172,7 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:'Segoe UI',syst
 .alert-sev{width:8px;height:8px;border-radius:50%;flex-shrink:0}.alert-sev.critical{background:var(--red);box-shadow:0 0 6px var(--red)}.alert-sev.warning{background:var(--yellow);box-shadow:0 0 6px var(--yellow)}.alert-sev.info{background:var(--cyan);box-shadow:0 0 4px var(--cyan)}
 .alert-name{flex:1;font-weight:600}.alert-cond{color:var(--muted);font-family:Consolas,monospace;font-size:.72rem}.alert-status{font-size:.7rem}
 
-/* â•â•â•â•â•â•â• SYSTEM INTERNALS â•â•â•â•â•â•â• */
+/* ═══════ SYSTEM INTERNALS ═══════ */
 .int-tabs{display:flex;gap:3px;margin-bottom:14px;flex-wrap:wrap}.int-tab{padding:5px 12px;border-radius:6px;font-size:.72rem;cursor:pointer;border:1px solid var(--line);color:var(--muted);transition:.15s}.int-tab:hover{color:var(--text);border-color:var(--line2)}.int-tab.active{background:rgba(132,204,22,.12);border-color:var(--lime);color:var(--lime)}
 .int-panel{display:none}.int-panel.active{display:block}
 .flow-diagram{display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin:12px 0;padding:14px;background:var(--bg);border:1px solid var(--line);border-radius:var(--radius-sm)}
@@ -181,7 +181,7 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:'Segoe UI',syst
 .data-model-mini{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;margin-top:10px}
 .dm-card{background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:10px}.dm-card h6{font-size:.76rem;color:var(--accent);margin:0 0 4px;font-weight:700}.dm-card ul{margin:0;padding:0 0 0 14px;font-size:.68rem;color:var(--muted);list-style:disc}
 
-/* â•â•â•â•â•â•â• EXPERT REVIEW â•â•â•â•â•â•â• */
+/* ═══════ EXPERT REVIEW ═══════ */
 .expert-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px;margin-bottom:16px}
 .expert-card{background:var(--bg2);border:1px solid var(--line);border-radius:var(--radius-sm);padding:14px;transition:all .2s}.expert-card:hover{border-color:var(--accent);transform:translateY(-1px)}
 .expert-card .ex-hdr{display:flex;align-items:center;gap:10px;margin-bottom:8px}.expert-card .ex-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1rem}
@@ -196,19 +196,19 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:'Segoe UI',syst
 .exp-sec-tab{padding:4px 10px;border-radius:6px;font-size:.7rem;cursor:pointer;border:1px solid var(--line);color:var(--muted);transition:.15s}.exp-sec-tab:hover{color:var(--text)}.exp-sec-tab.active{background:rgba(236,72,153,.12);border-color:var(--pink);color:var(--pink)}
 .exp-sec-panel{display:none}.exp-sec-panel.active{display:block}
 
-/* â•â•â•â•â•â•â• REQUIREMENTS & DOCS â•â•â•â•â•â•â• */
+/* ═══════ REQUIREMENTS & DOCS ═══════ */
 .doc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px}
 .doc-card{background:var(--bg2);border:1px solid var(--line);border-radius:var(--radius-sm);padding:14px;transition:all .2s;text-decoration:none;color:var(--text);display:block}.doc-card:hover{border-color:var(--accent);transform:translateY(-1px);color:var(--text)}
 .doc-card .dc-hdr{display:flex;align-items:center;gap:10px;margin-bottom:6px}.doc-card .dc-icon{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0}
 .doc-card .dc-title{font-weight:700;font-size:.82rem}.doc-card .dc-desc{font-size:.72rem;color:var(--muted)}.doc-card .dc-meta{font-size:.66rem;color:var(--dim);margin-top:6px}
 
-/* â•â•â•â•â•â•â• DEV STATUS TRACKER â•â•â•â•â•â•â• */
+/* ═══════ DEV STATUS TRACKER ═══════ */
 .status-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px}
 .status-card{background:var(--bg2);border:1px solid var(--line);border-radius:var(--radius-sm);padding:14px}
 .status-card .sc-name{font-weight:700;font-size:.84rem;margin-bottom:6px}.status-card .sc-bar{height:6px;background:var(--line);border-radius:3px;margin:6px 0}.status-card .sc-fill{height:6px;border-radius:3px}
 .status-card .sc-tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px}
 
-/* â•â•â•â•â•â•â• STAKEHOLDER ACCEPTANCE â•â•â•â•â•â•â• */
+/* ═══════ STAKEHOLDER ACCEPTANCE ═══════ */
 .note-form{background:var(--bg2);border:1px solid var(--line);border-radius:var(--radius-sm);padding:16px;margin-bottom:14px}
 .note-form textarea{width:100%;background:var(--bg);border:1px solid var(--line);color:var(--text);border-radius:8px;padding:10px;font-size:.8rem;resize:vertical;min-height:80px;font-family:inherit;outline:none}
 .note-form textarea:focus{border-color:var(--accent)}
@@ -220,7 +220,7 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:'Segoe UI',syst
 .note-item .ni-target{color:var(--blue);font-size:.72rem}.note-item .ni-body{color:var(--muted);line-height:1.5}
 .note-item .ni-flow{font-size:.7rem;color:var(--cyan);margin-top:4px}
 
-/* â•â•â•â•â•â•â• DEV AGENT TEAM â•â•â•â•â•â•â• */
+/* ═══════ DEV AGENT TEAM ═══════ */
 .dev-team-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
 .dev-agent-card{background:var(--bg2);border:1px solid var(--line);border-radius:var(--radius-sm);padding:14px;transition:all .2s}.dev-agent-card:hover{border-color:var(--accent)}
 .dev-agent-card .da-hdr{display:flex;align-items:center;gap:10px;margin-bottom:8px}.dev-agent-card .da-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem}
@@ -232,7 +232,7 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:'Segoe UI',syst
 .ticket-row{display:flex;align-items:center;gap:8px;padding:6px 10px;border-bottom:1px solid rgba(30,41,59,.4);font-size:.76rem}
 .ticket-row .tk-id{min-width:60px;font-weight:700;color:var(--blue);flex-shrink:0}.ticket-row .tk-title{flex:1}.ticket-row .tk-assignee{min-width:90px;color:var(--cyan);flex-shrink:0}.ticket-row .tk-pri{min-width:50px;flex-shrink:0}
 
-/* â•â•â•â•â•â•â• RESPONSIVE â•â•â•â•â•â•â• */
+/* ═══════ RESPONSIVE ═══════ */
 @media(max-width:768px){
   .sidebar{width:48px}.sidebar .nav-item{width:36px;height:36px;font-size:.85rem}.sidebar .logo{width:32px;height:32px;font-size:.75rem}
   .main{margin-left:48px}.content{padding:14px}.top-bar{padding:10px 14px}
@@ -246,7 +246,7 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:'Segoe UI',syst
 </head>
 <body>
 
-<!-- â•â•â•â•â•â•â• SIDEBAR â•â•â•â•â•â•â• -->
+<!-- ═══════ SIDEBAR ═══════ -->
 <nav class="sidebar">
   <div class="logo">B</div>
 
@@ -289,24 +289,24 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:'Segoe UI',syst
   <div class="nav-item" id="btn-refresh" title="Refresh"><i class="fas fa-sync-alt"></i><span class="tip">Refresh Data</span></div>
 </nav>
 
-<!-- â•â•â•â•â•â•â• MAIN â•â•â•â•â•â•â• -->
+<!-- ═══════ MAIN ═══════ -->
 <div class="main">
 
   <!-- Top Bar -->
   <div class="top-bar">
     <h1><i class="fas fa-atom me-2" style="-webkit-text-fill-color:var(--accent)"></i>BANF Unified Ecosystem</h1>
     <div class="meta">
-      <span><span class="status-dot loading" id="health-dot"></span> <span id="health-text">Checkingâ€¦</span></span>
-      <span id="version-badge">â€”</span>
-      <span id="last-refresh">â€”</span>
+      <span><span class="status-dot loading" id="health-dot"></span> <span id="health-text">Checking…</span></span>
+      <span id="version-badge">—</span>
+      <span id="last-refresh">—</span>
     </div>
   </div>
 
   <div class="content">
 
-    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+    <!-- ══════════════════════════════════════ -->
     <!-- SECTION: OVERVIEW                      -->
-    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+    <!-- ══════════════════════════════════════ -->
     <div class="section active" id="sec-overview">
 
       <div class="kpi-grid" id="kpi-row"></div>
@@ -353,7 +353,7 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:'Segoe UI',syst
                 <tr><td>EC Onboarding Gate</td><td>v5.10.0</td><td>7</td><td><span class="badge-s badge-green">Active</span></td></tr>
                 <tr><td>Zelle Payments</td><td>v5.4.0</td><td>10</td><td><span class="badge-s badge-green">Active</span></td></tr>
                 <tr><td>Landing Page CRM</td><td>v5.9.0</td><td>3</td><td><span class="badge-s badge-green">Active</span></td></tr>
-                <tr><td>Agent Orchestrator</td><td>v5.4.0</td><td>â€”</td><td><span class="badge-s badge-blue">Backend</span></td></tr>
+                <tr><td>Agent Orchestrator</td><td>v5.4.0</td><td>—</td><td><span class="badge-s badge-blue">Backend</span></td></tr>
                 <tr><td>Computer Agent / Tests</td><td>v5.4.0</td><td>5</td><td><span class="badge-s badge-green">Active</span></td></tr>
               </tbody>
             </table>
@@ -416,9 +416,9 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:'Segoe UI',syst
 
     </div>
 
-    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+    <!-- ══════════════════════════════════════ -->
     <!-- SECTION: PIPELINE                      -->
-    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+    <!-- ══════════════════════════════════════ -->
     <div class="section" id="sec-pipeline">
       <div class="card-d">
         <h2><i class="fas fa-stream"></i> Full Agentic Lifecycle Pipeline</h2>
@@ -446,13 +446,13 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:'Segoe UI',syst
         <table class="t">
           <thead><tr><th>Stage</th><th>Agent</th><th>Inputs</th><th>Outputs</th><th>Human Gate</th><th>Automation Triggers</th></tr></thead>
           <tbody>
-            <tr><td><span class="badge-s badge-blue">Requirements</span></td><td>req-agent</td><td>User feedback, raw requests</td><td>Classified requirements, stories, AC</td><td>PO approves priority</td><td>feedback_submitted â†’ classify</td></tr>
-            <tr><td><span class="badge-s badge-purple">Design</span></td><td>des-agent</td><td>Approved stories</td><td>API contracts, schema diffs, ADRs</td><td>Architect review</td><td>story_linked â†’ gen contracts</td></tr>
-            <tr><td><span class="badge-s badge-green">Development</span></td><td>dev-agent</td><td>Approved designs</td><td>Scaffolded code, PR reviews</td><td>PR reviewer</td><td>design_approved â†’ scaffold</td></tr>
-            <tr><td><span class="badge-s badge-yellow">Testing</span></td><td>tst-agent</td><td>Merged code</td><td>Test plans, results, coverage</td><td>QA sign-off</td><td>code_merged â†’ gen test plan</td></tr>
-            <tr><td><span class="badge-s badge-orange">Deployment</span></td><td>dpl-agent</td><td>Gate-ready code</td><td>Published version, changelog</td><td>DevOps approval</td><td>gate_ready â†’ pre-checks</td></tr>
-            <tr><td><span class="badge-s badge-red">Operations</span></td><td>ops-agent</td><td>Live system</td><td>Health reports, incidents</td><td>SRE escalation â‰¥ P1</td><td>cron_5min â†’ health check</td></tr>
-            <tr><td><span class="badge-s badge-cyan">MLOps</span></td><td>mlo-agent</td><td>Agent metrics</td><td>Eval reports, prompt versions</td><td>ML engineer review</td><td>cron_daily â†’ evaluate</td></tr>
+            <tr><td><span class="badge-s badge-blue">Requirements</span></td><td>req-agent</td><td>User feedback, raw requests</td><td>Classified requirements, stories, AC</td><td>PO approves priority</td><td>feedback_submitted → classify</td></tr>
+            <tr><td><span class="badge-s badge-purple">Design</span></td><td>des-agent</td><td>Approved stories</td><td>API contracts, schema diffs, ADRs</td><td>Architect review</td><td>story_linked → gen contracts</td></tr>
+            <tr><td><span class="badge-s badge-green">Development</span></td><td>dev-agent</td><td>Approved designs</td><td>Scaffolded code, PR reviews</td><td>PR reviewer</td><td>design_approved → scaffold</td></tr>
+            <tr><td><span class="badge-s badge-yellow">Testing</span></td><td>tst-agent</td><td>Merged code</td><td>Test plans, results, coverage</td><td>QA sign-off</td><td>code_merged → gen test plan</td></tr>
+            <tr><td><span class="badge-s badge-orange">Deployment</span></td><td>dpl-agent</td><td>Gate-ready code</td><td>Published version, changelog</td><td>DevOps approval</td><td>gate_ready → pre-checks</td></tr>
+            <tr><td><span class="badge-s badge-red">Operations</span></td><td>ops-agent</td><td>Live system</td><td>Health reports, incidents</td><td>SRE escalation ≥ P1</td><td>cron_5min → health check</td></tr>
+            <tr><td><span class="badge-s badge-cyan">MLOps</span></td><td>mlo-agent</td><td>Agent metrics</td><td>Eval reports, prompt versions</td><td>ML engineer review</td><td>cron_daily → evaluate</td></tr>
           </tbody>
         </table>
       </div>
@@ -476,37 +476,37 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:'Segoe UI',syst
       </div>
     </div>
 
-    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+    <!-- ══════════════════════════════════════ -->
     <!-- SECTION: AGENTS                        -->
-    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+    <!-- ══════════════════════════════════════ -->
     <div class="section" id="sec-agents">
       <div class="card-d">
         <h2><i class="fas fa-project-diagram"></i> Agent Mesh Architecture</h2>
         <pre style="background:#080d16;border:1px solid var(--line);border-radius:10px;padding:18px;font-family:Consolas,Monaco,monospace;font-size:.75rem;color:#8aa0b8;overflow-x:auto;line-height:1.3">
-â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
-â”‚                         AGENT MESH  (Wix Velo)                                â”‚
-â”‚                                                                               â”‚
-â”‚   LIFECYCLE AGENTS                         DOMAIN AGENTS (existing)          â”‚
-â”‚   â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”  â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”          â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”  â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”    â”‚
-â”‚   â”‚ req-agent  â”‚  â”‚ des-agent  â”‚          â”‚  events    â”‚  â”‚ membership â”‚    â”‚
-â”‚   â””â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”˜  â””â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”˜          â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜  â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜    â”‚
-â”‚         â”‚               â”‚                 â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”  â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”    â”‚
-â”‚   â”Œâ”€â”€â”€â”€â”€â–¼â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â–¼â”€â”€â”€â”€â”€â”€â”          â”‚  payment   â”‚  â”‚ complaint  â”‚    â”‚
-â”‚   â”‚  EVENT BUS (AgentEventLog) â”‚          â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜  â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜    â”‚
-â”‚   â””â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”˜          â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”  â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”    â”‚
-â”‚         â”‚               â”‚                 â”‚ sponsorshipâ”‚  â”‚   career   â”‚    â”‚
-â”‚   â”Œâ”€â”€â”€â”€â”€â–¼â”€â”€â”€â”€â”€â”€â”  â”Œâ”€â”€â”€â”€â”€â–¼â”€â”€â”€â”€â”€â”€â”          â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜  â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜    â”‚
-â”‚   â”‚ dev-agent  â”‚  â”‚ tst-agent  â”‚          â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”                    â”‚
-â”‚   â””â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”˜  â””â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”˜          â”‚  general   â”‚                    â”‚
-â”‚         â”‚               â”‚                 â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜                    â”‚
-â”‚   â”Œâ”€â”€â”€â”€â”€â–¼â”€â”€â”€â”€â”€â”€â”  â”Œâ”€â”€â”€â”€â”€â–¼â”€â”€â”€â”€â”€â”€â”                                           â”‚
-â”‚   â”‚ dpl-agent  â”‚  â”‚ ops-agent  â”‚     â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”    â”‚
-â”‚   â””â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”˜  â””â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”˜     â”‚     ORCHESTRATOR (meta-agent)  â”‚    â”‚
-â”‚         â”‚               â”‚            â”‚  route Â· detect Â· escalate     â”‚    â”‚
-â”‚   â”Œâ”€â”€â”€â”€â”€â–¼â”€â”€â”€â”€â”€â”€â”        â”‚            â”‚  arbitrate Â· digest            â”‚    â”‚
-â”‚   â”‚ mlo-agent  â”‚â”€â”€â”€â”€â”€â”€â”€â”€â”˜            â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜    â”‚
-â”‚   â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜                                                            â”‚
-â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜</pre>
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                         AGENT MESH  (Wix Velo)                                │
+│                                                                               │
+│   LIFECYCLE AGENTS                         DOMAIN AGENTS (existing)          │
+│   ┌────────────┐  ┌────────────┐          ┌────────────┐  ┌────────────┐    │
+│   │ req-agent  │  │ des-agent  │          │  events    │  │ membership │    │
+│   └─────┬──────┘  └─────┬──────┘          └────────────┘  └────────────┘    │
+│         │               │                 ┌────────────┐  ┌────────────┐    │
+│   ┌─────▼───────────────▼──────┐          │  payment   │  │ complaint  │    │
+│   │  EVENT BUS (AgentEventLog) │          └────────────┘  └────────────┘    │
+│   └─────┬───────────────┬──────┘          ┌────────────┐  ┌────────────┐    │
+│         │               │                 │ sponsorship│  │   career   │    │
+│   ┌─────▼──────┐  ┌─────▼──────┐          └────────────┘  └────────────┘    │
+│   │ dev-agent  │  │ tst-agent  │          ┌────────────┐                    │
+│   └─────┬──────┘  └─────┬──────┘          │  general   │                    │
+│         │               │                 └────────────┘                    │
+│   ┌─────▼──────┐  ┌─────▼──────┐                                           │
+│   │ dpl-agent  │  │ ops-agent  │     ┌─────────────────────────────────┐    │
+│   └─────┬──────┘  └─────┬──────┘     │     ORCHESTRATOR (meta-agent)  │    │
+│         │               │            │  route · detect · escalate     │    │
+│   ┌─────▼──────┐        │            │  arbitrate · digest            │    │
+│   │ mlo-agent  │────────┘            └─────────────────────────────────┘    │
+│   └────────────┘                                                            │
+└──────────────────────────────────────────────────────────────────────────────┘</pre>
       </div>
 
       <!-- Lifecycle Agents  -->
@@ -522,21 +522,21 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:'Segoe UI',syst
       </div>
     </div>
 
-    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+    <!-- ══════════════════════════════════════ -->
     <!-- SECTION: ENDPOINTS                     -->
-    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+    <!-- ══════════════════════════════════════ -->
     <div class="section" id="sec-endpoints">
       <div class="card-d">
         <h2><i class="fas fa-plug"></i> API Endpoint Explorer <span style="font-weight:400;font-size:.74rem;color:var(--muted);margin-left:8px">(196 endpoints)</span></h2>
         <p style="font-size:.8rem;color:var(--muted);margin-bottom:14px">Base URL: <code style="color:var(--accent)">https://banfwix.wixsite.com/banf1/_functions/</code></p>
-        <div style="margin-bottom:12px"><input type="text" id="ep-search" placeholder="Filter endpointsâ€¦" style="background:var(--bg2);border:1px solid var(--line);color:var(--text);padding:8px 14px;border-radius:8px;width:100%;max-width:400px;font-size:.82rem;outline:none"></div>
+        <div style="margin-bottom:12px"><input type="text" id="ep-search" placeholder="Filter endpoints…" style="background:var(--bg2);border:1px solid var(--line);color:var(--text);padding:8px 14px;border-radius:8px;width:100%;max-width:400px;font-size:.82rem;outline:none"></div>
         <div id="ep-list"></div>
       </div>
     </div>
 
-    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+    <!-- ══════════════════════════════════════ -->
     <!-- SECTION: TESTING                       -->
-    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+    <!-- ══════════════════════════════════════ -->
     <div class="section" id="sec-testing">
       <div class="card-d">
         <h2><i class="fas fa-vial"></i> Test Suites & Quality Gates</h2>
@@ -579,19 +579,19 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:'Segoe UI',syst
         <table class="t">
           <thead><tr><th>Gate Criterion</th><th>Threshold</th><th>Current</th><th>Status</th></tr></thead>
           <tbody>
-            <tr><td>Comprehensive pass rate</td><td>â‰¥ 95%</td><td>100%</td><td><span class="badge-s badge-green">PASS</span></td></tr>
+            <tr><td>Comprehensive pass rate</td><td>≥ 95%</td><td>100%</td><td><span class="badge-s badge-green">PASS</span></td></tr>
             <tr><td>No P0 failures</td><td>0</td><td>0</td><td><span class="badge-s badge-green">PASS</span></td></tr>
-            <tr><td>HTTP endpoint coverage</td><td>â‰¥ 80%</td><td>81%</td><td><span class="badge-s badge-green">PASS</span></td></tr>
-            <tr><td>Browser agent pass rate</td><td>â‰¥ 70%</td><td>57%</td><td><span class="badge-s badge-red">FAIL</span></td></tr>
-            <tr><td>Health endpoint responds</td><td>HTTP 200</td><td id="gate-health">â€”</td><td id="gate-health-badge">â€”</td></tr>
+            <tr><td>HTTP endpoint coverage</td><td>≥ 80%</td><td>81%</td><td><span class="badge-s badge-green">PASS</span></td></tr>
+            <tr><td>Browser agent pass rate</td><td>≥ 70%</td><td>57%</td><td><span class="badge-s badge-red">FAIL</span></td></tr>
+            <tr><td>Health endpoint responds</td><td>HTTP 200</td><td id="gate-health">—</td><td id="gate-health-badge">—</td></tr>
           </tbody>
         </table>
       </div>
     </div>
 
-    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+    <!-- ══════════════════════════════════════ -->
     <!-- SECTION: DEPLOYMENT                    -->
-    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+    <!-- ══════════════════════════════════════ -->
     <div class="section" id="sec-deployment">
       <div class="card-d">
         <h2><i class="fas fa-rocket"></i> Deployment Pipeline (wix-agent 6-Phase)</h2>
@@ -623,7 +623,7 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:'Segoe UI',syst
                 <tr><td><span class="badge-s badge-dim">5.8.0</span></td><td>Jan 2026</td><td>Family fix agent, CRM audit, evite, survey</td></tr>
                 <tr><td><span class="badge-s badge-dim">5.7.0</span></td><td>Jan 2026</td><td>Google Drive sync, bulk data mapper</td></tr>
                 <tr><td><span class="badge-s badge-dim">5.6.0</span></td><td>Jan 2026</td><td>RAG knowledge engine, sensitivity map</td></tr>
-                <tr><td><span class="badge-s badge-dim">5.5.0</span></td><td>Dec 2025</td><td>Full CRM â€” family ID, profiles, org roles</td></tr>
+                <tr><td><span class="badge-s badge-dim">5.5.0</span></td><td>Dec 2025</td><td>Full CRM — family ID, profiles, org roles</td></tr>
                 <tr><td><span class="badge-s badge-dim">5.4.0</span></td><td>Dec 2025</td><td>Agents, RAG, email, RBAC, dashboards</td></tr>
               </tbody>
             </table>
@@ -655,9 +655,9 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:'Segoe UI',syst
       </div>
     </div>
 
-    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+    <!-- ══════════════════════════════════════ -->
     <!-- SECTION: DATA MODEL                    -->
-    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+    <!-- ══════════════════════════════════════ -->
     <div class="section" id="sec-data">
       <div class="card-d">
         <h2><i class="fas fa-database"></i> Wix CMS Collections</h2>
@@ -674,9 +674,9 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:'Segoe UI',syst
       </div>
     </div>
 
-    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+    <!-- ══════════════════════════════════════ -->
     <!-- SECTION: SPRINTS                       -->
-    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+    <!-- ══════════════════════════════════════ -->
     <div class="section" id="sec-sprints">
       <div class="card-d">
         <h2><i class="fas fa-tasks"></i> Sprint Execution Roadmap (12 Weeks)</h2>
@@ -687,24 +687,24 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:'Segoe UI',syst
         <table class="t">
           <thead><tr><th>Epic</th><th>Title</th><th>Sprint</th><th>Stories</th><th>Points</th><th>Status</th></tr></thead>
           <tbody>
-            <tr><td><span class="badge-s badge-blue">EP-01</span></td><td>RBAC & Secrets Hardening</td><td>1â€“2</td><td>2</td><td>13</td><td><span class="badge-s badge-yellow">Planned</span></td></tr>
-            <tr><td><span class="badge-s badge-blue">EP-02</span></td><td>Data Governance Framework</td><td>1â€“2</td><td>2</td><td>13</td><td><span class="badge-s badge-yellow">Planned</span></td></tr>
-            <tr><td><span class="badge-s badge-blue">EP-03</span></td><td>Event-Driven Architecture</td><td>2â€“3</td><td>2</td><td>13</td><td><span class="badge-s badge-dim">Backlog</span></td></tr>
-            <tr><td><span class="badge-s badge-blue">EP-04</span></td><td>Agent Intelligence Upgrade</td><td>2â€“3</td><td>2</td><td>10</td><td><span class="badge-s badge-dim">Backlog</span></td></tr>
-            <tr><td><span class="badge-s badge-blue">EP-05</span></td><td>Wix Platform Modernization</td><td>3â€“4</td><td>2</td><td>10</td><td><span class="badge-s badge-dim">Backlog</span></td></tr>
-            <tr><td><span class="badge-s badge-blue">EP-06</span></td><td>Testing & Observability</td><td>3â€“4</td><td>2</td><td>10</td><td><span class="badge-s badge-dim">Backlog</span></td></tr>
-            <tr><td><span class="badge-s badge-blue">EP-07</span></td><td>Performance & Cost Optimization</td><td>4â€“5</td><td>2</td><td>8</td><td><span class="badge-s badge-dim">Backlog</span></td></tr>
-            <tr><td><span class="badge-s badge-blue">EP-08</span></td><td>UX Polish & Accessibility</td><td>4â€“5</td><td>1</td><td>5</td><td><span class="badge-s badge-dim">Backlog</span></td></tr>
-            <tr><td><span class="badge-s badge-blue">EP-09</span></td><td>Business Feature Completion</td><td>5â€“6</td><td>2</td><td>8</td><td><span class="badge-s badge-dim">Backlog</span></td></tr>
+            <tr><td><span class="badge-s badge-blue">EP-01</span></td><td>RBAC & Secrets Hardening</td><td>1–2</td><td>2</td><td>13</td><td><span class="badge-s badge-yellow">Planned</span></td></tr>
+            <tr><td><span class="badge-s badge-blue">EP-02</span></td><td>Data Governance Framework</td><td>1–2</td><td>2</td><td>13</td><td><span class="badge-s badge-yellow">Planned</span></td></tr>
+            <tr><td><span class="badge-s badge-blue">EP-03</span></td><td>Event-Driven Architecture</td><td>2–3</td><td>2</td><td>13</td><td><span class="badge-s badge-dim">Backlog</span></td></tr>
+            <tr><td><span class="badge-s badge-blue">EP-04</span></td><td>Agent Intelligence Upgrade</td><td>2–3</td><td>2</td><td>10</td><td><span class="badge-s badge-dim">Backlog</span></td></tr>
+            <tr><td><span class="badge-s badge-blue">EP-05</span></td><td>Wix Platform Modernization</td><td>3–4</td><td>2</td><td>10</td><td><span class="badge-s badge-dim">Backlog</span></td></tr>
+            <tr><td><span class="badge-s badge-blue">EP-06</span></td><td>Testing & Observability</td><td>3–4</td><td>2</td><td>10</td><td><span class="badge-s badge-dim">Backlog</span></td></tr>
+            <tr><td><span class="badge-s badge-blue">EP-07</span></td><td>Performance & Cost Optimization</td><td>4–5</td><td>2</td><td>8</td><td><span class="badge-s badge-dim">Backlog</span></td></tr>
+            <tr><td><span class="badge-s badge-blue">EP-08</span></td><td>UX Polish & Accessibility</td><td>4–5</td><td>1</td><td>5</td><td><span class="badge-s badge-dim">Backlog</span></td></tr>
+            <tr><td><span class="badge-s badge-blue">EP-09</span></td><td>Business Feature Completion</td><td>5–6</td><td>2</td><td>8</td><td><span class="badge-s badge-dim">Backlog</span></td></tr>
             <tr><td><span class="badge-s badge-blue">EP-10</span></td><td>Documentation & Runbooks</td><td>6</td><td>1</td><td>3</td><td><span class="badge-s badge-dim">Backlog</span></td></tr>
           </tbody>
         </table>
       </div>
     </div>
 
-    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+    <!-- ══════════════════════════════════════ -->
     <!-- SECTION: ROLE DASHBOARDS               -->
-    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+    <!-- ══════════════════════════════════════ -->
     <div class="section" id="sec-dashboards">
       <div class="card-d">
         <h2><i class="fas fa-th-large"></i> Role-Synchronized Dashboard Views</h2>
@@ -714,9 +714,9 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:'Segoe UI',syst
       </div>
     </div>
 
-    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+    <!-- ══════════════════════════════════════ -->
     <!-- SECTION: QUICK LINKS                   -->
-    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+    <!-- ══════════════════════════════════════ -->
     <div class="section" id="sec-links">
       <div class="card-d">
         <h2><i class="fas fa-external-link-alt"></i> Ecosystem Quick Links</h2>
@@ -724,15 +724,15 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:'Segoe UI',syst
       </div>
     </div>
 
-    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+    <!-- ══════════════════════════════════════ -->
     <!-- SECTION: OBSERVABILITY (OpenTelemetry) -->
-    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+    <!-- ══════════════════════════════════════ -->
     <div class="section" id="sec-observability">
       <div class="kpi-grid" id="otel-kpi-row"></div>
 
       <div class="card-d">
         <h2><i class="fas fa-wave-square" style="color:var(--cyan)"></i> OpenTelemetry Observability Layer</h2>
-        <p style="font-size:.82rem;color:var(--muted);margin-bottom:12px">Platform-wide logs, traces, and metrics â€” correlated by trace ID. Alerts fire proactively before users notice.</p>
+        <p style="font-size:.82rem;color:var(--muted);margin-bottom:12px">Platform-wide logs, traces, and metrics — correlated by trace ID. Alerts fire proactively before users notice.</p>
         <div class="otel-tabs" id="otel-tabs">
           <div class="otel-tab active" data-otel="logs"><i class="fas fa-file-alt me-1"></i>Logs</div>
           <div class="otel-tab" data-otel="traces"><i class="fas fa-project-diagram me-1"></i>Traces</div>
@@ -750,14 +750,14 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:'Segoe UI',syst
             <select id="log-svc-filter" style="background:var(--bg2);border:1px solid var(--line);color:var(--text);padding:4px 8px;border-radius:6px;font-size:.74rem">
               <option value="all">All Services</option><option value="http-router">http-router</option><option value="agent-orch">agent-orch</option><option value="wixData">wixData</option><option value="email-svc">email-svc</option><option value="rag-engine">rag-engine</option><option value="auth-rbac">auth-rbac</option><option value="evite-svc">evite-svc</option>
             </select>
-            <input type="text" id="log-search" placeholder="Search logsâ€¦" style="background:var(--bg2);border:1px solid var(--line);color:var(--text);padding:4px 10px;border-radius:6px;flex:1;font-size:.74rem;min-width:150px;outline:none">
+            <input type="text" id="log-search" placeholder="Search logs…" style="background:var(--bg2);border:1px solid var(--line);color:var(--text);padding:4px 10px;border-radius:6px;flex:1;font-size:.74rem;min-width:150px;outline:none">
           </div>
           <div style="background:var(--bg);border:1px solid var(--line);border-radius:8px;max-height:380px;overflow-y:auto;padding:4px" id="log-container"></div>
         </div>
 
         <!-- Traces Panel -->
         <div class="otel-panel" id="otel-traces">
-          <p style="font-size:.78rem;color:var(--muted);margin-bottom:10px">Distributed trace waterfall â€” shows how a request flows through BANF service layers.</p>
+          <p style="font-size:.78rem;color:var(--muted);margin-bottom:10px">Distributed trace waterfall — shows how a request flows through BANF service layers.</p>
           <div id="trace-container"></div>
         </div>
 
@@ -778,7 +778,7 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:'Segoe UI',syst
             </div>
           </div>
           <div class="card-d mt-3">
-            <h3 style="font-size:.84rem;color:var(--green)"><i class="fas fa-exchange-alt me-1"></i>Throughput â€” Requests / 5 min</h3>
+            <h3 style="font-size:.84rem;color:var(--green)"><i class="fas fa-exchange-alt me-1"></i>Throughput — Requests / 5 min</h3>
             <div id="throughput-bars"></div>
           </div>
         </div>
@@ -791,27 +791,27 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:'Segoe UI',syst
 
         <!-- Proactive Panel -->
         <div class="otel-panel" id="otel-proactive">
-          <p style="font-size:.78rem;color:var(--muted);margin-bottom:10px">AI-powered proactive analysis â€” ops-agent and mlo-agent detect patterns BEFORE failures occur.</p>
+          <p style="font-size:.78rem;color:var(--muted);margin-bottom:10px">AI-powered proactive analysis — ops-agent and mlo-agent detect patterns BEFORE failures occur.</p>
           <div id="proactive-items"></div>
         </div>
       </div>
     </div>
 
-    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+    <!-- ══════════════════════════════════════ -->
     <!-- SECTION: SYSTEM INTERNALS              -->
-    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+    <!-- ══════════════════════════════════════ -->
     <div class="section" id="sec-internals">
       <div class="card-d">
-        <h2><i class="fas fa-microscope" style="color:var(--lime)"></i> System Internals â€” What Runs Inside Each Section</h2>
+        <h2><i class="fas fa-microscope" style="color:var(--lime)"></i> System Internals — What Runs Inside Each Section</h2>
         <p style="font-size:.82rem;color:var(--muted);margin-bottom:12px">Explore the data flows, models, workflows, and internal logic powering every part of the BANF ecosystem.</p>
         <div class="int-tabs" id="int-tabs"></div>
         <div id="int-panels"></div>
       </div>
     </div>
 
-    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+    <!-- ══════════════════════════════════════ -->
     <!-- SECTION: EXPERT REVIEW ORCHESTRATION   -->
-    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+    <!-- ══════════════════════════════════════ -->
     <div class="section" id="sec-experts">
       <div class="card-d">
         <h2><i class="fas fa-users-gear" style="color:var(--pink)"></i> 9-Expert Agent Review Orchestration</h2>
@@ -841,9 +841,9 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:'Segoe UI',syst
       </div>
     </div>
 
-    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+    <!-- ══════════════════════════════════════ -->
     <!-- SECTION: REQUIREMENTS & DOCUMENTS       -->
-    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+    <!-- ══════════════════════════════════════ -->
     <div class="section" id="sec-requirements">
       <div class="kpi-grid" id="req-kpis"></div>
       <div class="card-d">
@@ -860,17 +860,11 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:'Segoe UI',syst
         <p style="font-size:.78rem;color:var(--muted);margin-bottom:10px">Tickets auto-generated from stakeholder acceptance notes and expert reviews flow here for development assignment.</p>
         <div id="jira-summary"></div>
       </div>
-      <div class="card-d">
-        <h2><i class="fas fa-chart-line" style="color:var(--accent)"></i> TK-046 Membership Drive Analytics</h2>
-        <p style="font-size:.78rem;color:var(--muted);margin-bottom:10px">Implements SN-008: invites sent, responses received, and conversion rate by membership tier.</p>
-        <div class="kpi-grid" id="drive-analytics-kpis" style="margin-bottom:10px"></div>
-        <div id="drive-analytics-table"></div>
-      </div>
     </div>
 
-    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+    <!-- ══════════════════════════════════════ -->
     <!-- SECTION: DEVELOPMENT STATUS TRACKER     -->
-    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+    <!-- ══════════════════════════════════════ -->
     <div class="section" id="sec-devstatus">
       <div class="kpi-grid" id="devstat-kpis"></div>
       <div class="card-d">
@@ -887,16 +881,16 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:'Segoe UI',syst
       </div>
     </div>
 
-    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+    <!-- ══════════════════════════════════════ -->
     <!-- SECTION: STAKEHOLDER ACCEPTANCE         -->
-    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+    <!-- ══════════════════════════════════════ -->
     <div class="section" id="sec-acceptance">
       <div class="card-d">
         <h2><i class="fas fa-clipboard-check" style="color:var(--yellow)"></i> Stakeholder Acceptance Portal</h2>
-        <p style="font-size:.82rem;color:var(--muted);margin-bottom:14px">Stakeholders, SMEs, and users can add acceptance notes per section, functionality, or workflow. Notes flow to Design â†’ Ticket creation â†’ Development.</p>
+        <p style="font-size:.82rem;color:var(--muted);margin-bottom:14px">Stakeholders, SMEs, and users can add acceptance notes per section, functionality, or workflow. Notes flow to Design → Ticket creation → Development.</p>
         <div class="note-form">
           <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
-            <select id="note-section" style="flex:1;min-width:140px"><option value="">Select Sectionâ€¦</option></select>
+            <select id="note-section" style="flex:1;min-width:140px"><option value="">Select Section…</option></select>
             <select id="note-type" style="min-width:130px"><option value="acceptance">Acceptance Note</option><option value="feedback">Feedback</option><option value="requirement">New Requirement</option><option value="bug">Bug Report</option><option value="enhancement">Enhancement</option></select>
             <select id="note-priority" style="min-width:100px"><option value="medium">Medium</option><option value="high">High</option><option value="critical">Critical</option><option value="low">Low</option></select>
           </div>
@@ -904,9 +898,9 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:'Segoe UI',syst
             <input type="text" id="note-author" placeholder="Your Name (e.g. Ranadhir Ghosh)" style="flex:1;min-width:180px">
             <input type="text" id="note-target" placeholder="Specific functionality (optional)" style="flex:1;min-width:180px">
           </div>
-          <textarea id="note-body" placeholder="Enter your acceptance note, feedback, or requirement hereâ€¦\n\nThis will flow to: Design Review â†’ Ticket Creation â†’ Development Sprint"></textarea>
+          <textarea id="note-body" placeholder="Enter your acceptance note, feedback, or requirement here…\n\nThis will flow to: Design Review → Ticket Creation → Development Sprint"></textarea>
           <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px">
-            <span style="font-size:.72rem;color:var(--dim)"><i class="fas fa-route me-1"></i>Flow: Note â†’ Expert Review â†’ Design â†’ Ticket â†’ Sprint Assignment</span>
+            <span style="font-size:.72rem;color:var(--dim)"><i class="fas fa-route me-1"></i>Flow: Note → Expert Review → Design → Ticket → Sprint Assignment</span>
             <button class="btn-submit" id="note-submit"><i class="fas fa-paper-plane me-1"></i>Submit Note</button>
           </div>
         </div>
@@ -921,9 +915,9 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:'Segoe UI',syst
       </div>
     </div>
 
-    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+    <!-- ══════════════════════════════════════ -->
     <!-- SECTION: DEVELOPMENT AGENT TEAM         -->
-    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+    <!-- ══════════════════════════════════════ -->
     <div class="section" id="sec-devteam">
       <div class="card-d">
         <h2><i class="fas fa-people-group" style="color:var(--teal)"></i> Development Agent Team</h2>
@@ -932,7 +926,7 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:'Segoe UI',syst
       </div>
       <div class="card-d">
         <h2><i class="fas fa-ticket" style="color:var(--blue)"></i> Active Development Tickets</h2>
-        <p style="font-size:.78rem;color:var(--muted);margin-bottom:10px">Stakeholder notes â†’ Design review â†’ Tickets auto-assigned to agents based on skill match. Tech Lead (Super Admin) approves all implementations.</p>
+        <p style="font-size:.78rem;color:var(--muted);margin-bottom:10px">Stakeholder notes → Design review → Tickets auto-assigned to agents based on skill match. Tech Lead (Super Admin) approves all implementations.</p>
         <div class="ticket-board" id="ticket-board"></div>
       </div>
       <div class="card-d">
@@ -963,14 +957,14 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:'Segoe UI',syst
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ═══════════════════════════════════════════════════════════════════
 //  DATA DEFINITIONS
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ═══════════════════════════════════════════════════════════════════
 
 const BASE = 'https://banfwix.wixsite.com/banf1/_functions';
 const ADMIN_KEY = 'banf-super-admin-2026';
 
-// â”€â”€ Lifecycle Agents â”€â”€
+// ── Lifecycle Agents ──
 const LIFECYCLE_AGENTS = [
   {id:'req-agent',name:'Requirements Agent',stage:'Requirements',color:'#3b82f6',icon:'fa-clipboard-list',
    caps:['intake_classify','priority_score','decompose_stories','detect_gaps','trace_link'],gate:'PO approves priority'},
@@ -988,25 +982,25 @@ const LIFECYCLE_AGENTS = [
    caps:['model_eval','prompt_version','rag_drift','guardrails','ab_test','token_budget'],gate:'ML engineer review'},
 ];
 
-// â”€â”€ Domain Agents â”€â”€
+// ── Domain Agents ──
 const DOMAIN_AGENTS = [
   {id:'events-agent',name:'Events Coordinator',stage:'CRM',color:'#ec4899',icon:'fa-calendar-alt',
-   caps:['event_info','registration','rsvp','payment_info'],gate:'â€”'},
+   caps:['event_info','registration','rsvp','payment_info'],gate:'—'},
   {id:'membership-agent',name:'Membership Services',stage:'CRM',color:'#8b5cf6',icon:'fa-id-card',
-   caps:['join_process','benefits_info','dues_info','renewal'],gate:'â€”'},
+   caps:['join_process','benefits_info','dues_info','renewal'],gate:'—'},
   {id:'payment-agent',name:'Treasurer / Payment',stage:'CRM',color:'#14b8a6',icon:'fa-wallet',
-   caps:['payment_methods','zelle_venmo','verification','receipts'],gate:'â€”'},
+   caps:['payment_methods','zelle_venmo','verification','receipts'],gate:'—'},
   {id:'complaint-agent',name:'Complaint Resolution',stage:'CRM',color:'#f43f5e',icon:'fa-exclamation-circle',
    caps:['intake','acknowledge','track','escalate'],gate:'EC review'},
   {id:'sponsorship-agent',name:'Sponsorship Coordinator',stage:'CRM',color:'#84cc16',icon:'fa-handshake',
-   caps:['tier_info','customization','invoicing','recognition'],gate:'â€”'},
+   caps:['tier_info','customization','invoicing','recognition'],gate:'—'},
   {id:'career-agent',name:'Career Services',stage:'CRM',color:'#0ea5e9',icon:'fa-briefcase',
-   caps:['resume_review','job_referrals','networking','sessions'],gate:'â€”'},
+   caps:['resume_review','job_referrals','networking','sessions'],gate:'—'},
   {id:'general-agent',name:'General Information',stage:'CRM',color:'#a3a3a3',icon:'fa-info-circle',
-   caps:['faq','routing','org_info','directing'],gate:'â€”'},
+   caps:['faq','routing','org_info','directing'],gate:'—'},
 ];
 
-// â”€â”€ Endpoint Groups â”€â”€
+// ── Endpoint Groups ──
 const EP_GROUPS = [
   {name:'Admin API',badge:'orange',eps:[
     {m:'GET',n:'admin_dashboard'},{m:'GET',n:'admin_members'},{m:'POST',n:'admin_member_update'},{m:'POST',n:'admin_member_deactivate'},
@@ -1109,7 +1103,7 @@ const EP_GROUPS = [
   ]},
 ];
 
-// â”€â”€ Existing Collections â”€â”€
+// ── Existing Collections ──
 const EXISTING_COLLECTIONS = [
   {name:'Members',fields:['email','firstName','lastName','familyId','role','status']},
   {name:'FamilyUnits',fields:['familyId','familyName','adults','children','primaryEmail']},
@@ -1151,12 +1145,12 @@ const NEW_COLLECTIONS = [
   {name:'PromptRegistry',desc:'Versioned LLM prompt management',fields:['promptId','agentId','version','systemPrompt','status','evalScore']},
 ];
 
-// â”€â”€ Role Dashboard Config â”€â”€
+// ── Role Dashboard Config ──
 const ROLES = {
   stakeholder:{name:'Stakeholder',icon:'fa-chart-pie',color:'#f97316',widgets:[
     {title:'Requirements Board',desc:'Prioritized backlog with agent-scored rankings',icon:'fa-list-check'},
-    {title:'Release Timeline',desc:'Gantt-style view: epics â†’ sprints â†’ deploy dates',icon:'fa-calendar-alt'},
-    {title:'KPI Scoreboard',desc:'Velocity, coverage, open risks â€” 15 min refresh',icon:'fa-tachometer-alt'},
+    {title:'Release Timeline',desc:'Gantt-style view: epics → sprints → deploy dates',icon:'fa-calendar-alt'},
+    {title:'KPI Scoreboard',desc:'Velocity, coverage, open risks — 15 min refresh',icon:'fa-tachometer-alt'},
     {title:'Feedback Inbox',desc:'User feedback auto-classified by req-agent',icon:'fa-comments'},
     {title:'Risk Register',desc:'Active risks with severity, owner, mitigation',icon:'fa-exclamation-triangle'},
     {title:'Notifications',desc:'Digest emails + in-dashboard gate approval alerts',icon:'fa-bell'},
@@ -1167,18 +1161,18 @@ const ROLES = {
     {title:'Code Quality Trends',desc:'Module-level quality scores tracked over time',icon:'fa-chart-bar'},
     {title:'Build Status',desc:'Real-time publish pipeline progress',icon:'fa-hammer'},
     {title:'My Items',desc:'Personal task list from WorkLedger',icon:'fa-tasks'},
-    {title:'Traceability',desc:'Full lifecycle: REQ â†’ DES â†’ TST â†’ DPL',icon:'fa-link'},
+    {title:'Traceability',desc:'Full lifecycle: REQ → DES → TST → DPL',icon:'fa-link'},
   ]},
   tester:{name:'Tester',icon:'fa-vial',color:'#eab308',widgets:[
     {title:'Test Run Results',desc:'Latest execution with pass/fail/skip',icon:'fa-play-circle'},
-    {title:'Coverage Matrix',desc:'Requirement â†’ Test â†’ Result traceability',icon:'fa-project-diagram'},
+    {title:'Coverage Matrix',desc:'Requirement → Test → Result traceability',icon:'fa-project-diagram'},
     {title:'Defect Board',desc:'Open defects auto-classified by severity',icon:'fa-bug'},
     {title:'Regression Trend',desc:'Historical pass rates with detection',icon:'fa-chart-line'},
     {title:'Flaky Test Watch',desc:'Non-deterministic tests flagged',icon:'fa-random'},
     {title:'Release Gate',desc:'Green/red gate status for readiness',icon:'fa-door-open'},
   ]},
   devops:{name:'DevOps',icon:'fa-server',color:'#ef4444',widgets:[
-    {title:'Pipeline Status',desc:'Live build â†’ test â†’ publish â†’ health',icon:'fa-stream'},
+    {title:'Pipeline Status',desc:'Live build → test → publish → health',icon:'fa-stream'},
     {title:'Endpoint Health',desc:'196-endpoint matrix with latency/errors',icon:'fa-server'},
     {title:'Deploy History',desc:'Version timeline with rollback paths',icon:'fa-history'},
     {title:'Incident Board',desc:'Active incidents with runbook progress',icon:'fa-fire-alt'},
@@ -1203,41 +1197,41 @@ const ROLES = {
   ]},
 };
 
-// â”€â”€ Sprint Data â”€â”€
+// ── Sprint Data ──
 const SPRINTS = [
-  {name:'Sprint 1 (Wk 1â€“2)',items:[
+  {name:'Sprint 1 (Wk 1–2)',items:[
     {id:'STY-01',title:'Rotate Secrets to Wix Secrets Manager',pts:5},
     {id:'STY-02',title:'Granular Collection Permissions',pts:8},
     {id:'STY-03',title:'Sensitivity-Based Access Controls',pts:5},
     {id:'STY-04',title:'Daily Encrypted Backup Job',pts:8},
   ]},
-  {name:'Sprint 2 (Wk 3â€“4)',items:[
+  {name:'Sprint 2 (Wk 3–4)',items:[
     {id:'STY-05',title:'Collection afterInsert Hooks',pts:5},
     {id:'STY-06',title:'Replace Polling with Event Bus',pts:8},
     {id:'STY-07',title:'HuggingFace Inference Endpoints',pts:5},
     {id:'STY-08',title:'Agent Self-Evaluation Loop',pts:5},
   ]},
-  {name:'Sprint 3 (Wk 5â€“6)',items:[
+  {name:'Sprint 3 (Wk 5–6)',items:[
     {id:'STY-09',title:'Velo CLI Automation Pipeline',pts:5},
     {id:'STY-10',title:'Multi-Revision Preview Slots',pts:5},
     {id:'STY-11',title:'Automated Regression Suite',pts:5},
     {id:'STY-12',title:'Unified Observability Pipeline',pts:5},
   ]},
-  {name:'Sprint 4 (Wk 7â€“8)',items:[
+  {name:'Sprint 4 (Wk 7–8)',items:[
     {id:'STY-13',title:'wixData Batch + Index Tuning',pts:5},
     {id:'STY-14',title:'LLM Token Cost Guard',pts:3},
     {id:'STY-15',title:'Responsive + Accessibility Audit',pts:5},
   ]},
-  {name:'Sprint 5 (Wk 9â€“10)',items:[
+  {name:'Sprint 5 (Wk 9–10)',items:[
     {id:'STY-16',title:'Multi-Language Support',pts:5},
     {id:'STY-17',title:'Predictive Analytics Dashboard',pts:3},
   ]},
-  {name:'Sprint 6 (Wk 11â€“12)',items:[
+  {name:'Sprint 6 (Wk 11–12)',items:[
     {id:'STY-18',title:'Operational Runbooks & ADRs',pts:3},
   ]},
 ];
 
-// â”€â”€ Quick Links â”€â”€
+// ── Quick Links ──
 const LINKS = [
   {title:'Live Site',desc:'banfwix.wixsite.com/banf1',url:'https://banfwix.wixsite.com/banf1',icon:'fa-globe',color:'var(--green)'},
   {title:'Health Check',desc:'API health endpoint',url:'https://banfwix.wixsite.com/banf1/_functions/health',icon:'fa-heartbeat',color:'var(--green)'},
@@ -1259,9 +1253,9 @@ const LINKS = [
   {title:'Super Admin Portal',desc:'Login, user management, drives',url:'https://banfwix.wixsite.com/banf1/_functions/admin_portal',icon:'fa-shield-alt',color:'var(--red)'},
 ];
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ═══════════════════════════════════════════════════════════════════
 //  RENDERING
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ═══════════════════════════════════════════════════════════════════
 
 function renderKPIs() {
   const el = document.getElementById('kpi-row');
@@ -1287,7 +1281,7 @@ function renderAgents(agents, containerId) {
         <div><div class="a-name">${a.name}</div><div class="a-stage">${a.stage} &bull; ${a.id}</div></div>
       </div>
       <div class="a-caps">${a.caps.map(c=>`<span class="a-cap">${c}</span>`).join('')}</div>
-      ${a.gate !== 'â€”' ? `<div class="a-gate"><i class="fas fa-lock me-1"></i>${a.gate}</div>` : ''}
+      ${a.gate !== '—' ? `<div class="a-gate"><i class="fas fa-lock me-1"></i>${a.gate}</div>` : ''}
     </div>
   `).join('');
 }
@@ -1391,9 +1385,9 @@ function renderLinks() {
   `).join('');
 }
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ═══════════════════════════════════════════════════════════════════
 //  LIVE DATA
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ═══════════════════════════════════════════════════════════════════
 
 async function fetchHealth() {
   const dot = document.getElementById('health-dot');
@@ -1404,7 +1398,7 @@ async function fetchHealth() {
   const gHB = document.getElementById('gate-health-badge');
 
   dot.className = 'status-dot loading';
-  txt.textContent = 'Checkingâ€¦';
+  txt.textContent = 'Checking…';
 
   try {
     const r = await fetch(BASE + '/health', {signal: AbortSignal.timeout(10000)});
@@ -1412,7 +1406,7 @@ async function fetchHealth() {
     if(d.status === 'healthy' || d.success) {
       dot.className = 'status-dot ok';
       txt.textContent = 'Healthy';
-      ver.textContent = d.version || 'â€”';
+      ver.textContent = d.version || '—';
       if(gH) { gH.textContent = 'HTTP 200'; gHB.innerHTML = '<span class="badge-s badge-green">PASS</span>'; }
     } else {
       dot.className = 'status-dot err';
@@ -1427,30 +1421,30 @@ async function fetchHealth() {
   ref.textContent = new Date().toLocaleTimeString();
 }
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ═══════════════════════════════════════════════════════════════════
 //  OBSERVABILITY DATA + RENDERING
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ═══════════════════════════════════════════════════════════════════
 
 const OTEL_LOGS = [
-  {ts:'14:32:01',level:'info',svc:'http-router',trace:'t-8a3f',msg:'GET /health â†’ 200 (12ms)'},
+  {ts:'14:32:01',level:'info',svc:'http-router',trace:'t-8a3f',msg:'GET /health → 200 (12ms)'},
   {ts:'14:32:02',level:'info',svc:'agent-orch',trace:'t-8a3f',msg:'Orchestrator routing: general-agent selected for member query'},
   {ts:'14:32:03',level:'debug',svc:'rag-engine',trace:'t-8a40',msg:'TF-IDF search: 25 chunks scored, top-3 selected (relevance=0.87)'},
-  {ts:'14:32:04',level:'info',svc:'wixData',trace:'t-8a41',msg:'Members.find() â†’ 342 records, 45ms'},
+  {ts:'14:32:04',level:'info',svc:'wixData',trace:'t-8a41',msg:'Members.find() → 342 records, 45ms'},
   {ts:'14:32:05',level:'warn',svc:'email-svc',trace:'t-8a42',msg:'Gmail API rate limit approaching: 80/100 quota used'},
-  {ts:'14:32:06',level:'error',svc:'http-router',trace:'t-8a43',msg:'POST /bulk_import_members â†’ 500: wixData timeout after 30s'},
+  {ts:'14:32:06',level:'error',svc:'http-router',trace:'t-8a43',msg:'POST /bulk_import_members → 500: wixData timeout after 30s'},
   {ts:'14:32:07',level:'info',svc:'auth-rbac',trace:'t-8a44',msg:'Role check: admin-member verified for /admin_dashboard'},
   {ts:'14:32:08',level:'info',svc:'evite-svc',trace:'t-8a45',msg:'Event "Bosonto Utsob 2026" created, 150 invites queued'},
   {ts:'14:32:09',level:'debug',svc:'agent-orch',trace:'t-8a46',msg:'HuggingFace inference: Llama-3.1-8B, 142 tokens, 380ms'},
-  {ts:'14:32:10',level:'info',svc:'http-router',trace:'t-8a47',msg:'GET /crm_dashboard â†’ 200 (89ms)'},
+  {ts:'14:32:10',level:'info',svc:'http-router',trace:'t-8a47',msg:'GET /crm_dashboard → 200 (89ms)'},
   {ts:'14:32:11',level:'warn',svc:'rag-engine',trace:'t-8a48',msg:'Knowledge chunk "bylaws-2024" stale: last updated 45 days ago'},
-  {ts:'14:32:12',level:'info',svc:'wixData',trace:'t-8a49',msg:'Events.find() â†’ 28 records, 22ms'},
-  {ts:'14:32:13',level:'error',svc:'email-svc',trace:'t-8a50',msg:'Gmail OAuth token expired â€” refresh failed, manual re-auth needed'},
-  {ts:'14:32:14',level:'info',svc:'http-router',trace:'t-8a51',msg:'GET /survey_list â†’ 200 (34ms)'},
-  {ts:'14:32:15',level:'info',svc:'agent-orch',trace:'t-8a52',msg:'complaint-agent escalation: P1 complaint â†’ EC review queue'},
+  {ts:'14:32:12',level:'info',svc:'wixData',trace:'t-8a49',msg:'Events.find() → 28 records, 22ms'},
+  {ts:'14:32:13',level:'error',svc:'email-svc',trace:'t-8a50',msg:'Gmail OAuth token expired — refresh failed, manual re-auth needed'},
+  {ts:'14:32:14',level:'info',svc:'http-router',trace:'t-8a51',msg:'GET /survey_list → 200 (34ms)'},
+  {ts:'14:32:15',level:'info',svc:'agent-orch',trace:'t-8a52',msg:'complaint-agent escalation: P1 complaint → EC review queue'},
   {ts:'14:32:16',level:'debug',svc:'auth-rbac',trace:'t-8a53',msg:'Permission matrix: 40 rules evaluated, 0 violations'},
-  {ts:'14:32:17',level:'info',svc:'http-router',trace:'t-8a54',msg:'POST /zelle_scan â†’ 200 (156ms), 8 new payments matched'},
+  {ts:'14:32:17',level:'info',svc:'http-router',trace:'t-8a54',msg:'POST /zelle_scan → 200 (156ms), 8 new payments matched'},
   {ts:'14:32:18',level:'warn',svc:'wixData',trace:'t-8a55',msg:'Collection "Members" approaching 10K row soft limit (9,247 rows)'},
-  {ts:'14:32:19',level:'info',svc:'http-router',trace:'t-8a56',msg:'GET /ec_year_status â†’ 200 (18ms)'},
+  {ts:'14:32:19',level:'info',svc:'http-router',trace:'t-8a56',msg:'GET /ec_year_status → 200 (18ms)'},
   {ts:'14:32:20',level:'info',svc:'evite-svc',trace:'t-8a57',msg:'RSVP batch processed: 12 confirmations, 3 declines'},
 ];
 
@@ -1504,16 +1498,16 @@ const OTEL_METRICS = {
 };
 
 const OTEL_ALERTS = [
-  {sev:'critical',name:'API Response Time > 2s',cond:'p95_latency > 2000ms',channel:'ops-agent â†’ PagerDuty',status:'ok',statusColor:'green'},
-  {sev:'critical',name:'Error Rate > 5%',cond:'error_rate > 5.0% (5min)',channel:'ops-agent â†’ Slack #incidents',status:'ok',statusColor:'green'},
-  {sev:'critical',name:'Health Endpoint Down',cond:'/health != 200 (2 checks)',channel:'ops-agent â†’ auto-restart',status:'ok',statusColor:'green'},
-  {sev:'warning',name:'Gmail Quota > 80%',cond:'gmail_quota_used > 80%',channel:'email-svc â†’ ops-agent',status:'firing',statusColor:'yellow'},
-  {sev:'warning',name:'DB Row Limit Approaching',cond:'collection.rows > 9000',channel:'wixData â†’ ops-agent',status:'firing',statusColor:'yellow'},
-  {sev:'warning',name:'RAG Chunk Staleness > 30d',cond:'chunk.lastUpdated > 30d',channel:'mlo-agent â†’ notification',status:'firing',statusColor:'yellow'},
-  {sev:'warning',name:'LLM Token Budget > 90%',cond:'daily_tokens > 90% budget',channel:'mlo-agent â†’ throttle',status:'ok',statusColor:'green'},
-  {sev:'info',name:'Deploy Success',cond:'deploy.status == success',channel:'dpl-agent â†’ Slack #releases',status:'ok',statusColor:'green'},
-  {sev:'info',name:'New P1 Complaint',cond:'complaint.priority == P1',channel:'complaint-agent â†’ EC queue',status:'ok',statusColor:'green'},
-  {sev:'info',name:'Test Suite Complete',cond:'test_run.finished == true',channel:'tst-agent â†’ dashboard',status:'ok',statusColor:'green'},
+  {sev:'critical',name:'API Response Time > 2s',cond:'p95_latency > 2000ms',channel:'ops-agent → PagerDuty',status:'ok',statusColor:'green'},
+  {sev:'critical',name:'Error Rate > 5%',cond:'error_rate > 5.0% (5min)',channel:'ops-agent → Slack #incidents',status:'ok',statusColor:'green'},
+  {sev:'critical',name:'Health Endpoint Down',cond:'/health != 200 (2 checks)',channel:'ops-agent → auto-restart',status:'ok',statusColor:'green'},
+  {sev:'warning',name:'Gmail Quota > 80%',cond:'gmail_quota_used > 80%',channel:'email-svc → ops-agent',status:'firing',statusColor:'yellow'},
+  {sev:'warning',name:'DB Row Limit Approaching',cond:'collection.rows > 9000',channel:'wixData → ops-agent',status:'firing',statusColor:'yellow'},
+  {sev:'warning',name:'RAG Chunk Staleness > 30d',cond:'chunk.lastUpdated > 30d',channel:'mlo-agent → notification',status:'firing',statusColor:'yellow'},
+  {sev:'warning',name:'LLM Token Budget > 90%',cond:'daily_tokens > 90% budget',channel:'mlo-agent → throttle',status:'ok',statusColor:'green'},
+  {sev:'info',name:'Deploy Success',cond:'deploy.status == success',channel:'dpl-agent → Slack #releases',status:'ok',statusColor:'green'},
+  {sev:'info',name:'New P1 Complaint',cond:'complaint.priority == P1',channel:'complaint-agent → EC queue',status:'ok',statusColor:'green'},
+  {sev:'info',name:'Test Suite Complete',cond:'test_run.finished == true',channel:'tst-agent → dashboard',status:'ok',statusColor:'green'},
 ];
 
 const PROACTIVE_ITEMS = [
@@ -1522,64 +1516,64 @@ const PROACTIVE_ITEMS = [
   {icon:'fa-brain',color:'var(--cyan)',title:'RAG knowledge drift detected',desc:'3 knowledge chunks (bylaws-2024, membership-rules, ec-procedures) haven\'t been updated in 30+ days. Referenced in 34% of agent responses. Recommendation: schedule content refresh with SME review.',action:'Refresh Docs',priority:'Low'},
   {icon:'fa-clock',color:'var(--red)',title:'Google Drive sync latency spike pattern',desc:'p95 latency for gdrive_* endpoints increases 3x during 10-11 AM (concurrent user peak). Recommendation: pre-cache frequently accessed files or shift sync to off-peak.',action:'Pre-cache',priority:'High'},
   {icon:'fa-shield-alt',color:'var(--purple)',title:'OAuth token refresh failure pattern',desc:'Gmail OAuth refresh has failed 3 times in past 7 days. Token age: 89 days. Recommendation: proactively rotate credentials before next failure window.',action:'Rotate Token',priority:'High'},
-  {icon:'fa-chart-line',color:'var(--green)',title:'Browser test pass rate trending up',desc:'Browser agent tests improved from 42% â†’ 57% over last 3 runs. 8 previously flaky tests now stable. At current rate, 70% gate threshold achievable in ~2 sprints.',action:'Track Trend',priority:'Info'},
+  {icon:'fa-chart-line',color:'var(--green)',title:'Browser test pass rate trending up',desc:'Browser agent tests improved from 42% → 57% over last 3 runs. 8 previously flaky tests now stable. At current rate, 70% gate threshold achievable in ~2 sprints.',action:'Track Trend',priority:'Info'},
 ];
 
-// â”€â”€ System Internals Data â”€â”€
+// ── System Internals Data ──
 const INTERNALS_DATA = [
   {key:'overview',label:'Overview',icon:'fa-home',
    desc:'The Overview section aggregates KPIs from all backend modules via real-time API calls and wixData queries.',
    flow:[{t:'API Health',c:'input'},{t:'wixData Queries',c:'process'},{t:'KPI Aggregation',c:'process'},{t:'Dashboard Render',c:'output'}],
    models:['Members (342 rows)','Events (28 rows)','Payments (156 rows)','SiteStats (12 keys)'],
-   workflow:'User loads dashboard â†’ fetchHealth() pings /health â†’ parallel wixData.find() for Members, Events, Payments, Sponsors â†’ aggregate counts â†’ render KPI cards + test summary bars.'},
+   workflow:'User loads dashboard → fetchHealth() pings /health → parallel wixData.find() for Members, Events, Payments, Sponsors → aggregate counts → render KPI cards + test summary bars.'},
   {key:'pipeline',label:'Pipeline',icon:'fa-stream',
    desc:'The Pipeline section shows the 7-stage agentic lifecycle with event bus connections and human gate controls.',
    flow:[{t:'Work Item',c:'input'},{t:'Stage Router',c:'agent'},{t:'Event Bus',c:'process'},{t:'Human Gate',c:'process'},{t:'Next Stage',c:'output'}],
    models:['WorkLedger (workItemId, type, status, priority, ownerAgent, currentStage)','AgentEventLog (eventType, sourceAgent, targetAgent, payload)'],
-   workflow:'WorkLedger item created â†’ req-agent classifies â†’ event posted to AgentEventLog â†’ des-agent picks up â†’ human gate (Architect) approves â†’ dev-agent scaffolds â†’ cycle repeats through tst/dpl/ops/mlo.'},
+   workflow:'WorkLedger item created → req-agent classifies → event posted to AgentEventLog → des-agent picks up → human gate (Architect) approves → dev-agent scaffolds → cycle repeats through tst/dpl/ops/mlo.'},
   {key:'agents',label:'Agent Mesh',icon:'fa-robot',
    desc:'14 agents (7 lifecycle + 7 domain) connected via event bus. Orchestrator meta-agent routes, arbitrates, and escalates.',
    flow:[{t:'User Request',c:'input'},{t:'Orchestrator',c:'agent'},{t:'Domain Agent',c:'agent'},{t:'RAG Search',c:'process'},{t:'LLM Inference',c:'process'},{t:'Response',c:'output'}],
    models:['AgentProfiles (agentId, name, systemPrompt, config)','AgentMetrics (agentId, metricType, value)','PromptRegistry (promptId, version, evalScore)'],
-   workflow:'Inbound request â†’ orchestrator.route() selects agent by keyword matching â†’ agent.process() queries RAG for context â†’ HuggingFace inference (Llama-3.1-8B, Mistral-7B fallback) â†’ response formatted â†’ logged to AgentEventLog.'},
+   workflow:'Inbound request → orchestrator.route() selects agent by keyword matching → agent.process() queries RAG for context → HuggingFace inference (Llama-3.1-8B, Mistral-7B fallback) → response formatted → logged to AgentEventLog.'},
   {key:'endpoints',label:'API Explorer',icon:'fa-plug',
    desc:'196 HTTP endpoints routed through a single http-functions.js dispatcher (6,705 LOC). RBAC enforced per route.',
    flow:[{t:'HTTP Request',c:'input'},{t:'Router',c:'process'},{t:'Auth Check',c:'process'},{t:'Handler',c:'process'},{t:'wixData',c:'store'},{t:'Response',c:'output'}],
    models:['AdminRoles (memberId, role, permissions)','AdminActivityLog (actor, action, target, timestamp)'],
-   workflow:'Client sends GET/POST â†’ http-functions.js parses path â†’ auth-rbac checks permissions against AdminRoles â†’ correct handler invoked â†’ wixData CRUD â†’ JSON response with appropriate status code.'},
+   workflow:'Client sends GET/POST → http-functions.js parses path → auth-rbac checks permissions against AdminRoles → correct handler invoked → wixData CRUD → JSON response with appropriate status code.'},
   {key:'testing',label:'Testing',icon:'fa-vial',
    desc:'3 test suites (270 tests total) validate API endpoints, browser flows, and integration scenarios.',
    flow:[{t:'Test Plan',c:'input'},{t:'Test Runner',c:'process'},{t:'API Calls',c:'process'},{t:'Assert',c:'process'},{t:'Report',c:'output'}],
    models:['TestRunLedger (runId, testPlanId, results, coverageScore, gateReady)'],
-   workflow:'tst-agent generates test plan from WorkLedger stories â†’ Node.js runner executes HTTP calls (comprehensive + HTTP suites) â†’ Playwright runs browser flows â†’ results compared against gates â†’ report generated â†’ gate status updated.'},
+   workflow:'tst-agent generates test plan from WorkLedger stories → Node.js runner executes HTTP calls (comprehensive + HTTP suites) → Playwright runs browser flows → results compared against gates → report generated → gate status updated.'},
   {key:'deployment',label:'Deployment',icon:'fa-rocket',
-   desc:'6-phase automated deployment via wix-agent: Setup â†’ Dev â†’ Collections â†’ Test â†’ Publish â†’ Monitor.',
+   desc:'6-phase automated deployment via wix-agent: Setup → Dev → Collections → Test → Publish → Monitor.',
    flow:[{t:'Git Commit',c:'input'},{t:'wix-agent Setup',c:'process'},{t:'Validate',c:'process'},{t:'Publish',c:'process'},{t:'Health Check',c:'process'},{t:'Tag Release',c:'output'}],
    models:['DeploymentLedger (deployId, version, status, healthCheckResult, rollbackPath, changelog)'],
-   workflow:'Developer pushes code â†’ wix-agent runs pre-checks (git status, node version) â†’ wix dev validates â†’ collection schemas synced â†’ test suite runs â†’ npx @wix/cli publish â†’ /health polled â†’ git tag created â†’ DeploymentLedger entry written.'},
+   workflow:'Developer pushes code → wix-agent runs pre-checks (git status, node version) → wix dev validates → collection schemas synced → test suite runs → npx @wix/cli publish → /health polled → git tag created → DeploymentLedger entry written.'},
   {key:'data',label:'Data Model',icon:'fa-database',
    desc:'40+ Wix CMS collections with wixData CRUD. 6 new platform collections for agent telemetry and lifecycle tracking.',
    flow:[{t:'API Handler',c:'input'},{t:'wixData Query',c:'process'},{t:'CMS Store',c:'store'},{t:'Index Lookup',c:'process'},{t:'Result Set',c:'output'}],
    models:['29 Existing Collections','6 New Collections (WorkLedger, AgentEventLog, AgentMetrics, DeploymentLedger, TestRunLedger, PromptRegistry)'],
-   workflow:'Handler calls wixData.query("Members").eq("familyId", id).find() â†’ Wix CMS processes query with indexes â†’ results returned as JSON array â†’ handler transforms/filters â†’ response sent to client.'},
+   workflow:'Handler calls wixData.query("Members").eq("familyId", id).find() → Wix CMS processes query with indexes → results returned as JSON array → handler transforms/filters → response sent to client.'},
   {key:'sprints',label:'Sprints',icon:'fa-tasks',
    desc:'12-week execution roadmap: 10 epics, 18 stories, 6 sprints. Tracked in WorkLedger with agent-scored priority.',
    flow:[{t:'Epic/Story',c:'input'},{t:'Sprint Assign',c:'process'},{t:'Dev Cycle',c:'process'},{t:'Review',c:'process'},{t:'Deploy',c:'output'}],
    models:['WorkLedger entries for each story (STY-01 through STY-18)'],
-   workflow:'PM creates epic â†’ req-agent decomposes into stories with acceptance criteria â†’ stories assigned to sprints based on dependency graph â†’ dev-agent + tst-agent execute â†’ dpl-agent publishes sprint increment.'},
+   workflow:'PM creates epic → req-agent decomposes into stories with acceptance criteria → stories assigned to sprints based on dependency graph → dev-agent + tst-agent execute → dpl-agent publishes sprint increment.'},
   {key:'dashboards',label:'Role Views',icon:'fa-th-large',
    desc:'6 role-based dashboard views (Stakeholder, Developer, Tester, DevOps, MLOps, Security) with filtered widgets.',
    flow:[{t:'User Login',c:'input'},{t:'Role Check',c:'process'},{t:'Widget Filter',c:'process'},{t:'Event Bus',c:'process'},{t:'Dashboard',c:'output'}],
    models:['AdminRoles (role-based visibility)','AgentEventLog (event-filtered widgets)'],
-   workflow:'User authenticates â†’ AdminRoles queried for role â†’ dashboard widgets filtered to role-relevant set â†’ AgentEventLog events streamed to matching widgets â†’ real-time updates via 5-min polling.'},
+   workflow:'User authenticates → AdminRoles queried for role → dashboard widgets filtered to role-relevant set → AgentEventLog events streamed to matching widgets → real-time updates via 5-min polling.'},
   {key:'links',label:'Quick Links',icon:'fa-external-link-alt',
-    desc:'17 ecosystem quick links connecting to live site, reports, architecture docs, and management tools.',
+  desc:'17 ecosystem quick links connecting to live site, reports, architecture docs, and management tools.',
    flow:[{t:'Link Registry',c:'input'},{t:'Render Grid',c:'output'}],
    models:['Static LINKS array in dashboard JS'],
-   workflow:'Dashboard loads â†’ LINKS array iterated â†’ cards rendered with icons, descriptions, and target URLs â†’ onClick opens in new tab.'},
+   workflow:'Dashboard loads → LINKS array iterated → cards rendered with icons, descriptions, and target URLs → onClick opens in new tab.'},
 ];
 
-// â”€â”€ Expert Review Data â”€â”€
+// ── Expert Review Data ──
 const EXPERT_AGENTS = [
   {id:'biz-sme',name:'Business / SME Expert',role:'Domain requirements, process validation, stakeholder alignment',icon:'fa-briefcase',color:'#f97316',
    reviewed:10,comments:23,addressed:18,pending:3,deferred:2},
@@ -1667,7 +1661,7 @@ const SECTION_FLOWS = {
     {name:'Plan',status:'done',est:'4h',note:'10 epics, 18 stories'},
     {name:'Biz Review',status:'done',est:'2h',note:'Priority ranked'},
     {name:'Tech Review',status:'done',est:'2h',note:'Dependencies mapped'},
-    {name:'Implement',status:'active',est:'â€”',note:'Sprint 1 in progress'},
+    {name:'Implement',status:'active',est:'—',note:'Sprint 1 in progress'},
     {name:'Track',status:'pending',est:'ongoing',note:'Velocity tracking'},
   ]},
   dashboards:{stages:[
@@ -1689,30 +1683,30 @@ const SECTION_FLOWS = {
 // Expert Audit Trail
 const AUDIT_TRAIL = [
   {expert:'Biz/SME',section:'Overview',comment:'KPIs should include member retention rate as a top-level metric',status:'addressed',ts:'Feb 20',response:'Added retention tracking to AgentMetrics; visible when collection data populates.'},
-  {expert:'UX/UI',section:'Overview',comment:'KPI grid should be responsive â€” 2 columns on mobile would be more readable',status:'addressed',ts:'Feb 20',response:'CSS updated: @media(max-width:768px) sets grid-template-columns:repeat(2,1fr).'},
-  {expert:'Full-Stack',section:'Pipeline',comment:'Event bus should use afterInsert hooks instead of polling for lower latency',status:'addressed',ts:'Feb 21',response:'STY-06 created: Replace Polling with Event Bus â€” scheduled Sprint 2.'},
+  {expert:'UX/UI',section:'Overview',comment:'KPI grid should be responsive — 2 columns on mobile would be more readable',status:'addressed',ts:'Feb 20',response:'CSS updated: @media(max-width:768px) sets grid-template-columns:repeat(2,1fr).'},
+  {expert:'Full-Stack',section:'Pipeline',comment:'Event bus should use afterInsert hooks instead of polling for lower latency',status:'addressed',ts:'Feb 21',response:'STY-06 created: Replace Polling with Event Bus — scheduled Sprint 2.'},
   {expert:'Data Model',section:'Data Model',comment:'WorkLedger needs composite index on (currentStage + priority) for sprint board queries',status:'in-progress',ts:'Feb 22',response:'Index design reviewed; implementation blocked until collection creation in Sprint 1.'},
   {expert:'Data Sci',section:'Agents',comment:'Agent eval should use BLEU + semantic similarity, not just keyword match',status:'addressed',ts:'Feb 21',response:'Agent self-evaluation loop (STY-08) will implement multi-metric eval in Sprint 2.'},
   {expert:'Data Eng',section:'Data Model',comment:'Bulk import should use batch inserts (50 per call) to avoid wixData timeouts',status:'addressed',ts:'Feb 20',response:'bulk_import_members updated to process in batches of 50 with retry logic.'},
-  {expert:'AI Gov',section:'Agents',comment:'LLM responses need moderation filter before returning to user â€” bias & toxicity check',status:'addressed',ts:'Feb 21',response:'Guardrail module added to agent-orchestrator.js â€” checks output against safety rules.'},
-  {expert:'Data Sec',section:'Endpoints',comment:'Admin API key should be rotated monthly, not hardcoded in http-functions.js',status:'in-progress',ts:'Feb 22',response:'STY-01 (Rotate Secrets to Wix Secrets Manager) in Sprint 1 â€” highest priority.'},
-  {expert:'Net Sec',section:'Endpoints',comment:'No rate limiting on public POST endpoints â€” vulnerable to abuse',status:'pending',ts:'Feb 23',response:'Rate limiting design under review. Will use in-memory counter with 1-min window.'},
-  {expert:'Full-Stack',section:'Deployment',comment:'Rollback path should be automated â€” currently requires manual git checkout',status:'addressed',ts:'Feb 21',response:'wix-agent phase 6 now includes automated rollback on health check failure.'},
+  {expert:'AI Gov',section:'Agents',comment:'LLM responses need moderation filter before returning to user — bias & toxicity check',status:'addressed',ts:'Feb 21',response:'Guardrail module added to agent-orchestrator.js — checks output against safety rules.'},
+  {expert:'Data Sec',section:'Endpoints',comment:'Admin API key should be rotated monthly, not hardcoded in http-functions.js',status:'in-progress',ts:'Feb 22',response:'STY-01 (Rotate Secrets to Wix Secrets Manager) in Sprint 1 — highest priority.'},
+  {expert:'Net Sec',section:'Endpoints',comment:'No rate limiting on public POST endpoints — vulnerable to abuse',status:'pending',ts:'Feb 23',response:'Rate limiting design under review. Will use in-memory counter with 1-min window.'},
+  {expert:'Full-Stack',section:'Deployment',comment:'Rollback path should be automated — currently requires manual git checkout',status:'addressed',ts:'Feb 21',response:'wix-agent phase 6 now includes automated rollback on health check failure.'},
   {expert:'UX/UI',section:'Dashboards',comment:'Role switching should animate transitions for better perceived performance',status:'deferred',ts:'Feb 22',response:'Deferred to Sprint 4 (EP-08 UX Polish). Current instant switch is functional.'},
   {expert:'Biz/SME',section:'Sprints',comment:'Sprint 1 velocity assumption (26pt / 2wk) may be aggressive for initial sprint',status:'addressed',ts:'Feb 21',response:'Buffer added: Sprint 1 reduced to 4 stories (26pt) with explicit risk mitigation items.'},
-  {expert:'Data Sec',section:'Pipeline',comment:'Agent-to-agent communication needs encryption â€” currently plain JSON in AgentEventLog',status:'pending',ts:'Feb 23',response:'Under evaluation: field-level encryption vs transport-level. Decision pending security review.'},
+  {expert:'Data Sec',section:'Pipeline',comment:'Agent-to-agent communication needs encryption — currently plain JSON in AgentEventLog',status:'pending',ts:'Feb 23',response:'Under evaluation: field-level encryption vs transport-level. Decision pending security review.'},
   {expert:'AI Gov',section:'Testing',comment:'Test suite should include adversarial prompts to validate guardrail effectiveness',status:'in-progress',ts:'Feb 23',response:'Adversarial test set being compiled. 15 prompt injection patterns identified for testing.'},
-  {expert:'Data Eng',section:'Observability',comment:'Log retention policy needed â€” unbounded logs will fill collection storage',status:'pending',ts:'Feb 23',response:'Retention policy design started: 7-day hot, 30-day warm, archive to Google Drive.'},
-  {expert:'Full-Stack',section:'Agents',comment:'HuggingFace fallback chain should have circuit breaker to avoid cascading timeouts',status:'addressed',ts:'Feb 22',response:'Circuit breaker pattern added: 3 failures in 5 min â†’ skip model for 10 min cooldown.'},
+  {expert:'Data Eng',section:'Observability',comment:'Log retention policy needed — unbounded logs will fill collection storage',status:'pending',ts:'Feb 23',response:'Retention policy design started: 7-day hot, 30-day warm, archive to Google Drive.'},
+  {expert:'Full-Stack',section:'Agents',comment:'HuggingFace fallback chain should have circuit breaker to avoid cascading timeouts',status:'addressed',ts:'Feb 22',response:'Circuit breaker pattern added: 3 failures in 5 min → skip model for 10 min cooldown.'},
   {expert:'Net Sec',section:'Deployment',comment:'Wix CLI publish credentials should use short-lived tokens, not persistent auth',status:'deferred',ts:'Feb 23',response:'Deferred: Wix CLI uses their own auth flow. Documented as accepted risk with compensating controls.'},
   {expert:'Data Model',section:'Sprints',comment:'Sprint tracking should link to WorkLedger entries for real-time status sync',status:'in-progress',ts:'Feb 23',response:'WorkLedger collection creation planned for Sprint 1. Dashboard will auto-sync once live.'},
   {expert:'UX/UI',section:'Endpoints',comment:'API Explorer needs copy-to-clipboard for endpoint URLs',status:'pending',ts:'Feb 23',response:'Low-effort enhancement. Will add in next dashboard iteration.'},
   {expert:'Biz/SME',section:'Testing',comment:'Browser test failures should be categorized by business impact, not just pass/fail',status:'addressed',ts:'Feb 22',response:'Test results now include severity classification: P0 (blocker), P1 (high), P2 (medium).'},
 ];
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ═══════════════════════════════════════════════════════════════════
 //  OBSERVABILITY RENDERING
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ═══════════════════════════════════════════════════════════════════
 
 function renderOtelKPIs() {
   const el = document.getElementById('otel-kpi-row');
@@ -1835,9 +1829,9 @@ function renderObservability() {
   });
 }
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ═══════════════════════════════════════════════════════════════════
 //  SYSTEM INTERNALS RENDERING
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ═══════════════════════════════════════════════════════════════════
 
 function renderInternals() {
   const tabsEl = document.getElementById('int-tabs');
@@ -1877,9 +1871,9 @@ function renderInternals() {
   });
 }
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ═══════════════════════════════════════════════════════════════════
 //  EXPERT REVIEW RENDERING
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ═══════════════════════════════════════════════════════════════════
 
 function renderExperts() {
   // Expert cards
@@ -1959,7 +1953,7 @@ function renderAuditTrail() {
       return `<div class="audit-entry">
         <span class="audit-expert" style="color:var(--${a.status==='addressed'?'green':a.status==='in-progress'?'yellow':'red'})">${a.expert}</span>
         <span class="badge-s badge-blue" style="flex-shrink:0;margin-right:4px">${a.section}</span>
-        <span class="audit-comment">${a.comment}<br><em style="color:var(--${sc});font-size:.7rem">â†’ ${a.response}</em></span>
+        <span class="audit-comment">${a.comment}<br><em style="color:var(--${sc});font-size:.7rem">→ ${a.response}</em></span>
         <span class="badge-s badge-${sc} audit-status">${a.status.toUpperCase()}</span>
         <span class="audit-ts">${a.ts}</span>
       </div>`;
@@ -1979,24 +1973,24 @@ function renderAuditTrail() {
   fStatus.addEventListener('change', filter);
 }
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ═══════════════════════════════════════════════════════════════════
 //  REQUIREMENTS, DEV STATUS, ACCEPTANCE, DEV TEAM DATA + RENDERING
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ═══════════════════════════════════════════════════════════════════
 
 const REQ_DOCS = [
   {title:'System Architecture',desc:'Full platform architecture with module dependencies',url:'BANF_SYSTEM_ARCHITECTURE.html',icon:'fa-sitemap',color:'var(--indigo)',type:'Architecture',date:'Feb 2026'},
   {title:'Agentic Platform Spec',desc:'Agent mesh lifecycle, orchestration, LLM config',url:'BANF_AGENTIC_PLATFORM.html',icon:'fa-atom',color:'var(--accent)',type:'Specification',date:'Feb 2026'},
-  {title:'Execution Backlog',desc:'10 epics, 18 stories, 6 sprints â€” ready for execution',url:'BANF_EXECUTION_BACKLOG_PLAN.html',icon:'fa-tasks',color:'var(--yellow)',type:'Backlog',date:'Feb 2026'},
+  {title:'Execution Backlog',desc:'10 epics, 18 stories, 6 sprints — ready for execution',url:'BANF_EXECUTION_BACKLOG_PLAN.html',icon:'fa-tasks',color:'var(--yellow)',type:'Backlog',date:'Feb 2026'},
   {title:'Multi-Agent Critique Report',desc:'5-agent review with findings and recommendations',url:'BANF_MULTI_AGENT_CRITIQUE_REPORT.html',icon:'fa-magnifying-glass',color:'var(--pink)',type:'Review',date:'Feb 2026'},
-  {title:'Complete Guide',desc:'Full operational and development guide',url:'ðŸ“š_COMPLETE_GUIDE.md',icon:'fa-book',color:'var(--green)',type:'Guide',date:'Feb 2026'},
-  {title:'Quick Start',desc:'Developer quick start â€” setup, run, deploy',url:'â±ï¸_QUICK_START.md',icon:'fa-bolt',color:'var(--yellow)',type:'Guide',date:'Feb 2026'},
-  {title:'CRM v5.5.0 Guide',desc:'Family-based CRM â€” members, families, org roles',url:'BANF_v5.5.0_CRM_GUIDE.md',icon:'fa-users',color:'var(--purple)',type:'Feature Guide',date:'Dec 2025'},
+  {title:'Complete Guide',desc:'Full operational and development guide',url:'📚_COMPLETE_GUIDE.md',icon:'fa-book',color:'var(--green)',type:'Guide',date:'Feb 2026'},
+  {title:'Quick Start',desc:'Developer quick start — setup, run, deploy',url:'⏱️_QUICK_START.md',icon:'fa-bolt',color:'var(--yellow)',type:'Guide',date:'Feb 2026'},
+  {title:'CRM v5.5.0 Guide',desc:'Family-based CRM — members, families, org roles',url:'BANF_v5.5.0_CRM_GUIDE.md',icon:'fa-users',color:'var(--purple)',type:'Feature Guide',date:'Dec 2025'},
   {title:'Collections Setup Guide',desc:'Wix CMS collection schemas and setup',url:'COLLECTIONS_SETUP_GUIDE.md',icon:'fa-database',color:'var(--cyan)',type:'Setup',date:'Feb 2026'},
   {title:'Email Configuration',desc:'Gmail OAuth, templates, auto-response setup',url:'EMAIL_CONFIGURATION_REPORT.md',icon:'fa-envelope',color:'var(--blue)',type:'Configuration',date:'Feb 2026'},
   {title:'Deployment Summary',desc:'Deployment process, version history, rollback',url:'DEPLOYMENT_SUMMARY.md',icon:'fa-rocket',color:'var(--red)',type:'DevOps',date:'Feb 2026'},
-  {title:'Master Summary',desc:'Executive-level project summary and KPIs',url:'ðŸ“Š_MASTER_SUMMARY.md',icon:'fa-chart-pie',color:'var(--accent)',type:'Summary',date:'Feb 2026'},
-  {title:'File Index',desc:'Complete file index for the project workspace',url:'ðŸ“š_FILE_INDEX.md',icon:'fa-folder-open',color:'var(--muted)',type:'Index',date:'Feb 2026'},
-  {title:'Completion Roadmap',desc:'Feature completion tracking and remaining work',url:'âœ…_COMPLETION_ROADMAP.md',icon:'fa-road',color:'var(--green)',type:'Roadmap',date:'Feb 2026'},
+  {title:'Master Summary',desc:'Executive-level project summary and KPIs',url:'📊_MASTER_SUMMARY.md',icon:'fa-chart-pie',color:'var(--accent)',type:'Summary',date:'Feb 2026'},
+  {title:'File Index',desc:'Complete file index for the project workspace',url:'📚_FILE_INDEX.md',icon:'fa-folder-open',color:'var(--muted)',type:'Index',date:'Feb 2026'},
+  {title:'Completion Roadmap',desc:'Feature completion tracking and remaining work',url:'✅_COMPLETION_ROADMAP.md',icon:'fa-road',color:'var(--green)',type:'Roadmap',date:'Feb 2026'},
   {title:'GitHub Migration Plan',desc:'Repository migration and CI/CD setup plan',url:'GITHUB_MIGRATION_PLAN.md',icon:'fa-code-branch',color:'var(--dim)',type:'Migration',date:'Feb 2026'},
   {title:'Approach Analysis',desc:'Technical approach analysis and decision records',url:'APPROACH_ANALYSIS.md',icon:'fa-scale-balanced',color:'var(--teal)',type:'Analysis',date:'Feb 2026'},
   {title:'Jira Import CSV',desc:'Ready-to-import Jira ticket CSV with all stories',url:'BANF_JIRA_IMPORT.csv',icon:'fa-table',color:'var(--blue)',type:'Jira',date:'Feb 2026'},
@@ -2008,8 +2002,8 @@ const USER_PROFILES = [
   {name:'EC President',role:'Stakeholder / EC Lead',email:'president@banf.org',goals:['Member engagement growth','Event management efficiency','Financial transparency','Community communication'],access:'Stakeholder',icon:'fa-star',color:'var(--yellow)'},
   {name:'EC Treasurer',role:'Stakeholder / Finance',email:'treasurer@banf.org',goals:['Payment reconciliation','Budget tracking','Zelle integration accuracy','Financial reporting'],access:'Stakeholder',icon:'fa-wallet',color:'var(--green)'},
   {name:'EC Secretary',role:'Stakeholder / Communications',email:'secretary@banf.org',goals:['Member directory accuracy','Communication tracking','Meeting minutes','Announcement management'],access:'Stakeholder',icon:'fa-pen',color:'var(--blue)'},
-  {name:'General Members',role:'End Users',email:'â€”',goals:['Easy event registration','Profile self-service','Payment visibility','Community interaction'],access:'Member Portal',icon:'fa-users',color:'var(--purple)'},
-  {name:'External Sponsors',role:'Sponsors',email:'â€”',goals:['Sponsorship tier clarity','Recognition visibility','Invoice tracking','Event participation'],access:'Sponsor View',icon:'fa-handshake',color:'var(--teal)'},
+  {name:'General Members',role:'End Users',email:'—',goals:['Easy event registration','Profile self-service','Payment visibility','Community interaction'],access:'Member Portal',icon:'fa-users',color:'var(--purple)'},
+  {name:'External Sponsors',role:'Sponsors',email:'—',goals:['Sponsorship tier clarity','Recognition visibility','Invoice tracking','Event participation'],access:'Sponsor View',icon:'fa-handshake',color:'var(--teal)'},
 ];
 
 const SECTION_STATUS = [
@@ -2034,23 +2028,16 @@ const SECTION_STATUS = [
 ];
 
 let STAKEHOLDER_NOTES = [
-  {id:'SN-001',author:'Ranadhir Ghosh',section:'Admin API',type:'acceptance',priority:'medium',target:'Dashboard Layout',body:'Admin dashboard KPIs look good. Need to add member retention rate as a visible metric.',status:'ticket-created',ticketId:'TK-042',ts:'Feb 20, 2026 10:30 AM',flow:'Note â†’ Expert Review âœ“ â†’ Design âœ“ â†’ TK-042 Created â†’ Sprint 2'},
-  {id:'SN-002',author:'EC President',section:'Evite System',type:'feedback',priority:'high',target:'RSVP Flow',body:'RSVP confirmation emails should include event location map link and parking info.',status:'in-development',ticketId:'TK-043',ts:'Feb 21, 2026 2:15 PM',flow:'Note â†’ Expert Review âœ“ â†’ Design âœ“ â†’ TK-043 â†’ dev-agent (Sprint 2)'},
-  {id:'SN-003',author:'EC Treasurer',section:'Zelle Payments',type:'acceptance',priority:'medium',target:'Payment Matching',body:'Zelle auto-matching is accurate for 90%+ cases. Edge case: partial payments need manual review flag.',status:'completed',ticketId:'TK-038',ts:'Feb 19, 2026 4:00 PM',flow:'Note â†’ Expert Review âœ“ â†’ Design âœ“ â†’ TK-038 â†’ Completed âœ“'},
-  {id:'SN-004',author:'Ranadhir Ghosh',section:'Agent Orchestrator',type:'requirement',priority:'critical',target:'Circuit Breaker',body:'HuggingFace fallback chain needs circuit breaker pattern. 3 failures in 5 min should skip model for 10 min cooldown.',status:'completed',ticketId:'TK-035',ts:'Feb 18, 2026 9:00 AM',flow:'Note â†’ Expert Review âœ“ â†’ Design âœ“ â†’ TK-035 â†’ Completed âœ“'},
-  {id:'SN-005',author:'EC Secretary',section:'Comms Correction',type:'feedback',priority:'low',target:'Email Templates',body:'Correction drive emails look professional. Suggest adding Bengali greeting option for cultural touch.',status:'in-review',ticketId:null,ts:'Feb 22, 2026 11:00 AM',flow:'Note â†’ Expert Review (in progress)'},
-  {id:'SN-006',author:'General Member',section:'Member API',type:'bug',priority:'high',target:'Profile Update',body:'Profile photo upload fails on mobile Safari. Works on Chrome desktop.',status:'in-development',ticketId:'TK-044',ts:'Feb 23, 2026 3:30 PM',flow:'Note â†’ Expert Review âœ“ â†’ Design âœ“ â†’ TK-044 â†’ dev-agent (Sprint 1)'},
-  {id:'SN-007',author:'Ranadhir Ghosh',section:'Testing',type:'requirement',priority:'high',target:'Browser Suite',body:'Browser agent test pass rate must reach 70% before next release. Current: 57%. Focus on flaky test stabilization.',status:'in-development',ticketId:'TK-040',ts:'Feb 22, 2026 8:00 AM',flow:'Note â†’ Expert Review âœ“ â†’ Design âœ“ â†’ TK-040 â†’ tst-agent'},
-  {id:'SN-008',author:'EC President',section:'Membership Drive',type:'enhancement',priority:'medium',target:'Drive Analytics',body:'Need a dashboard showing membership drive progress: invites sent, responses received, conversion rate by tier.',status:'completed',ticketId:'TK-046',ts:'Feb 24, 2026 10:00 AM',flow:'Note â†’ Expert Review âœ“ â†’ Design âœ“ â†’ TK-046 â†’ Completed âœ“'},
-  {id:'SN-009',author:'Ranadhir Ghosh',section:'RBAC & Auth',type:'requirement',priority:'critical',target:'Secret Rotation',body:'All API keys must be migrated to Wix Secrets Manager. No hardcoded secrets in source. Sprint 1 priority.',status:'in-development',ticketId:'TK-031',ts:'Feb 17, 2026 9:00 AM',flow:'Note â†’ Expert Review âœ“ â†’ Design âœ“ â†’ TK-031 (STY-01) â†’ Sprint 1'},
-  {id:'SN-010',author:'EC Treasurer',section:'Landing Pages',type:'feedback',priority:'low',target:'Sponsor Section',body:'Landing page sponsor section should show tier badges (Gold, Silver, Bronze) with logo placement.',status:'submitted',ticketId:null,ts:'Feb 25, 2026 1:00 PM',flow:'Note â†’ Pending Expert Review'},
-];
-
-const MEMBERSHIP_DRIVE_ANALYTICS = [
-  {tier:'Family',invites:48,responses:32},
-  {tier:'Couple',invites:26,responses:18},
-  {tier:'Individual',invites:40,responses:19},
-  {tier:'Student',invites:20,responses:15},
+  {id:'SN-001',author:'Ranadhir Ghosh',section:'Admin API',type:'acceptance',priority:'medium',target:'Dashboard Layout',body:'Admin dashboard KPIs look good. Need to add member retention rate as a visible metric.',status:'ticket-created',ticketId:'TK-042',ts:'Feb 20, 2026 10:30 AM',flow:'Note → Expert Review ✓ → Design ✓ → TK-042 Created → Sprint 2'},
+  {id:'SN-002',author:'EC President',section:'Evite System',type:'feedback',priority:'high',target:'RSVP Flow',body:'RSVP confirmation emails should include event location map link and parking info.',status:'in-development',ticketId:'TK-043',ts:'Feb 21, 2026 2:15 PM',flow:'Note → Expert Review ✓ → Design ✓ → TK-043 → dev-agent (Sprint 2)'},
+  {id:'SN-003',author:'EC Treasurer',section:'Zelle Payments',type:'acceptance',priority:'medium',target:'Payment Matching',body:'Zelle auto-matching is accurate for 90%+ cases. Edge case: partial payments need manual review flag.',status:'completed',ticketId:'TK-038',ts:'Feb 19, 2026 4:00 PM',flow:'Note → Expert Review ✓ → Design ✓ → TK-038 → Completed ✓'},
+  {id:'SN-004',author:'Ranadhir Ghosh',section:'Agent Orchestrator',type:'requirement',priority:'critical',target:'Circuit Breaker',body:'HuggingFace fallback chain needs circuit breaker pattern. 3 failures in 5 min should skip model for 10 min cooldown.',status:'completed',ticketId:'TK-035',ts:'Feb 18, 2026 9:00 AM',flow:'Note → Expert Review ✓ → Design ✓ → TK-035 → Completed ✓'},
+  {id:'SN-005',author:'EC Secretary',section:'Comms Correction',type:'feedback',priority:'low',target:'Email Templates',body:'Correction drive emails look professional. Suggest adding Bengali greeting option for cultural touch.',status:'in-review',ticketId:null,ts:'Feb 22, 2026 11:00 AM',flow:'Note → Expert Review (in progress)'},
+  {id:'SN-006',author:'General Member',section:'Member API',type:'bug',priority:'high',target:'Profile Update',body:'Profile photo upload fails on mobile Safari. Works on Chrome desktop.',status:'in-development',ticketId:'TK-044',ts:'Feb 23, 2026 3:30 PM',flow:'Note → Expert Review ✓ → Design ✓ → TK-044 → dev-agent (Sprint 1)'},
+  {id:'SN-007',author:'Ranadhir Ghosh',section:'Testing',type:'requirement',priority:'high',target:'Browser Suite',body:'Browser agent test pass rate must reach 70% before next release. Current: 57%. Focus on flaky test stabilization.',status:'in-development',ticketId:'TK-040',ts:'Feb 22, 2026 8:00 AM',flow:'Note → Expert Review ✓ → Design ✓ → TK-040 → tst-agent'},
+  {id:'SN-008',author:'EC President',section:'Membership Drive',type:'enhancement',priority:'medium',target:'Drive Analytics',body:'Need a dashboard showing membership drive progress: invites sent, responses received, conversion rate by tier.',status:'submitted',ticketId:null,ts:'Feb 24, 2026 10:00 AM',flow:'Note → Pending Expert Review'},
+  {id:'SN-009',author:'Ranadhir Ghosh',section:'RBAC & Auth',type:'requirement',priority:'critical',target:'Secret Rotation',body:'All API keys must be migrated to Wix Secrets Manager. No hardcoded secrets in source. Sprint 1 priority.',status:'in-development',ticketId:'TK-031',ts:'Feb 17, 2026 9:00 AM',flow:'Note → Expert Review ✓ → Design ✓ → TK-031 (STY-01) → Sprint 1'},
+  {id:'SN-010',author:'EC Treasurer',section:'Landing Pages',type:'feedback',priority:'low',target:'Sponsor Section',body:'Landing page sponsor section should show tier badges (Gold, Silver, Bronze) with logo placement.',status:'submitted',ticketId:null,ts:'Feb 25, 2026 1:00 PM',flow:'Note → Pending Expert Review'},
 ];
 
 const DEV_AGENTS = [
@@ -2088,7 +2075,6 @@ const DEV_TICKETS = [
   {id:'TK-043',title:'RSVP Email Location Map Link',assignee:'integration-agent',pri:'P1',status:'in-progress',sprint:'Sprint 2',section:'Evite System'},
   {id:'TK-044',title:'Mobile Safari Photo Upload Fix',assignee:'frontend-agent',pri:'P1',status:'in-progress',sprint:'Sprint 1',section:'Member API'},
   {id:'TK-045',title:'Unified Observability Pipeline',assignee:'devops-agent',pri:'P1',status:'planned',sprint:'Sprint 3',section:'Observability Pipeline'},
-  {id:'TK-046',title:'Membership Drive Analytics by Tier',assignee:'backend-agent',pri:'P1',status:'completed',sprint:'Sprint 2',section:'Membership Drive'},
 ];
 
 function renderRequirements() {
@@ -2114,7 +2100,7 @@ function renderRequirements() {
     <div class="a-hdr"><div class="a-icon" style="background:${u.color}22;color:${u.color}"><i class="fas ${u.icon}"></i></div>
     <div><div class="a-name">${u.name}</div><div class="a-stage">${u.role} &bull; ${u.access}</div></div></div>
     <div class="a-caps">${u.goals.map(g=>`<span class="a-cap">${g}</span>`).join('')}</div>
-    ${u.email!=='â€”'?`<div class="a-gate" style="color:var(--blue)"><i class="fas fa-envelope me-1"></i>${u.email}</div>`:''}
+    ${u.email!=='—'?`<div class="a-gate" style="color:var(--blue)"><i class="fas fa-envelope me-1"></i>${u.email}</div>`:''}
   </div>`).join('') + '</div>';
 
   // Jira Summary
@@ -2124,28 +2110,6 @@ function renderRequirements() {
     return `<tr><td><span class="badge-s badge-blue">${t.id}</span></td><td>${t.title}</td><td>${t.section}</td><td>${t.assignee}</td>
     <td><span class="badge-s badge-${t.pri==='P0'?'red':t.pri==='P1'?'orange':'dim'}">${t.pri}</span></td><td>${t.sprint}</td>
     <td><span class="badge-s badge-${sc}">${t.status}</span></td></tr>`;}).join('')}</tbody></table>`;
-
-  // TK-046 Drive Analytics
-  const totalInvites = MEMBERSHIP_DRIVE_ANALYTICS.reduce((sum,row)=>sum+row.invites,0);
-  const totalResponses = MEMBERSHIP_DRIVE_ANALYTICS.reduce((sum,row)=>sum+row.responses,0);
-  const overallConversion = totalInvites>0 ? Math.round((totalResponses/totalInvites)*100) : 0;
-
-  const dKpiEl = document.getElementById('drive-analytics-kpis');
-  dKpiEl.innerHTML = [
-    {v:MEMBERSHIP_DRIVE_ANALYTICS.length,k:'Tiers',cls:'blue'},
-    {v:totalInvites,k:'Invites Sent',cls:'purple'},
-    {v:totalResponses,k:'Responses',cls:'cyan'},
-    {v:overallConversion+'%',k:'Conversion',cls:overallConversion>=60?'green':'yellow'}
-  ].map(k=>`<div class="kpi ${k.cls}"><div class="v">${k.v}</div><div class="k">${k.k}</div></div>`).join('');
-
-  const dTableEl = document.getElementById('drive-analytics-table');
-  dTableEl.innerHTML = `<table class="t"><thead><tr><th>Tier</th><th>Invites</th><th>Responses</th><th>Conversion</th></tr></thead><tbody>
-    ${MEMBERSHIP_DRIVE_ANALYTICS.map(row=>{
-      const pct = row.invites>0 ? Math.round((row.responses/row.invites)*100) : 0;
-      const sc = pct>=60?'green':pct>=30?'yellow':'red';
-      return `<tr><td><strong>${row.tier}</strong></td><td>${row.invites}</td><td>${row.responses}</td><td><span class="badge-s badge-${sc}">${pct}%</span></td></tr>`;
-    }).join('')}
-  </tbody></table>`;
 }
 
 function renderDevStatus() {
@@ -2192,7 +2156,7 @@ function renderDevStatus() {
 function renderAcceptance() {
   const sections = [...new Set(SECTION_STATUS.map(s=>s.name))];
   const secSel = document.getElementById('note-section');
-  secSel.innerHTML = '<option value="">Select Sectionâ€¦</option>' + sections.map(s=>`<option value="${s}">${s}</option>`).join('');
+  secSel.innerHTML = '<option value="">Select Section…</option>' + sections.map(s=>`<option value="${s}">${s}</option>`).join('');
 
   // Also populate history filter
   const hfSec = document.getElementById('history-filter-section');
@@ -2209,7 +2173,7 @@ function renderAcceptance() {
         <span class="badge-s badge-${sc}">${n.status}</span>
         ${n.ticketId?`<span class="badge-s badge-blue">${n.ticketId}</span>`:''}
         <span class="ni-ts">${n.ts}</span></div>
-        <div class="ni-target"><i class="fas fa-crosshairs me-1"></i>${n.section} â†’ ${n.target}</div>
+        <div class="ni-target"><i class="fas fa-crosshairs me-1"></i>${n.section} → ${n.target}</div>
         <div class="ni-body">${n.body}</div>
         <div class="ni-flow"><i class="fas fa-route me-1"></i>${n.flow}</div>
       </div>`;
@@ -2229,7 +2193,7 @@ function renderAcceptance() {
     const note = {id:'SN-'+(STAKEHOLDER_NOTES.length+1).toString().padStart(3,'0'),author,section:sec,type,priority:pri,
       target:target||sec,body,status:'submitted',ticketId:null,
       ts:new Date().toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit',hour12:true}),
-      flow:'Note â†’ Pending Expert Review'};
+      flow:'Note → Pending Expert Review'};
     STAKEHOLDER_NOTES.unshift(note);
     renderHistory(STAKEHOLDER_NOTES);
     document.getElementById('note-body').value='';
@@ -2270,9 +2234,9 @@ function renderDevTeam() {
   }).join('');
 }
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ═══════════════════════════════════════════════════════════════════
 //  NAVIGATION
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ═══════════════════════════════════════════════════════════════════
 
 const NAV_MAP = {
   overview:'sec-overview', pipeline:'sec-pipeline', agents:'sec-agents',
@@ -2294,9 +2258,9 @@ document.querySelectorAll('.sidebar .nav-item[data-section]').forEach(item => {
 
 document.getElementById('btn-refresh').addEventListener('click', fetchHealth);
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ═══════════════════════════════════════════════════════════════════
 //  INIT
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ═══════════════════════════════════════════════════════════════════
 
 (function init() {
   renderKPIs();
@@ -2322,4 +2286,3 @@ document.getElementById('btn-refresh').addEventListener('click', fetchHealth);
 
 </body>
 </html>
-
