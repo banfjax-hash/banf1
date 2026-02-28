@@ -1319,6 +1319,7 @@ function buildDriveInviteEmail(opts) {
   var name = opts.name, email = opts.email, roleName = opts.roleName;
   var dataViews = opts.dataViews, feedbackAbility = opts.feedbackAbility;
   var dashboardLink = opts.dashboardLink, unsubscribeLink = opts.unsubscribeLink;
+  var journeyLink = opts.journeyLink || 'https://banfjax-hash.github.io/banf1/stakeholder-requirements-journey.html';
   var customNote = opts.customNote;
   var year = new Date().getFullYear();
   var sentDate = new Date().toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
@@ -1376,7 +1377,11 @@ function buildDriveInviteEmail(opts) {
 'style="display:inline-block;background:linear-gradient(135deg,#8B0000,#DC143C);color:#fff;text-decoration:none;' +
 'padding:15px 44px;border-radius:30px;font-size:1.05rem;font-weight:700;letter-spacing:.5px;' +
 'box-shadow:0 4px 18px rgba(139,0,0,.35)">' +
-'Access Your Dashboard</a>' +
+'Access Your Dashboard</a><br><br>' +
+'<a href="' + journeyLink + '" ' +
+'style="display:inline-block;background:#fff;color:#8B0000;text-decoration:none;border:2px solid #8B0000;' +
+'padding:11px 26px;border-radius:30px;font-size:.92rem;font-weight:700;letter-spacing:.3px">' +
+'Open Requirements Journey</a>' +
 '<p style="margin:14px 0 4px;font-size:.8rem;color:#888">Sign in with your email address: <strong>' + email + '</strong></p>' +
 '</td></tr>' +
 
@@ -1441,6 +1446,7 @@ document.getElementById('btn-send-drive').addEventListener('click',async()=>{
   const subject=document.getElementById('drive-subject').value.trim()||"BANF Stakeholder Invitation";
   const customNote=document.getElementById('drive-custom-note').value.trim();
   const dashboardLink='https://banfjax-hash.github.io/banf1/unified-ecosystem-dashboard.html';
+  const journeyLink='https://banfjax-hash.github.io/banf1/stakeholder-requirements-journey.html';
   let sent=0,failed=0;
 
   for(const d of eligible){
@@ -1458,6 +1464,7 @@ document.getElementById('btn-send-drive').addEventListener('click',async()=>{
       dataViews: dataViews,
       feedbackAbility: feedbackAbility,
       dashboardLink: dashboardLink,
+      journeyLink: journeyLink,
       unsubscribeLink: unsubscribeLink,
       customNote: customNote
     });
@@ -1501,6 +1508,7 @@ document.getElementById('btn-preview-drive-email').addEventListener('click',()=>
     dataViews:'Overview, Pipeline, Agents, Endpoints, Testing, Deployment, Data Model, Sprints, Requirements, Dev Status, Observability, Internals, Expert Review',
     feedbackAbility:'Full (Submit + Vote + Approve)',
     dashboardLink:'https://banfjax-hash.github.io/banf1/unified-ecosystem-dashboard.html',
+    journeyLink:'https://banfjax-hash.github.io/banf1/stakeholder-requirements-journey.html',
     unsubscribeLink:'https://banfwix.wixsite.com/banf1/_functions/unsubscribe?email=ranadhir.ghosh@gmail.com',
     customNote: customNote
   });
