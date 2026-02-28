@@ -8,731 +8,644 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
   <style>
     :root {
-      --banf-green: #006A4E;
-      --banf-green-lt: #00856F;
-      --banf-deep-red: #DC143C;
-      --banf-orange: #FF6B35;
-      --bg: #f4f6fa;
-      --card: #fff;
-      --muted: #6c757d;
-      --line: #e5e8ee;
-      --ok: #198754;
-      --warn: #fd7e14;
-      --danger: #dc3545;
-      --info: #0d6efd;
+      --g: #006A4E; --gl: #00856F; --red: #DC143C; --or: #FF6B35;
+      --bg: #f4f6fa; --card: #fff; --mu: #64748b; --ln: #e5e8ee;
+      --ok: #16a34a; --warn: #f59e0b; --danger: #dc2626; --info: #2563eb;
     }
     *, *::before, *::after { box-sizing: border-box; }
-    body { background: var(--bg); color: #1e293b; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; margin: 0; }
+    body { background: var(--bg); color: #1e293b; font-family: 'Segoe UI', system-ui, sans-serif; margin: 0; font-size: 14px; }
 
-    /* ─── Header ─────────────────────────── */
-    .top-header {
-      background: linear-gradient(135deg, var(--banf-green), var(--banf-green-lt));
-      color: #fff;
-      padding: 0;
-      position: sticky; top: 0; z-index: 200;
-      box-shadow: 0 4px 20px rgba(0,0,0,.15);
-    }
-    .top-header .inner {
-      max-width: 1320px; margin: 0 auto; padding: .85rem 1.25rem;
-      display: flex; flex-wrap: wrap; gap: .75rem;
-      justify-content: space-between; align-items: center;
-    }
-    .top-header h1 { font-size: 1.15rem; margin: 0; font-weight: 700; }
-    .top-header .sub { opacity: .85; font-size: .8rem; margin: .1rem 0 0; }
-    .nav-links a {
-      color: #fff; font-size: .78rem; text-decoration: none; padding: .35rem .7rem;
-      border: 1px solid rgba(255,255,255,.35); border-radius: 6px; display: inline-block;
-    }
-    .nav-links a:hover { background: rgba(255,255,255,.15); }
+    /* Header */
+    .hdr { background: linear-gradient(135deg, var(--g), var(--gl)); color: #fff; position: sticky; top: 0; z-index: 200; box-shadow: 0 4px 20px rgba(0,0,0,.15); }
+    .hdr .in { max-width: 1400px; margin: 0 auto; padding: .7rem 1.2rem; display: flex; flex-wrap: wrap; gap: .6rem; justify-content: space-between; align-items: center; }
+    .hdr h1 { font-size: 1.1rem; margin: 0; font-weight: 700; }
+    .hdr .sub { opacity: .8; font-size: .75rem; }
+    .hdr a { color: #fff; font-size: .72rem; text-decoration: none; padding: .3rem .6rem; border: 1px solid rgba(255,255,255,.3); border-radius: 5px; }
+    .hdr a:hover { background: rgba(255,255,255,.15); }
 
-    /* ─── Stakeholder Identity Bar ────────── */
-    .identity-bar {
-      background: #fff; border-bottom: 1px solid var(--line);
-      box-shadow: 0 2px 8px rgba(0,0,0,.04);
-    }
-    .identity-bar .inner {
-      max-width: 1320px; margin: 0 auto; padding: .7rem 1.25rem;
-      display: flex; flex-wrap: wrap; gap: .75rem;
-      justify-content: space-between; align-items: center;
-    }
-    .identity-greeting { font-size: 1.05rem; font-weight: 600; color: #1e293b; }
-    .identity-greeting .role { color: var(--banf-green); font-weight: 700; }
-    .identity-meta { font-size: .78rem; color: var(--muted); }
-    .stakeholder-select {
-      font-size: .82rem; padding: .3rem .6rem; border-radius: 6px;
-      border: 1px solid var(--line); background: #f9fafb; cursor: pointer;
-    }
+    /* Identity Bar */
+    .id-bar { background: #fff; border-bottom: 1px solid var(--ln); box-shadow: 0 2px 6px rgba(0,0,0,.03); }
+    .id-bar .in { max-width: 1400px; margin: 0 auto; padding: .6rem 1.2rem; display: flex; flex-wrap: wrap; gap: .6rem; justify-content: space-between; align-items: center; }
+    .id-name { font-size: 1rem; font-weight: 700; }
+    .id-name .rl { color: var(--g); }
+    .id-meta { font-size: .73rem; color: var(--mu); }
+    .sel { font-size: .8rem; padding: .25rem .5rem; border-radius: 5px; border: 1px solid var(--ln); background: #f9fafb; }
 
-    /* ─── Container ──────────────────────── */
-    .main-wrap { max-width: 1320px; margin: 0 auto; padding: 1.25rem; }
+    /* Wrap */
+    .wrap { max-width: 1400px; margin: 0 auto; padding: 1rem 1.2rem; }
 
-    /* ─── Cards / Panels ─────────────────── */
-    .card-panel {
-      background: var(--card); border: 1px solid var(--line);
-      border-radius: 14px; padding: 1.15rem;
-      box-shadow: 0 2px 10px rgba(14,23,38,.04);
-      margin-bottom: 1rem;
-    }
-    .card-panel h2 {
-      font-size: .95rem; font-weight: 700; margin: 0 0 .85rem;
-      display: flex; align-items: center; gap: .45rem;
-    }
-    .card-panel h2 .cnt {
-      font-size: .7rem; background: var(--banf-green); color: #fff;
-      border-radius: 999px; padding: .1rem .5rem; font-weight: 600;
-    }
+    /* Tabs */
+    .tab-bar { display: flex; gap: 2px; background: #e2e8f0; border-radius: 10px; padding: 3px; margin-bottom: 1rem; flex-wrap: wrap; }
+    .tab-btn { padding: .45rem .9rem; border: none; background: transparent; border-radius: 8px; font-size: .78rem; font-weight: 600; color: var(--mu); cursor: pointer; white-space: nowrap; }
+    .tab-btn.active { background: #fff; color: var(--g); box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
 
-    /* ─── KPI Strip ──────────────────────── */
-    .kpi-strip {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: .75rem; margin-bottom: 1rem;
-    }
-    .kpi-card {
-      background: var(--card); border: 1px solid var(--line); border-radius: 12px;
-      padding: .85rem 1rem; text-align: center;
-    }
-    .kpi-card .val { font-size: 1.55rem; font-weight: 800; line-height: 1.1; }
-    .kpi-card .lbl { font-size: .72rem; color: var(--muted); margin-top: .2rem; }
-    .kpi-card.green .val { color: var(--ok); }
-    .kpi-card.red .val { color: var(--danger); }
-    .kpi-card.orange .val { color: var(--warn); }
-    .kpi-card.blue .val { color: var(--info); }
+    /* Cards */
+    .cp { background: var(--card); border: 1px solid var(--ln); border-radius: 12px; padding: 1rem; box-shadow: 0 2px 8px rgba(14,23,38,.03); margin-bottom: .85rem; }
+    .cp h2 { font-size: .88rem; font-weight: 700; margin: 0 0 .7rem; display: flex; align-items: center; gap: .4rem; }
+    .cp h2 .cnt { font-size: .65rem; background: var(--g); color: #fff; border-radius: 999px; padding: .1rem .45rem; }
 
-    /* ─── Pipeline Stage Swim Lanes ──────── */
-    .pipeline-lanes {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: .6rem; margin-bottom: 1rem;
-    }
-    .lane {
-      border-radius: 12px; padding: .7rem .65rem; min-height: 72px;
-      border: 2px solid transparent; position: relative;
-    }
-    .lane.stage-req     { background: #f0f4ff; border-color: #bfdbfe; }
-    .lane.stage-approve  { background: #eef2ff; border-color: #c7d2fe; }
-    .lane.stage-tech     { background: #fef9ee; border-color: #fde68a; }
-    .lane.stage-devops   { background: #f5f3ff; border-color: #ddd6fe; }
-    .lane.stage-live     { background: #ecfdf5; border-color: #86efac; }
-    .lane h4 {
-      font-size: .72rem; text-transform: uppercase; letter-spacing: .6px;
-      font-weight: 700; margin: 0 0 .45rem; opacity: .75;
-    }
-    .lane .count { font-size: 1.35rem; font-weight: 800; line-height: 1; }
-    .lane .items { font-size: .7rem; color: var(--muted); margin-top: .2rem; }
-    .lane-arrow {
-      display: flex; align-items: center; justify-content: center;
-      color: #94a3b8; font-size: .65rem;
-    }
-    @media (max-width: 768px) {
-      .pipeline-lanes { grid-template-columns: 1fr; }
-      .lane-arrow { transform: rotate(90deg); }
-    }
+    /* KPI */
+    .kpi-g { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: .6rem; margin-bottom: .85rem; }
+    .kpi { background: var(--card); border: 1px solid var(--ln); border-radius: 10px; padding: .7rem .8rem; text-align: center; }
+    .kpi .v { font-size: 1.4rem; font-weight: 800; line-height: 1.1; }
+    .kpi .l { font-size: .67rem; color: var(--mu); margin-top: .15rem; }
+    .kpi.gr .v { color: var(--ok); } .kpi.rd .v { color: var(--danger); } .kpi.or .v { color: var(--warn); } .kpi.bl .v { color: var(--info); }
 
-    /* ─── Approval Action Cards ──────────── */
-    .approval-card {
-      border: 1px solid var(--line); border-radius: 10px;
-      padding: .85rem; margin-bottom: .65rem;
-      display: flex; gap: .75rem; align-items: flex-start;
-      transition: border-color .2s;
-    }
-    .approval-card:hover { border-color: var(--banf-green); }
-    .approval-card .icon-col {
-      width: 38px; height: 38px; border-radius: 10px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: .9rem; flex-shrink: 0;
-    }
-    .approval-card .icon-col.pending { background: #fef3c7; color: #b45309; }
-    .approval-card .icon-col.approved { background: #d1fae5; color: #065f46; }
-    .approval-card .icon-col.stuck { background: #fee2e2; color: #991b1b; }
-    .approval-card .body-col { flex: 1; min-width: 0; }
-    .approval-card .title-row {
-      font-size: .85rem; font-weight: 600;
-      display: flex; gap: .4rem; flex-wrap: wrap; align-items: center;
-    }
-    .approval-card .meta-row { font-size: .73rem; color: var(--muted); margin-top: .2rem; }
-    .approval-card .action-col { flex-shrink: 0; }
+    /* Pipeline Lanes */
+    .lanes { display: grid; grid-template-columns: repeat(5, 1fr); gap: .5rem; }
+    .lane { border-radius: 10px; padding: .6rem; border: 2px solid transparent; }
+    .lane.s0 { background: #f0f4ff; border-color: #bfdbfe; }
+    .lane.s1 { background: #eef2ff; border-color: #c7d2fe; }
+    .lane.s2 { background: #fef9ee; border-color: #fde68a; }
+    .lane.s3 { background: #f5f3ff; border-color: #ddd6fe; }
+    .lane.s4 { background: #ecfdf5; border-color: #86efac; }
+    .lane h4 { font-size: .65rem; text-transform: uppercase; letter-spacing: .5px; font-weight: 700; margin: 0 0 .3rem; opacity: .7; }
+    .lane .ct { font-size: 1.2rem; font-weight: 800; }
+    .lane .ids { font-size: .63rem; color: var(--mu); margin-top: .15rem; word-break: break-word; }
+    @media (max-width: 768px) { .lanes { grid-template-columns: 1fr; } }
 
-    /* ─── Status Chips ───────────────────── */
-    .chip {
-      display: inline-block; font-size: .65rem; font-weight: 600;
-      padding: .15rem .5rem; border-radius: 999px;
-    }
-    .chip-green  { background: #d1fae5; color: #065f46; }
-    .chip-blue   { background: #dbeafe; color: #1d4ed8; }
-    .chip-orange { background: #fef3c7; color: #92400e; }
-    .chip-purple { background: #ede9fe; color: #6d28d9; }
-    .chip-red    { background: #fee2e2; color: #991b1b; }
-    .chip-gray   { background: #f1f5f9; color: #475569; }
+    /* Chips */
+    .ch { display: inline-block; font-size: .6rem; font-weight: 600; padding: .12rem .42rem; border-radius: 999px; vertical-align: middle; }
+    .ch-gr { background: #d1fae5; color: #065f46; } .ch-bl { background: #dbeafe; color: #1d4ed8; }
+    .ch-or { background: #fef3c7; color: #92400e; } .ch-pu { background: #ede9fe; color: #6d28d9; }
+    .ch-rd { background: #fee2e2; color: #991b1b; } .ch-gy { background: #f1f5f9; color: #475569; }
+    .ch-tl { background: #ccfbf1; color: #115e59; }
 
-    /* ─── Requirements Table ─────────────── */
-    .req-table { width: 100%; border-collapse: separate; border-spacing: 0; }
-    .req-table th {
-      font-size: .7rem; text-transform: uppercase; letter-spacing: .5px;
-      color: var(--muted); font-weight: 600; padding: .5rem .6rem;
-      border-bottom: 2px solid var(--line); white-space: nowrap;
-    }
-    .req-table td {
-      font-size: .82rem; padding: .65rem .6rem;
-      border-bottom: 1px solid #f1f5f9; vertical-align: middle;
-    }
-    .req-table tr:last-child td { border-bottom: none; }
-    .progress-thin { height: 6px; border-radius: 3px; background: #e2e8f0; overflow: hidden; }
-    .progress-thin .fill { height: 100%; border-radius: 3px; }
+    /* Category Badge */
+    .cat-badge { font-size: .6rem; padding: .1rem .35rem; border-radius: 4px; font-weight: 600; margin-left: .3rem; }
+    .cat-admin { background: #ede9fe; color: #6d28d9; }
+    .cat-member { background: #dbeafe; color: #1d4ed8; }
+    .cat-public { background: #d1fae5; color: #065f46; }
+    .cat-infra { background: #f1f5f9; color: #475569; }
 
-    /* ─── Blocker Table ──────────────────── */
-    .blocker-row {
-      display: flex; gap: .65rem; padding: .7rem 0;
-      border-bottom: 1px solid #f1f5f9; align-items: flex-start;
-    }
-    .blocker-row:last-child { border-bottom: none; }
-    .blocker-row .b-icon {
-      width: 32px; height: 32px; border-radius: 8px;
-      background: #fee2e2; color: #dc2626; display: flex;
-      align-items: center; justify-content: center; font-size: .8rem; flex-shrink: 0;
-    }
-    .blocker-row .b-body { flex: 1; min-width: 0; }
-    .blocker-row .b-title { font-size: .82rem; font-weight: 600; }
-    .blocker-row .b-meta { font-size: .72rem; color: var(--muted); margin-top: .1rem; }
+    /* Table */
+    .rt { width: 100%; border-collapse: separate; border-spacing: 0; }
+    .rt th { font-size: .63rem; text-transform: uppercase; letter-spacing: .5px; color: var(--mu); font-weight: 600; padding: .4rem .5rem; border-bottom: 2px solid var(--ln); white-space: nowrap; }
+    .rt td { font-size: .76rem; padding: .55rem .5rem; border-bottom: 1px solid #f1f5f9; vertical-align: top; }
+    .rt tr:last-child td { border-bottom: none; }
+    .pb { height: 5px; border-radius: 3px; background: #e2e8f0; overflow: hidden; }
+    .pb .f { height: 100%; border-radius: 3px; }
 
-    /* ─── Timeline ───────────────────────── */
-    .tl-item {
-      display: flex; gap: .6rem; padding: .55rem 0;
-      border-bottom: 1px solid #f8fafc;
-    }
-    .tl-item:last-child { border-bottom: none; }
-    .tl-dot {
-      width: 8px; height: 8px; border-radius: 50%;
-      background: var(--info); margin-top: .35rem; flex-shrink: 0;
-    }
-    .tl-text { font-size: .8rem; }
-    .tl-when { font-size: .7rem; color: var(--muted); }
+    /* Approval Card */
+    .ac { border: 1px solid var(--ln); border-radius: 9px; padding: .7rem; margin-bottom: .5rem; display: flex; gap: .6rem; }
+    .ac:hover { border-color: var(--g); }
+    .ac .ic { width: 34px; height: 34px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: .8rem; flex-shrink: 0; }
+    .ac .ic.pe { background: #fef3c7; color: #b45309; }
+    .ac .ic.ap { background: #d1fae5; color: #065f46; }
+    .ac .ic.st { background: #fee2e2; color: #991b1b; }
+    .ac .bd { flex: 1; min-width: 0; }
+    .ac .tl { font-size: .78rem; font-weight: 600; }
+    .ac .mt { font-size: .68rem; color: var(--mu); margin-top: .15rem; }
 
-    .small-note { color: var(--muted); font-size: .76rem; }
-    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    /* Blocker / Timeline */
+    .bl-r { display: flex; gap: .5rem; padding: .55rem 0; border-bottom: 1px solid #f1f5f9; }
+    .bl-r:last-child { border-bottom: none; }
+    .bl-i { width: 28px; height: 28px; border-radius: 7px; background: #fee2e2; color: #dc2626; display: flex; align-items: center; justify-content: center; font-size: .7rem; flex-shrink: 0; }
+    .tl-i { display: flex; gap: .5rem; padding: .4rem 0; border-bottom: 1px solid #f8fafc; }
+    .tl-i:last-child { border-bottom: none; }
+    .tl-d { width: 7px; height: 7px; border-radius: 50%; background: var(--info); margin-top: .3rem; flex-shrink: 0; }
+
+    /* User Journey Card */
+    .uj { border: 1px solid var(--ln); border-radius: 10px; padding: .85rem; margin-bottom: .7rem; background: #fafbfc; }
+    .uj .name { font-weight: 700; font-size: .88rem; }
+    .uj .role-tag { font-size: .65rem; padding: .1rem .4rem; border-radius: 4px; font-weight: 600; }
+    .uj .steps { margin-top: .5rem; padding-left: 0; list-style: none; counter-reset: step; }
+    .uj .steps li { font-size: .75rem; padding: .25rem 0; padding-left: 1.6rem; position: relative; border-left: 2px solid #e2e8f0; margin-left: .5rem; }
+    .uj .steps li::before { counter-increment: step; content: counter(step); position: absolute; left: -11px; top: .2rem; width: 20px; height: 20px; border-radius: 50%; background: var(--g); color: #fff; font-size: .6rem; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+
+    .sn { color: var(--mu); font-size: .7rem; }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: .85rem; }
     @media (max-width: 992px) { .two-col { grid-template-columns: 1fr; } }
+    .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: .85rem; }
+    @media (max-width: 1100px) { .three-col { grid-template-columns: 1fr; } }
+    .filter-row { display: flex; gap: .4rem; flex-wrap: wrap; margin-bottom: .7rem; }
+    .filter-btn { font-size: .68rem; padding: .2rem .55rem; border: 1px solid var(--ln); border-radius: 5px; background: #fff; cursor: pointer; font-weight: 500; }
+    .filter-btn.active { background: var(--g); color: #fff; border-color: var(--g); }
   </style>
 </head>
 <body>
 
-<!-- ══════ Sticky Header ══════ -->
-<header class="top-header">
-  <div class="inner">
+<header class="hdr">
+  <div class="in">
     <div>
-      <h1><i class="fas fa-route me-2"></i>Stakeholder Requirements Journey</h1>
-      <div class="sub">Requirement → Approval → Technical Validation → DevOps → Live Production</div>
+      <h1><i class="fas fa-route me-2"></i>BANF — Stakeholder Requirements Journey</h1>
+      <div class="sub">Bengali Association of North Florida — Comprehensive Web Platform — 196+ Endpoints — FY 2026-27</div>
     </div>
-    <div class="nav-links">
-      <a href="member-portal.html"><i class="fas fa-user me-1"></i>Member Portal</a>
+    <div style="display:flex;gap:4px;flex-wrap:wrap;">
+      <a href="member-portal.html"><i class="fas fa-user me-1"></i>Member</a>
       <a href="unified-ecosystem-dashboard.html"><i class="fas fa-chart-line me-1"></i>Dashboard</a>
       <a href="admin-portal.html"><i class="fas fa-shield-halved me-1"></i>Admin</a>
+      <a href="crm-admin.html"><i class="fas fa-address-book me-1"></i>CRM</a>
     </div>
   </div>
 </header>
 
-<!-- ══════ Identity Bar ══════ -->
-<div class="identity-bar">
-  <div class="inner">
+<div class="id-bar">
+  <div class="in">
     <div>
-      <div class="identity-greeting">
-        Welcome, <span id="stakeholderName" class="role">—</span>
-      </div>
-      <div class="identity-meta" id="stakeholderMeta">Select your role to see your personalised view</div>
+      <div class="id-name">Welcome, <span id="shName" class="rl">—</span></div>
+      <div class="id-meta" id="shMeta">Select your identity to see pending approvals and personalised view</div>
     </div>
-    <div>
-      <select id="stakeholderPicker" class="stakeholder-select">
-        <option value="">— Select Stakeholder —</option>
-      </select>
-    </div>
+    <select id="shPick" class="sel"><option value="">— Select Stakeholder —</option></select>
   </div>
 </div>
 
-<!-- ══════ Main Content ══════ -->
-<div class="main-wrap">
+<div class="wrap">
 
-  <!-- KPI Strip -->
-  <div class="kpi-strip" id="kpiStrip"></div>
-
-  <!-- Pipeline Swim Lanes -->
-  <div class="card-panel" style="padding:.85rem;">
-    <h2><i class="fas fa-stream" style="color:var(--banf-green)"></i> Pipeline Snapshot</h2>
-    <div class="pipeline-lanes" id="pipelineLanes"></div>
+  <!-- Tab Navigation -->
+  <div class="tab-bar" id="tabBar">
+    <button class="tab-btn active" data-tab="overview">Overview & Pipeline</button>
+    <button class="tab-btn" data-tab="admin">Admin Requirements</button>
+    <button class="tab-btn" data-tab="member">Member Requirements</button>
+    <button class="tab-btn" data-tab="infra">Infrastructure & Platform</button>
+    <button class="tab-btn" data-tab="journeys">User Journeys</button>
+    <button class="tab-btn" data-tab="blockers">Blockers & Timeline</button>
   </div>
 
-  <!-- Pending YOUR Approval -->
-  <div class="card-panel" id="pendingApprovalPanel">
-    <h2>
-      <i class="fas fa-bell" style="color:var(--banf-orange)"></i>
-      Pending Your Approval
-      <span class="cnt" id="pendingCnt">0</span>
-    </h2>
-    <div id="pendingApprovalList"></div>
-  </div>
-
-  <!-- Full Requirements Board -->
-  <div class="card-panel">
-    <h2><i class="fas fa-clipboard-list" style="color:var(--info)"></i> All Requirements — End-to-End Tracking</h2>
-    <div style="overflow-x:auto;">
-      <table class="req-table">
-        <thead>
-          <tr>
-            <th style="min-width:220px;">Requirement</th>
-            <th>Owner</th>
-            <th>Stage</th>
-            <th style="min-width:130px;">Progress</th>
-            <th>ETA</th>
-            <th>Risk</th>
-            <th>Approval Status</th>
-          </tr>
-        </thead>
-        <tbody id="reqTableBody"></tbody>
-      </table>
+  <!-- ═══════ TAB 1: OVERVIEW ═══════ -->
+  <div class="tab-panel active" id="tab-overview">
+    <div class="kpi-g" id="kpiStrip"></div>
+    <div class="cp" style="padding:.7rem .85rem">
+      <h2><i class="fas fa-stream" style="color:var(--g)"></i> Pipeline Snapshot — Requirement → Live</h2>
+      <div class="lanes" id="pipeLanes"></div>
+    </div>
+    <div class="cp" id="pendPanel">
+      <h2><i class="fas fa-bell" style="color:var(--or)"></i> Pending Your Approval <span class="cnt" id="pendCnt">0</span></h2>
+      <div id="pendList"></div>
+    </div>
+    <div class="cp">
+      <h2><i class="fas fa-clipboard-list" style="color:var(--info)"></i> All Requirements — End-to-End <span class="cnt" id="totalCnt">0</span></h2>
+      <div class="filter-row" id="catFilter"></div>
+      <div style="overflow-x:auto;"><table class="rt"><thead><tr>
+        <th style="min-width:200px">Requirement</th><th>Category</th><th>Owner</th><th>Stage</th><th style="min-width:110px">Progress</th><th>ETA</th><th>Risk</th><th>Approval</th>
+      </tr></thead><tbody id="reqTb"></tbody></table></div>
     </div>
   </div>
 
-  <!-- Two-column: Blockers + Timeline -->
-  <div class="two-col">
-    <div class="card-panel">
-      <h2><i class="fas fa-exclamation-triangle" style="color:var(--danger)"></i> Stuck / Blockers <span class="cnt" id="blockerCnt">0</span></h2>
-      <div id="blockerList"></div>
+  <!-- ═══════ TAB 2: ADMIN REQUIREMENTS ═══════ -->
+  <div class="tab-panel" id="tab-admin">
+    <div class="cp">
+      <h2><i class="fas fa-shield-halved" style="color:#6d28d9"></i> Admin & EC Workflows — Complete Business Requirements</h2>
+      <p class="sn">Every admin-facing feature of the BANF platform, grouped by functional domain. All items below have been implemented and approved by Technical Admin unless marked otherwise.</p>
     </div>
-    <div class="card-panel">
-      <h2><i class="fas fa-clock-rotate-left" style="color:var(--info)"></i> Recent Transitions</h2>
-      <div id="timelineList"></div>
+    <div id="adminReqSections"></div>
+  </div>
+
+  <!-- ═══════ TAB 3: MEMBER REQUIREMENTS ═══════ -->
+  <div class="tab-panel" id="tab-member">
+    <div class="cp">
+      <h2><i class="fas fa-users" style="color:var(--info)"></i> Member-Facing Workflows — Complete Business Requirements</h2>
+      <p class="sn">All features accessible through the Member Portal, public landing page, and self-service workflows.</p>
+    </div>
+    <div id="memberReqSections"></div>
+  </div>
+
+  <!-- ═══════ TAB 4: INFRA REQUIREMENTS ═══════ -->
+  <div class="tab-panel" id="tab-infra">
+    <div class="cp">
+      <h2><i class="fas fa-server" style="color:var(--mu)"></i> Platform Infrastructure & Integration Requirements</h2>
+      <p class="sn">Core technical platform, AI/ML capabilities, data integrations, and security foundations.</p>
+    </div>
+    <div id="infraReqSections"></div>
+  </div>
+
+  <!-- ═══════ TAB 5: USER JOURNEYS ═══════ -->
+  <div class="tab-panel" id="tab-journeys">
+    <div class="cp">
+      <h2><i class="fas fa-person-walking" style="color:var(--g)"></i> User Journeys — Real Stakeholder Interaction Flows</h2>
+      <p class="sn">Based on actual EC members, volunteers, and members from the BANF FY2026-27 roster.</p>
+    </div>
+    <div id="journeyCards"></div>
+  </div>
+
+  <!-- ═══════ TAB 6: BLOCKERS ═══════ -->
+  <div class="tab-panel" id="tab-blockers">
+    <div class="two-col">
+      <div class="cp"><h2><i class="fas fa-exclamation-triangle" style="color:var(--danger)"></i> Stuck / Blockers <span class="cnt" id="blkCnt">0</span></h2><div id="blkList"></div></div>
+      <div class="cp"><h2><i class="fas fa-clock-rotate-left" style="color:var(--info)"></i> Recent Transitions</h2><div id="tlList"></div></div>
     </div>
   </div>
 
-</div><!-- /main-wrap -->
+</div>
 
 <script>
-/* ═══════════════════════════════════════════
-   DATA MODEL
-   ═══════════════════════════════════════════ */
-
+/* ═══════════════════════════════════════════════════
+   STAKEHOLDERS (real EC committee FY2026-27)
+   ═══════════════════════════════════════════════════ */
 const STAKEHOLDERS = [
-  { id: 'president',   name: 'Ranadhir Ghosh',   role: 'President',          email: 'ranadhir.ghosh@gmail.com', domains: ['policy','budget','final-acceptance'] },
-  { id: 'gen_sec',     name: 'Suvro Banerjee',   role: 'General Secretary',  email: 'suvro.b@banf.org',         domains: ['operations','compliance','event-ops'] },
-  { id: 'treasurer',   name: 'Abhijit Das',      role: 'Treasurer',          email: 'abhijit.d@banf.org',       domains: ['budget','payments','finance'] },
-  { id: 'tech_admin',  name: 'Technical Admin',   role: 'Technical Admin',    email: 'techadmin@banf.org',       domains: ['platform','devops','architecture','security'] },
-  { id: 'ec_member',   name: 'EC Member',         role: 'EC Committee',       email: 'ec@banf.org',              domains: ['policy','membership','event-ops','community'] }
+  { id:'president',  name:'Ranadhir Ghosh',         role:'President & Super Admin',       email:'ranadhir.ghosh@gmail.com',   domains:['policy','budget','final-acceptance','membership-drive'] },
+  { id:'vp',         name:'Moumita Ghosh',           role:'Vice President',                email:'banfjax@gmail.com',          domains:['operations','events','cultural','community'] },
+  { id:'secretary',  name:'Partha Mukhopadhyay',     role:'Secretary',                     email:'partha.bhdm@gmail.com',      domains:['compliance','communications','minutes','archive'] },
+  { id:'jt_sec',     name:'Rajanya Ghosh',           role:'Joint Secretary',               email:'rajanya.ghosh@gmail.com',    domains:['membership','volunteer','community'] },
+  { id:'cultural',   name:'Sumanta Ghosh',           role:'Cultural Secretary',            email:'sumanta.ghosh@gmail.com',    domains:['events','cultural','magazine','radio'] },
+  { id:'treasurer',  name:'Amit Chandak',            role:'Treasurer',                     email:'amit.chandak@gmail.com',     domains:['budget','payments','finance','reconciliation','vendors','sponsors'] },
+  { id:'ec1',        name:'Rwiti Chowdhury',         role:'EC Member',                     email:'rwiti.chowdhury@gmail.com',  domains:['events','volunteer','community','feedback'] },
+  { id:'ec2',        name:'Soumyajit Dutta',         role:'EC Member',                     email:'soumyajit.dutta@gmail.com',  domains:['events','youth','sports','community'] },
+  { id:'tech_admin', name:'Technical Admin',          role:'Technical Admin',               email:'techadmin@banf.org',         domains:['platform','devops','architecture','security','ai'] }
 ];
 
 const STAGES = [
-  { key: 'requirement',  label: 'Requirement',           icon: 'fa-file-lines',     cls: 'stage-req' },
-  { key: 'approval',     label: 'Stakeholder Approval',  icon: 'fa-stamp',          cls: 'stage-approve' },
-  { key: 'tech',         label: 'Tech Validation',       icon: 'fa-microchip',      cls: 'stage-tech' },
-  { key: 'devops',       label: 'DevOps / Deploy',       icon: 'fa-rocket',         cls: 'stage-devops' },
-  { key: 'live',         label: 'Live in Production',    icon: 'fa-check-double',   cls: 'stage-live' }
+  { key:'requirement', label:'Requirement',          icon:'fa-file-lines',   cls:'s0' },
+  { key:'approval',    label:'Stakeholder Approval', icon:'fa-stamp',        cls:'s1' },
+  { key:'tech',        label:'Tech Validation',      icon:'fa-microchip',    cls:'s2' },
+  { key:'devops',      label:'DevOps / Deploy',      icon:'fa-rocket',       cls:'s3' },
+  { key:'live',        label:'Live Production',      icon:'fa-check-double', cls:'s4' }
 ];
 
-const REQUIREMENTS = [
+/* ═══════════════════════════════════════════════════
+   COMPREHENSIVE BUSINESS REQUIREMENTS (48 items)
+   ═══════════════════════════════════════════════════ */
+const R = [
+  // ── INFRASTRUCTURE & PLATFORM (live) ──
+  { id:'BR-001', title:'Wix Velo HTTP Functions Framework', cat:'infra', owner:'Platform Team', stage:'live', progress:100, eta:'Done', risk:'Low', approvedBy:'Technical Admin', approvedDate:'2025-11-15', needsApprovalFrom:[], stuck:null, desc:'196+ REST endpoints on Wix Velo, CORS, JSON responses, health monitoring, modular route registry.' },
+  { id:'BR-002', title:'RBAC — Role-Based Access Control', cat:'infra', owner:'Platform Team', stage:'live', progress:100, eta:'Done', risk:'Low', approvedBy:'Technical Admin', approvedDate:'2025-12-01', needsApprovalFrom:[], stuck:null, desc:'4-tier roles (super_admin, admin, ec_member, member), permission matrix, feature delegation per EC member.' },
+  { id:'BR-003', title:'Gmail API Integration (OAuth2)', cat:'infra', owner:'Platform Team', stage:'live', progress:100, eta:'Done', risk:'Low', approvedBy:'Technical Admin', approvedDate:'2025-12-10', needsApprovalFrom:[], stuck:null, desc:'OAuth2 refresh-token flow, branded HTML email sending, inbox sync for RSVP/Zelle scanning.' },
+  { id:'BR-004', title:'Google Drive Integration', cat:'infra', owner:'Platform Team', stage:'live', progress:100, eta:'Done', risk:'Low', approvedBy:'Technical Admin', approvedDate:'2025-12-15', needsApprovalFrom:[], stuck:null, desc:'Drive file browser, search, CSV sync, BANF folder auto-discovery, archive document linking.' },
+  { id:'BR-005', title:'DB-Driven Email Template System', cat:'infra', owner:'Platform Team', stage:'live', progress:100, eta:'Done', risk:'Low', approvedBy:'Technical Admin', approvedDate:'2026-02-22', needsApprovalFrom:[], stuck:null, desc:'{{variable}} templates, conditional blocks, admin CRUD, template preview, 5 default templates seeded.' },
+  { id:'BR-006', title:'RAG Knowledge Base & AI Agents', cat:'infra', owner:'AI Team', stage:'live', progress:100, eta:'Done', risk:'Low', approvedBy:'Technical Admin', approvedDate:'2026-02-15', needsApprovalFrom:[], stuck:null, desc:'Vector-search RAG engine, document upload, 6 AI agent profiles, LLM-powered Q&A, member chatbot.' },
+  { id:'BR-007', title:'Unified Ecosystem Dashboard', cat:'infra', owner:'Platform Team', stage:'live', progress:100, eta:'Done', risk:'Low', approvedBy:'Technical Admin', approvedDate:'2026-02-20', needsApprovalFrom:[], stuck:null, desc:'17 quick-links, system health KPIs, cross-portal navigation hub, GitHub Pages + Wix.' },
+
+  // ── ADMIN: IDENTITY & ONBOARDING ──
+  { id:'BR-010', title:'EC Onboarding Gate & Password Setup', cat:'admin', owner:'Platform Team', stage:'live', progress:100, eta:'Done', risk:'Low', approvedBy:'Technical Admin', approvedDate:'2026-01-08', needsApprovalFrom:[], stuck:null, desc:'One-time token setup, HMAC-SHA256 password hashing, profile completion wizard, onboarding gate chain.' },
+  { id:'BR-011', title:'Admin Portal — Super Admin Console', cat:'admin', owner:'Platform Team', stage:'live', progress:100, eta:'Done', risk:'Low', approvedBy:'Technical Admin', approvedDate:'2026-02-01', needsApprovalFrom:[], stuck:null, desc:'Role management, email builder, drive invitation control, system diagnostics, bootstrap seeding.' },
+  { id:'BR-012', title:'Multi-Role Identity & Login Workflow', cat:'admin', owner:'Platform Team', stage:'live', progress:100, eta:'Done', risk:'Low', approvedBy:'Technical Admin', approvedDate:'2026-02-05', needsApprovalFrom:[], stuck:null, desc:'Email+password login, session management, role-based portal routing, forgot-password flow.' },
+  { id:'BR-013', title:'EC Year Status & Membership Gate', cat:'admin', owner:'Platform Team', stage:'live', progress:100, eta:'Done', risk:'Low', approvedBy:'Technical Admin', approvedDate:'2026-01-10', needsApprovalFrom:[], stuck:null, desc:'Fiscal year EC readiness tracking, enforced sequence: SuperAdmin → President → Drive → Members.' },
+
+  // ── ADMIN: MEMBER MANAGEMENT ──
+  { id:'BR-020', title:'CRM Admin — Member Search, View, Edit', cat:'admin', owner:'CRM Engineering', stage:'live', progress:100, eta:'Done', risk:'Low', approvedBy:'Technical Admin', approvedDate:'2026-01-25', needsApprovalFrom:[], stuck:null, desc:'Full CRM: search, filter by status/tier/role, inline edit, member report, deactivation, export.' },
+  { id:'BR-021', title:'Family Unit Management', cat:'admin', owner:'CRM Engineering', stage:'live', progress:100, eta:'Done', risk:'Low', approvedBy:'Technical Admin', approvedDate:'2026-01-28', needsApprovalFrom:[], stuck:null, desc:'Create/edit family groups, add/remove adults and children, family history audit trail.' },
+  { id:'BR-022', title:'Family Profile Correction Automation', cat:'admin', owner:'CRM Engineering', stage:'devops', progress:78, eta:'Mar 06', risk:'Medium', approvedBy:'Technical Admin', approvedDate:'2026-02-24', needsApprovalFrom:['president'], stuck:'Deployment window conflict with migration freeze', desc:'Fuzzy-match family linkage, Levenshtein + evidence-graph, bulk correction campaigns.' },
+  { id:'BR-023', title:'Membership Drive Engine', cat:'admin', owner:'Membership Team', stage:'live', progress:100, eta:'Done', risk:'Low', approvedBy:'Technical Admin', approvedDate:'2026-01-20', needsApprovalFrom:[], stuck:null, desc:'6 categories × 4 tiers, invite codes, AI tier recommendation, registration flow, Zelle/PayPal payment, welcome emails.' },
+  { id:'BR-024', title:'Member Signup & Authentication', cat:'admin', owner:'Platform Team', stage:'live', progress:100, eta:'Done', risk:'Low', approvedBy:'Technical Admin', approvedDate:'2026-01-15', needsApprovalFrom:[], stuck:null, desc:'Email verification code, password setup, secret Q&A, session management, forgot-password, sign-out.' },
+  { id:'BR-025', title:'Membership Drive Analytics', cat:'admin', owner:'Data & Insights', stage:'live', progress:100, eta:'Done', risk:'Low', approvedBy:'Technical Admin', approvedDate:'2026-02-18', needsApprovalFrom:[], stuck:null, desc:'KPI panel with tier breakdown, invite vs response analytics, drive status monitoring.' },
+  { id:'BR-026', title:'Communication Consent & GDPR', cat:'admin', owner:'Compliance Team', stage:'live', progress:100, eta:'Done', risk:'Low', approvedBy:'Technical Admin', approvedDate:'2026-02-14', needsApprovalFrom:[], stuck:null, desc:'Opt-in form, consent tracking, unsubscribe flow, data correction campaign, GDPR compliance.' },
+
+  // ── ADMIN: EVENTS & EVITE ──
+  { id:'BR-030', title:'Event Creation & Management', cat:'admin', owner:'Events Team', stage:'live', progress:100, eta:'Done', risk:'Low', approvedBy:'Technical Admin', approvedDate:'2026-02-08', needsApprovalFrom:[], stuck:null, desc:'Create events, set keywords for Gmail scanning, manage 17 FY2026-27 events calendar.' },
+  { id:'BR-031', title:'Evite Invitation System', cat:'admin', owner:'Events Team', stage:'live', progress:100, eta:'Done', risk:'Low', approvedBy:'Technical Admin', approvedDate:'2026-02-10', needsApprovalFrom:[], stuck:null, desc:'Branded HTML invitations via Gmail, per-recipient tracking, open/click tracking, reminder sends.' },
+  { id:'BR-032', title:'RSVP Tracking & Attendance', cat:'admin', owner:'Events Team', stage:'live', progress:100, eta:'Done', risk:'Low', approvedBy:'Technical Admin', approvedDate:'2026-02-10', needsApprovalFrom:[], stuck:null, desc:'Gmail RSVP scanning with LLM parsing, family grouping, dietary breakdown, attendance worksheet.' },
+
+  // ── ADMIN: FINANCE ──
+  { id:'BR-040', title:'Budget Creation & Tracking', cat:'admin', owner:'Finance Team', stage:'live', progress:100, eta:'Done', risk:'Low', approvedBy:'Technical Admin', approvedDate:'2026-02-08', needsApprovalFrom:[], stuck:null, desc:'Income/expense ledger by year, 6 income + 12 expense categories, vendor linkage, FY summaries.' },
+  { id:'BR-041', title:'Vendor Registry (15 categories)', cat:'admin', owner:'Finance Team', stage:'live', progress:100, eta:'Done', risk:'Low', approvedBy:'Technical Admin', approvedDate:'2026-02-08', needsApprovalFrom:[], stuck:null, desc:'CRUD vendors: venue, catering, decoration, photography, videography, sound, printing, apparel, tech, spiritual, transport, security, entertainment, media, misc.' },
+  { id:'BR-042', title:'Sponsor Management', cat:'admin', owner:'Finance Team', stage:'live', progress:100, eta:'Done', risk:'Low', approvedBy:'Technical Admin', approvedDate:'2026-02-08', needsApprovalFrom:[], stuck:null, desc:'Sponsor registry with tiers, amounts, benefits, year tracking, contact management.' },
+  { id:'BR-043', title:'Ad / Advertisement Management', cat:'admin', owner:'Finance Team', stage:'live', progress:100, eta:'Done', risk:'Low', approvedBy:'Technical Admin', approvedDate:'2026-02-08', needsApprovalFrom:[], stuck:null, desc:'Advertisement tracking: title, status, added-by, linked to sponsors/vendors.' },
+  { id:'BR-044', title:'Reconciliation Engine', cat:'admin', owner:'Finance Team', stage:'live', progress:100, eta:'Done', risk:'Low', approvedBy:'Technical Admin', approvedDate:'2026-02-10', needsApprovalFrom:[], stuck:null, desc:'Auto-match ledger entries to Gmail emails and Drive files (±45 days), reconciliation rate reports.' },
+  { id:'BR-045', title:'Zelle Payment Processing', cat:'admin', owner:'Finance Team', stage:'live', progress:100, eta:'Done', risk:'Low', approvedBy:'Technical Admin', approvedDate:'2026-02-12', needsApprovalFrom:[], stuck:null, desc:'Gmail scan for Zelle notifications, auto-match to members, verify/reject, payment history.' },
+  { id:'BR-046', title:'Payment Verification & Recording', cat:'admin', owner:'Finance Team', stage:'live', progress:100, eta:'Done', risk:'Low', approvedBy:'Technical Admin', approvedDate:'2026-01-22', needsApprovalFrom:[], stuck:null, desc:'Manual payment recording, verification workflow, payment status tracking, Square integration.' },
+
+  // ── ADMIN: SURVEY & FEEDBACK ──
+  { id:'BR-050', title:'Survey Engine (6 question types)', cat:'admin', owner:'Platform Team', stage:'live', progress:100, eta:'Done', risk:'Low', approvedBy:'Technical Admin', approvedDate:'2026-02-12', needsApprovalFrom:[], stuck:null, desc:'Text, rating 1-5, rating 1-10, NPS 0-10, yes/no, multiple choice. Anonymous token-hash responses.' },
+  { id:'BR-051', title:'Survey Distribution & Analysis', cat:'admin', owner:'Platform Team', stage:'live', progress:100, eta:'Done', risk:'Low', approvedBy:'Technical Admin', approvedDate:'2026-02-12', needsApprovalFrom:[], stuck:null, desc:'Email distribution via Gmail with unique tokens, LLM sentiment analysis, escalation detection, aggregated reports.' },
+  { id:'BR-052', title:'Automated Feedback-to-Ticket Routing', cat:'admin', owner:'Automation Team', stage:'tech', progress:52, eta:'Mar 12', risk:'Medium', approvedBy:null, approvedDate:null, needsApprovalFrom:['secretary','tech_admin'], stuck:'Schema extension pending design board vote', desc:'Route survey/complaint feedback into actionable tickets with auto-assignment and SLA tracking.' },
+
+  // ── ADMIN: COMMUNICATIONS ──
+  { id:'BR-055', title:'Email Automation & Auto-Response', cat:'admin', owner:'Platform Team', stage:'live', progress:100, eta:'Done', risk:'Low', approvedBy:'Technical Admin', approvedDate:'2026-02-16', needsApprovalFrom:[], stuck:null, desc:'Gmail inbox scan, AI auto-response drafting, admin approval queue, sent email archive.' },
+  { id:'BR-056', title:'Complaint Management', cat:'admin', owner:'Platform Team', stage:'live', progress:100, eta:'Done', risk:'Low', approvedBy:'Technical Admin', approvedDate:'2026-02-05', needsApprovalFrom:[], stuck:null, desc:'Complaint intake, tracking, assignment, escalation to president, status updates.' },
+  { id:'BR-057', title:'Announcement Management', cat:'admin', owner:'Platform Team', stage:'live', progress:100, eta:'Done', risk:'Low', approvedBy:'Technical Admin', approvedDate:'2026-02-03', needsApprovalFrom:[], stuck:null, desc:'Create/edit announcements with priority levels, date scheduling, member-portal display.' },
+  { id:'BR-058', title:'Stakeholder SLA Breach Alerts', cat:'admin', owner:'DevOps', stage:'approval', progress:24, eta:'Mar 18', risk:'High', approvedBy:null, approvedDate:null, needsApprovalFrom:['president','secretary'], stuck:'Alert threshold policy not finalized', desc:'Monitor and alert when stakeholder action items exceed defined SLA windows.' },
+
+  // ── ADMIN: MEDIA & CULTURE ──
+  { id:'BR-060', title:'Community Radio Control', cat:'admin', owner:'Cultural Team', stage:'live', progress:100, eta:'Done', risk:'Low', approvedBy:'Technical Admin', approvedDate:'2026-02-04', needsApprovalFrom:[], stuck:null, desc:'Radio stream start/stop, next/previous, schedule management, now-playing display.' },
+  { id:'BR-061', title:'Magazine (Jagriti) Management', cat:'admin', owner:'Cultural Team', stage:'live', progress:100, eta:'Done', risk:'Low', approvedBy:'Technical Admin', approvedDate:'2026-02-06', needsApprovalFrom:[], stuck:null, desc:'Magazine issue listing, content management, view tracking, member submission workflow.' },
+  { id:'BR-062', title:'Volunteer & Award Management', cat:'admin', owner:'Operations Team', stage:'live', progress:100, eta:'Done', risk:'Low', approvedBy:'Technical Admin', approvedDate:'2026-02-05', needsApprovalFrom:[], stuck:null, desc:'Volunteer registration, hours tracking, event assignment, award creation and nomination.' },
+  { id:'BR-063', title:'Archive & Document Management', cat:'admin', owner:'Platform Team', stage:'live', progress:100, eta:'Done', risk:'Low', approvedBy:'Technical Admin', approvedDate:'2026-02-08', needsApprovalFrom:[], stuck:null, desc:'Google Drive archive scan, document catalog, category mapping, full-scan reporting.' },
+
+  // ── MEMBER-FACING ──
+  { id:'BR-070', title:'Member Dashboard & Profile', cat:'member', owner:'Platform Team', stage:'live', progress:100, eta:'Done', risk:'Low', approvedBy:'Technical Admin', approvedDate:'2026-02-01', needsApprovalFrom:[], stuck:null, desc:'Personalised dashboard: membership status, upcoming events, dues balance, active surveys, profile edit.' },
+  { id:'BR-071', title:'Family Member View', cat:'member', owner:'CRM Engineering', stage:'live', progress:100, eta:'Done', risk:'Low', approvedBy:'Technical Admin', approvedDate:'2026-01-28', needsApprovalFrom:[], stuck:null, desc:'View family unit (adults + children), linked to CRM family groups.' },
+  { id:'BR-072', title:'Events & RSVP Submission', cat:'member', owner:'Events Team', stage:'live', progress:100, eta:'Done', risk:'Low', approvedBy:'Technical Admin', approvedDate:'2026-02-10', needsApprovalFrom:[], stuck:null, desc:'Browse upcoming events, RSVP with headcount and dietary preferences, confirmation receipt.' },
+  { id:'BR-073', title:'Survey Participation', cat:'member', owner:'Platform Team', stage:'live', progress:100, eta:'Done', risk:'Low', approvedBy:'Technical Admin', approvedDate:'2026-02-12', needsApprovalFrom:[], stuck:null, desc:'Complete anonymous surveys via unique token links, multiple question types.' },
+  { id:'BR-074', title:'Complaint & Query Submission', cat:'member', owner:'Platform Team', stage:'live', progress:100, eta:'Done', risk:'Low', approvedBy:'Technical Admin', approvedDate:'2026-02-05', needsApprovalFrom:[], stuck:null, desc:'Submit complaints/queries, track status, view responses from admin team.' },
+  { id:'BR-075', title:'Magazine Submission & Radio Requests', cat:'member', owner:'Cultural Team', stage:'live', progress:100, eta:'Done', risk:'Low', approvedBy:'Technical Admin', approvedDate:'2026-02-06', needsApprovalFrom:[], stuck:null, desc:'Submit stories/articles for Jagriti magazine, request songs on BANF community radio.' },
+  { id:'BR-076', title:'AI Chatbot (RAG-powered)', cat:'member', owner:'AI Team', stage:'live', progress:100, eta:'Done', risk:'Low', approvedBy:'Technical Admin', approvedDate:'2026-02-18', needsApprovalFrom:[], stuck:null, desc:'Context-aware AI chatbot for BANF queries, powered by RAG knowledge base and member context.' },
+  { id:'BR-077', title:'Payment History & Receipts', cat:'member', owner:'Finance Team', stage:'live', progress:100, eta:'Done', risk:'Low', approvedBy:'Technical Admin', approvedDate:'2026-01-22', needsApprovalFrom:[], stuck:null, desc:'View payment history, download receipts, check balance and dues status.' },
+  { id:'BR-078', title:'Member Directory Search', cat:'member', owner:'Platform Team', stage:'live', progress:100, eta:'Done', risk:'Low', approvedBy:'Technical Admin', approvedDate:'2026-02-03', needsApprovalFrom:[], stuck:null, desc:'Search community member directory with privacy-respecting profile display.' },
+
+  // ── PUBLIC ──
+  { id:'BR-080', title:'Public Landing Page', cat:'public', owner:'Platform Team', stage:'live', progress:100, eta:'Done', risk:'Low', approvedBy:'Technical Admin', approvedDate:'2026-01-05', needsApprovalFrom:[], stuck:null, desc:'Hero, stats, events, radio player, membership plans, EC display, budget summary, contact form, sponsor tiers.' },
+  { id:'BR-081', title:'Public RSVP Form', cat:'public', owner:'Events Team', stage:'live', progress:100, eta:'Done', risk:'Low', approvedBy:'Technical Admin', approvedDate:'2026-02-10', needsApprovalFrom:[], stuck:null, desc:'Token-based public RSVP form served as standalone HTML for event invitations.' },
+
+  // ── PLANNED / IN-PROGRESS ──
+  { id:'BR-090', title:'Finance Dashboard — Budget vs Actual Reporting', cat:'admin', owner:'Finance Team', stage:'approval', progress:15, eta:'Mar 25', risk:'Medium', approvedBy:null, approvedDate:null, needsApprovalFrom:['treasurer','president'], stuck:null, desc:'Visual budget-vs-actual dashboard, variance alerts, category drill-down, multi-year comparison.' },
+  { id:'BR-091', title:'Career Guidance Portal', cat:'member', owner:'Community Team', stage:'requirement', progress:8, eta:'Apr 2026', risk:'Low', approvedBy:null, approvedDate:null, needsApprovalFrom:['vp','jt_sec'], stuck:null, desc:'Career sessions, mentorship matching, job board, registration & attendance tracking.' },
+  { id:'BR-092', title:'Meeting Minutes Digital Archive', cat:'admin', owner:'Secretary', stage:'requirement', progress:5, eta:'Apr 2026', risk:'Low', approvedBy:null, approvedDate:null, needsApprovalFrom:['secretary','president'], stuck:null, desc:'Digital meeting minutes storage, search, version history, auto-action-item extraction.' }
+];
+
+/* ═══════════════════════════════════════════════════
+   ADMIN DOMAIN SECTIONS (for tab 2)
+   ═══════════════════════════════════════════════════ */
+const ADMIN_SECTIONS = [
+  { title:'Identity, Onboarding & Access', icon:'fa-id-badge', ids:['BR-010','BR-011','BR-012','BR-013'] },
+  { title:'Member & Family Management', icon:'fa-users-gear', ids:['BR-020','BR-021','BR-022','BR-023','BR-024','BR-025','BR-026'] },
+  { title:'Events, Evite & RSVP', icon:'fa-calendar-check', ids:['BR-030','BR-031','BR-032'] },
+  { title:'Finance, Budget & Payments', icon:'fa-indian-rupee-sign', ids:['BR-040','BR-041','BR-042','BR-043','BR-044','BR-045','BR-046','BR-090'] },
+  { title:'Survey, Feedback & Complaints', icon:'fa-comment-dots', ids:['BR-050','BR-051','BR-052','BR-055','BR-056','BR-057','BR-058'] },
+  { title:'Media, Culture & Archive', icon:'fa-photo-film', ids:['BR-060','BR-061','BR-062','BR-063','BR-092'] }
+];
+
+const MEMBER_SECTIONS = [
+  { title:'Dashboard & Profile', icon:'fa-gauge-high', ids:['BR-070','BR-071'] },
+  { title:'Events & Community', icon:'fa-calendar-star', ids:['BR-072','BR-073','BR-074','BR-078'] },
+  { title:'Media & AI', icon:'fa-wand-magic-sparkles', ids:['BR-075','BR-076'] },
+  { title:'Finance & Career', icon:'fa-wallet', ids:['BR-077','BR-091'] }
+];
+
+const INFRA_SECTIONS = [
+  { title:'Core Platform', icon:'fa-server', ids:['BR-001','BR-002','BR-003','BR-004'] },
+  { title:'Templates, AI & Dashboard', icon:'fa-robot', ids:['BR-005','BR-006','BR-007'] },
+  { title:'Public Interfaces', icon:'fa-globe', ids:['BR-080','BR-081'] }
+];
+
+/* ═══════════════════════════════════════════════════
+   USER JOURNEYS (real EC members + personas)
+   ═══════════════════════════════════════════════════ */
+const JOURNEYS = [
   {
-    id: 'SN-001', title: 'Wix Velo HTTP Functions Framework',
-    owner: 'Platform Team', domain: 'platform',
-    stage: 'live', progress: 100, eta: 'Completed', risk: 'Low',
-    approvedBy: 'Technical Admin', approvedDate: '2025-11-15',
-    needsApprovalFrom: [],
-    stuckReason: null,
-    updates: ['Framework deployed and serving 50+ endpoints in production']
+    name: 'Ranadhir Ghosh', role: 'President & Super Admin', roleCls: 'cat-admin',
+    email: 'ranadhir.ghosh@gmail.com',
+    scenario: 'Launch the FY2026-27 membership drive and monitor EC onboarding completion.',
+    steps: [
+      'Log in to Admin Portal with email + password (BR-012)',
+      'Check EC Onboarding Dashboard — verify all 8 EC members completed onboarding (BR-013)',
+      'Approve membership drive configuration: 6 categories × 4 tiers (BR-023)',
+      'Send drive invitations to 500+ community contacts via Gmail API (BR-023, BR-003)',
+      'Monitor drive status dashboard — registrations, payments, pending (BR-025)',
+      'Review and approve Zelle payments matched by the system (BR-045)',
+      'Send reminders to non-responders using email builder (BR-055)',
+      'Review final drive analytics by tier breakdown on Unified Dashboard (BR-025, BR-007)'
+    ]
   },
   {
-    id: 'SN-002', title: 'RBAC and Super Admin Role System',
-    owner: 'Platform Team', domain: 'platform',
-    stage: 'live', progress: 100, eta: 'Completed', risk: 'Low',
-    approvedBy: 'Technical Admin', approvedDate: '2025-12-01',
-    needsApprovalFrom: [],
-    stuckReason: null,
-    updates: ['Multi-role RBAC with super_admin, admin, ec_member, member live']
+    name: 'Amit Chandak', role: 'Treasurer', roleCls: 'cat-admin',
+    email: 'amit.chandak@gmail.com',
+    scenario: 'Manage FY budget, track all income/expense, and run year-end reconciliation.',
+    steps: [
+      'Log in to CRM Admin via EC onboarding credentials (BR-010)',
+      'Create FY2026-27 budget ledger with income categories (membership, events, sponsors) (BR-040)',
+      'Register 23 vendors across 15 categories (venue, catering, decoration, etc.) (BR-041)',
+      'Record sponsor agreements: Gold, Silver, Bronze tiers with benefits (BR-042)',
+      'Track advertisement placements for Durga Puja program booklet (BR-043)',
+      'Record incoming Zelle payments auto-scanned from Gmail (BR-045)',
+      'Run reconciliation engine — match ledger entries to Gmail/Drive evidence (BR-044)',
+      'Generate reconciliation report: income vs expense, reconciled vs unreconciled (BR-044)',
+      'Export financial summary for EC board presentation (BR-040)'
+    ]
   },
   {
-    id: 'SN-003', title: 'Gmail API Email Integration',
-    owner: 'Platform Team', domain: 'platform',
-    stage: 'live', progress: 100, eta: 'Completed', risk: 'Low',
-    approvedBy: 'Technical Admin', approvedDate: '2025-12-10',
-    needsApprovalFrom: [],
-    stuckReason: null,
-    updates: ['OAuth2 refresh token flow, branded HTML templates, all outbound via Gmail API']
+    name: 'Sumanta Ghosh', role: 'Cultural Secretary', roleCls: 'cat-admin',
+    email: 'sumanta.ghosh@gmail.com',
+    scenario: 'Organize Bosonto Utsob event — from creation to attendance reporting.',
+    steps: [
+      'Log in to Admin Portal, navigate to Event Management (BR-011)',
+      'Create "Bosonto Utsob" event for Mar 7, 2026 with venue details (BR-030)',
+      'Send branded HTML invitations to all 500+ members via Evite system (BR-031)',
+      'Monitor invitation delivery: opened, clicked, not-opened (BR-031)',
+      'Run Gmail RSVP scan — LLM parses email replies into structured RSVPs (BR-032)',
+      'Review attendance worksheet: family groups, dietary breakdown (veg/nonVeg) (BR-032)',
+      'Manage radio playlist for event day celebrations (BR-060)',
+      'Collect magazine submissions for Bosonto Utsob special edition (BR-061)',
+      'Send post-event feedback survey with NPS + text questions (BR-050, BR-051)'
+    ]
   },
   {
-    id: 'SN-004', title: 'EC Onboarding Gate & Password Setup',
-    owner: 'Platform Team', domain: 'platform',
-    stage: 'live', progress: 100, eta: 'Completed', risk: 'Low',
-    approvedBy: 'Technical Admin', approvedDate: '2026-01-08',
-    needsApprovalFrom: [],
-    stuckReason: null,
-    updates: ['Onboarding wizard with token auth, HMAC password hashing, profile completion']
+    name: 'Partha Mukhopadhyay', role: 'Secretary', roleCls: 'cat-admin',
+    email: 'partha.bhdm@gmail.com',
+    scenario: 'Ensure communication compliance and manage the consent correction drive.',
+    steps: [
+      'Log in to Admin Portal, check compliance dashboard (BR-011)',
+      'Launch communication consent correction campaign to all members (BR-026)',
+      'Monitor form submission rate and consent status (BR-026)',
+      'Review email automation queue — approve AI-drafted responses (BR-055)',
+      'Handle escalated complaints forwarded by the system (BR-056)',
+      'Archive meeting minutes from EC board call (BR-057, BR-063)',
+      'Generate compliance report for all member communications (BR-026)'
+    ]
   },
   {
-    id: 'SN-005', title: 'Membership Drive — Registration, Payment, Welcome',
-    owner: 'Membership Team', domain: 'membership',
-    stage: 'live', progress: 100, eta: 'Completed', risk: 'Low',
-    approvedBy: 'Technical Admin', approvedDate: '2026-01-20',
-    needsApprovalFrom: [],
-    stuckReason: null,
-    updates: ['Full reg flow with invite codes, Square payment, tiered pricing, welcome emails']
+    name: 'Rwiti Chowdhury', role: 'EC Member — Volunteer Coordinator', roleCls: 'cat-admin',
+    email: 'rwiti.chowdhury@gmail.com',
+    scenario: 'Recruit volunteers for Durga Puja and manage post-event feedback.',
+    steps: [
+      'Log in to CRM Admin with assigned features (BR-002, BR-010)',
+      'Search member directory for active members in Jacksonville area (BR-020)',
+      'Add volunteer registrations for Durga Puja setup crew (BR-062)',
+      'Track volunteer hours and shift assignments (BR-062)',
+      'Create post-event feedback survey for all attendees (BR-050)',
+      'Distribute survey via email with anonymous tokens (BR-051)',
+      'Review survey results: sentiment scores, escalation flags (BR-051)',
+      'Nominate Volunteer of the Year award based on hours + feedback (BR-062)'
+    ]
   },
   {
-    id: 'SN-006', title: 'CRM Admin Portal & Member Management',
-    owner: 'CRM Engineering', domain: 'platform',
-    stage: 'live', progress: 100, eta: 'Completed', risk: 'Low',
-    approvedBy: 'Technical Admin', approvedDate: '2026-01-25',
-    needsApprovalFrom: [],
-    stuckReason: null,
-    updates: ['CRM with search, filters, edit, family linking, payment history, export']
+    name: 'Ananya Das', role: 'General Member (Family)', roleCls: 'cat-member',
+    email: 'ananya.das@example.com',
+    scenario: 'New family joining BANF — from registration to first event RSVP.',
+    steps: [
+      'Visit BANF landing page, browse membership plans (BR-080)',
+      'Click "Join" — enter family details, select M2 Premium Early Bird (BR-023)',
+      'Receive registration confirmation email with Zelle payment instructions (BR-003)',
+      'Complete Zelle payment which is auto-detected and matched (BR-045)',
+      'Receive welcome email with Member Portal link (BR-005)',
+      'Log in to Member Portal, view dashboard and family profile (BR-070, BR-071)',
+      'RSVP for Bosonto Utsob — 2 adults, 1 child, vegetarian (BR-072)',
+      'Submit a magazine article about Bengali New Year traditions (BR-075)',
+      'Complete anonymous community feedback survey (BR-073)',
+      'Ask AI chatbot about upcoming cultural events (BR-076)'
+    ]
   },
   {
-    id: 'SN-007', title: 'Admin Portal — Super Admin Operations Console',
-    owner: 'Platform Team', domain: 'platform',
-    stage: 'live', progress: 100, eta: 'Completed', risk: 'Low',
-    approvedBy: 'Technical Admin', approvedDate: '2026-02-01',
-    needsApprovalFrom: [],
-    stuckReason: null,
-    updates: ['Full admin portal: role management, email builder, drive control, diagnostics']
+    name: 'Soumyajit Dutta', role: 'EC Member — Youth & Sports', roleCls: 'cat-admin',
+    email: 'soumyajit.dutta@gmail.com',
+    scenario: 'Plan Kids Summer Sports Training and track youth participation.',
+    steps: [
+      'Log in to Admin Portal with EC credentials (BR-012)',
+      'Create "Kids Summer Sports Training" event for Jun-Jul 2026 (BR-030)',
+      'Filter CRM members by family units with children ages 5-15 (BR-020, BR-021)',
+      'Send targeted invitations to families with children (BR-031)',
+      'Monitor RSVPs and child headcount by age group (BR-032)',
+      'Register volunteer coaches and assign shifts (BR-062)',
+      'Track event expenses: venue rental, equipment, refreshments (BR-040)',
+      'Send post-event parent feedback survey (BR-050)',
+      'Report participation stats on Unified Dashboard (BR-007)'
+    ]
   },
   {
-    id: 'SN-008', title: 'Multi-role Identity & Access Workflow',
-    owner: 'Platform Team', domain: 'platform',
-    stage: 'live', progress: 100, eta: 'Completed', risk: 'Low',
-    approvedBy: 'Technical Admin', approvedDate: '2026-02-05',
-    needsApprovalFrom: [],
-    stuckReason: null,
-    updates: ['Identity workflow with login, password verification, role-based portal routing live']
-  },
-  {
-    id: 'TK-046', title: 'Membership Drive Analytics by Tier',
-    owner: 'Data & Insights', domain: 'platform',
-    stage: 'live', progress: 100, eta: 'Completed', risk: 'Low',
-    approvedBy: 'Technical Admin', approvedDate: '2026-02-18',
-    needsApprovalFrom: [],
-    stuckReason: null,
-    updates: ['KPI panel with tier breakdown, invite vs response analytics, live in unified dashboard']
-  },
-  {
-    id: 'SN-009', title: 'Evite / Event Invitation System',
-    owner: 'Events Team', domain: 'event-ops',
-    stage: 'live', progress: 100, eta: 'Completed', risk: 'Low',
-    approvedBy: 'Technical Admin', approvedDate: '2026-02-10',
-    needsApprovalFrom: [],
-    stuckReason: null,
-    updates: ['Event creation, branded invitation emails, RSVP tracking, attendance reporting']
-  },
-  {
-    id: 'SN-010', title: 'Survey Engine & Distribution',
-    owner: 'Platform Team', domain: 'community',
-    stage: 'live', progress: 100, eta: 'Completed', risk: 'Low',
-    approvedBy: 'Technical Admin', approvedDate: '2026-02-12',
-    needsApprovalFrom: [],
-    stuckReason: null,
-    updates: ['Multi-question surveys, email distribution to members, response analytics']
-  },
-  {
-    id: 'SN-011', title: 'Communication Consent & GDPR Compliance',
-    owner: 'Compliance Team', domain: 'compliance',
-    stage: 'live', progress: 100, eta: 'Completed', risk: 'Low',
-    approvedBy: 'Technical Admin', approvedDate: '2026-02-14',
-    needsApprovalFrom: [],
-    stuckReason: null,
-    updates: ['Opt-in form, consent tracking, unsubscribe flow, GDPR-ready data handling']
-  },
-  {
-    id: 'SN-012', title: 'Unified Ecosystem Dashboard',
-    owner: 'Platform Team', domain: 'platform',
-    stage: 'live', progress: 100, eta: 'Completed', risk: 'Low',
-    approvedBy: 'Technical Admin', approvedDate: '2026-02-20',
-    needsApprovalFrom: [],
-    stuckReason: null,
-    updates: ['17 quick links, system health, KPIs, stakeholder journey link — live on GitHub Pages + Wix']
-  },
-  {
-    id: 'SN-013', title: 'Email Template System (DB-driven)',
-    owner: 'Platform Team', domain: 'platform',
-    stage: 'live', progress: 100, eta: 'Completed', risk: 'Low',
-    approvedBy: 'Technical Admin', approvedDate: '2026-02-22',
-    needsApprovalFrom: [],
-    stuckReason: null,
-    updates: ['DB-backed templates with {{variable}} rendering, admin CRUD, template preview']
-  },
-  {
-    id: 'SN-014', title: 'RAG Knowledge Base & AI Agent Support',
-    owner: 'AI Team', domain: 'platform',
-    stage: 'live', progress: 100, eta: 'Completed', risk: 'Low',
-    approvedBy: 'Technical Admin', approvedDate: '2026-02-15',
-    needsApprovalFrom: [],
-    stuckReason: null,
-    updates: ['RAG engine with document upload, vector search, 6 AI agent profiles deployed']
-  },
-  {
-    id: 'SN-021', title: 'Family Profile Correction Automation',
-    owner: 'CRM Engineering', domain: 'platform',
-    stage: 'devops', progress: 78, eta: 'Mar 06, 2026', risk: 'Medium',
-    approvedBy: 'Technical Admin', approvedDate: '2026-02-24',
-    needsApprovalFrom: ['president'],
-    stuckReason: 'Deployment window conflict with migration freeze',
-    updates: ['Approval completed', 'Tech validation passed', 'DevOps pre-prod checks in progress — waiting for release slot']
-  },
-  {
-    id: 'SN-030', title: 'Automated Feedback-to-Ticket Routing',
-    owner: 'Automation Team', domain: 'operations',
-    stage: 'tech', progress: 52, eta: 'Mar 12, 2026', risk: 'Medium',
-    approvedBy: null, approvedDate: null,
-    needsApprovalFrom: ['gen_sec', 'tech_admin'],
-    stuckReason: 'Notification schema extension pending design board vote',
-    updates: ['Requirement approved', 'Validation open: schema compatibility review underway']
-  },
-  {
-    id: 'SN-034', title: 'Stakeholder SLA Breach Alerts',
-    owner: 'DevOps', domain: 'operations',
-    stage: 'approval', progress: 24, eta: 'Mar 18, 2026', risk: 'High',
-    approvedBy: null, approvedDate: null,
-    needsApprovalFrom: ['president', 'gen_sec'],
-    stuckReason: 'Alert threshold policy not finalized by compliance',
-    updates: ['In approval review queue — awaiting policy owner sign-off']
-  },
-  {
-    id: 'SN-040', title: 'Finance Module — Budget Tracking & Reporting',
-    owner: 'Finance Team', domain: 'finance',
-    stage: 'approval', progress: 15, eta: 'Mar 25, 2026', risk: 'Medium',
-    approvedBy: null, approvedDate: null,
-    needsApprovalFrom: ['treasurer', 'president'],
-    stuckReason: null,
-    updates: ['Requirements drafted — awaiting treasurer and president approval']
+    name: 'Rajanya Ghosh', role: 'Joint Secretary — Membership', roleCls: 'cat-admin',
+    email: 'rajanya.ghosh@gmail.com',
+    scenario: 'Handle membership renewals and community engagement outreach.',
+    steps: [
+      'Log in to CRM Admin, review membership universe (BR-020)',
+      'Identify lapsed members from previous FY (BR-023)',
+      'Send personalised renewal reminder emails (BR-055)',
+      'Process membership upgrades (M1 → M2 Premium) (BR-023)',
+      'Update family records — new child added to existing family (BR-021)',
+      'Coordinate volunteer signups for community outreach events (BR-062)',
+      'Review member directory for engagement opportunities (BR-078)'
+    ]
   }
 ];
 
 const TRANSITIONS = [
-  { when: 'Today 09:45',       text: 'SN-021 entered DevOps gate after tech validation pass.' },
-  { when: 'Today 08:20',       text: 'TK-046 final stakeholder acceptance logged — live.' },
-  { when: 'Yesterday 17:30',   text: 'SN-030 updated with schema risk note and decision request.' },
-  { when: 'Yesterday 14:10',   text: 'SN-034 moved to approval review with high-risk tag.' },
-  { when: 'Feb 25, 2026',      text: 'SN-013 email template system deployed to production.' },
-  { when: 'Feb 22, 2026',      text: 'SN-012 unified dashboard published with 17 links.' },
-  { when: 'Feb 20, 2026',      text: 'Requirements Journey CTA added across all admin email templates.' }
+  { when:'Today 09:45',     text:'BR-022 entered DevOps gate after tech validation pass.' },
+  { when:'Today 08:20',     text:'BR-025 tier analytics final acceptance — live.' },
+  { when:'Yesterday 17:30', text:'BR-052 schema risk note added, decision request sent.' },
+  { when:'Yesterday 14:10', text:'BR-058 moved to approval review with high-risk tag.' },
+  { when:'Feb 25, 2026',    text:'BR-005 email template system deployed to production.' },
+  { when:'Feb 22, 2026',    text:'BR-007 unified dashboard published with 17 links.' },
+  { when:'Feb 20, 2026',    text:'Requirements Journey CTA added across all admin email templates.' },
+  { when:'Feb 18, 2026',    text:'BR-076 AI chatbot deployed to member portal.' },
+  { when:'Feb 15, 2026',    text:'BR-006 RAG knowledge base seeded with 6 agent profiles.' },
+  { when:'Feb 12, 2026',    text:'BR-050/BR-051 survey engine + Zelle payment processing live.' },
+  { when:'Feb 10, 2026',    text:'BR-031/BR-032 evite + RSVP system go-live.' }
 ];
 
-/* ═══════════════════════════════════════════
-   RENDERING
-   ═══════════════════════════════════════════ */
-
-let currentStakeholder = null;
+/* ═══════════════════════════════════════════════════
+   RENDERING ENGINE
+   ═══════════════════════════════════════════════════ */
+let curSH = null;
+let catFilterActive = 'all';
 
 function init() {
-  const picker = document.getElementById('stakeholderPicker');
-  STAKEHOLDERS.forEach(s => {
-    const opt = document.createElement('option');
-    opt.value = s.id;
-    opt.textContent = `${s.name} — ${s.role}`;
-    picker.appendChild(opt);
-  });
-
-  // Auto-select from URL param ?stakeholder=president
+  // Stakeholder picker
+  const pick = document.getElementById('shPick');
+  STAKEHOLDERS.forEach(s => { const o = document.createElement('option'); o.value = s.id; o.textContent = `${s.name} — ${s.role}`; pick.appendChild(o); });
   const urlSh = new URLSearchParams(location.search).get('stakeholder');
-  if (urlSh && STAKEHOLDERS.find(s => s.id === urlSh)) {
-    picker.value = urlSh;
-  }
+  if (urlSh && STAKEHOLDERS.find(s => s.id === urlSh)) pick.value = urlSh;
+  pick.addEventListener('change', () => { curSH = STAKEHOLDERS.find(s => s.id === pick.value) || null; renderAll(); });
+  curSH = STAKEHOLDERS.find(s => s.id === pick.value) || null;
 
-  picker.addEventListener('change', () => {
-    currentStakeholder = STAKEHOLDERS.find(s => s.id === picker.value) || null;
-    renderAll();
+  // Tabs
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+    });
   });
 
-  // Trigger initial render
-  currentStakeholder = STAKEHOLDERS.find(s => s.id === picker.value) || null;
   renderAll();
 }
 
 function renderAll() {
-  renderIdentity();
-  renderKpis();
-  renderPipeline();
-  renderPendingApprovals();
-  renderReqTable();
-  renderBlockers();
-  renderTimeline();
+  renderIdentity(); renderKpis(); renderPipeline(); renderPending();
+  renderCatFilter(); renderReqTable(); renderBlockers(); renderTimeline();
+  renderDomainSections('adminReqSections', ADMIN_SECTIONS);
+  renderDomainSections('memberReqSections', MEMBER_SECTIONS);
+  renderDomainSections('infraReqSections', INFRA_SECTIONS);
+  renderJourneys();
 }
 
 function renderIdentity() {
-  const nameEl = document.getElementById('stakeholderName');
-  const metaEl = document.getElementById('stakeholderMeta');
-  if (currentStakeholder) {
-    nameEl.textContent = currentStakeholder.name;
-    metaEl.textContent = `Role: ${currentStakeholder.role}  •  Domain(s): ${currentStakeholder.domains.join(', ')}  •  ${new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}`;
-  } else {
-    nameEl.textContent = '—';
-    metaEl.textContent = 'Select your role to see your personalised view';
-  }
+  const n = document.getElementById('shName'), m = document.getElementById('shMeta');
+  if (curSH) { n.textContent = curSH.name; m.textContent = `Role: ${curSH.role}  •  Domains: ${curSH.domains.join(', ')}  •  ${new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}`; }
+  else { n.textContent = '—'; m.textContent = 'Select your identity to see pending approvals and personalised view'; }
 }
 
 function renderKpis() {
-  const total = REQUIREMENTS.length;
-  const live = REQUIREMENTS.filter(r => r.stage === 'live').length;
-  const stuck = REQUIREMENTS.filter(r => r.stuckReason).length;
-  const highRisk = REQUIREMENTS.filter(r => r.risk === 'High').length;
-  const avgProg = Math.round(REQUIREMENTS.reduce((a,r)=>a+r.progress,0)/total);
-  const pending = currentStakeholder
-    ? REQUIREMENTS.filter(r => r.needsApprovalFrom.includes(currentStakeholder.id)).length
-    : REQUIREMENTS.filter(r => r.needsApprovalFrom.length > 0).length;
-
+  const t = R.length, lv = R.filter(r=>r.stage==='live').length, sk = R.filter(r=>r.stuck).length, hi = R.filter(r=>r.risk==='High').length;
+  const avg = Math.round(R.reduce((a,r)=>a+r.progress,0)/t);
+  const pe = curSH ? R.filter(r => r.needsApprovalFrom.includes(curSH.id)).length : R.filter(r => r.needsApprovalFrom.length > 0).length;
+  const endpts = '196+';
   const cards = [
-    { val: total,      lbl: 'Total Requirements',      cls: '' },
-    { val: live,       lbl: 'Live in Production',       cls: 'green' },
-    { val: pending,    lbl: currentStakeholder ? 'Needs Your Approval' : 'Pending Approvals', cls: pending > 0 ? 'orange' : 'green' },
-    { val: stuck,      lbl: 'Stuck / Blocked',          cls: stuck > 0 ? 'red' : 'green' },
-    { val: highRisk,   lbl: 'High Risk',                cls: highRisk > 0 ? 'red' : 'green' },
-    { val: avgProg+'%', lbl: 'Overall Progress',        cls: 'blue' }
+    {v:t,l:'Requirements',c:''},{v:lv,l:'Live in Prod',c:'gr'},{v:pe,l:curSH?'Needs Your Approval':'Pending Approvals',c:pe>0?'or':'gr'},
+    {v:sk,l:'Stuck/Blocked',c:sk>0?'rd':'gr'},{v:hi,l:'High Risk',c:hi>0?'rd':'gr'},{v:avg+'%',l:'Overall Progress',c:'bl'},{v:endpts,l:'API Endpoints',c:'bl'}
   ];
-
-  document.getElementById('kpiStrip').innerHTML = cards.map(c => `
-    <div class="kpi-card ${c.cls}">
-      <div class="val">${c.val}</div>
-      <div class="lbl">${c.lbl}</div>
-    </div>
-  `).join('');
+  document.getElementById('kpiStrip').innerHTML = cards.map(c=>`<div class="kpi ${c.c}"><div class="v">${c.v}</div><div class="l">${c.l}</div></div>`).join('');
 }
 
 function renderPipeline() {
-  const counts = {};
-  STAGES.forEach(s => counts[s.key] = REQUIREMENTS.filter(r => r.stage === s.key).length);
-
-  document.getElementById('pipelineLanes').innerHTML = STAGES.map((s, i) => {
-    const items = REQUIREMENTS.filter(r => r.stage === s.key);
-    const ids = items.map(r => r.id).join(', ') || '—';
-    return `
-      <div class="lane ${s.cls}">
-        <h4><i class="fas ${s.icon} me-1"></i>${s.label}</h4>
-        <div class="count">${counts[s.key]}</div>
-        <div class="items">${ids}</div>
-      </div>
-    `;
+  document.getElementById('pipeLanes').innerHTML = STAGES.map(s => {
+    const items = R.filter(r => r.stage === s.key);
+    return `<div class="lane ${s.cls}"><h4><i class="fas ${s.icon} me-1"></i>${s.label}</h4><div class="ct">${items.length}</div><div class="ids">${items.map(r=>r.id).join(', ')||'—'}</div></div>`;
   }).join('');
 }
 
-function stageChip(stage) {
-  const map = {
-    requirement: ['Requirement','chip-gray'],
-    approval: ['Approval','chip-blue'],
-    tech: ['Tech Validation','chip-orange'],
-    devops: ['DevOps','chip-purple'],
-    live: ['Live','chip-green']
-  };
-  const [label, cls] = map[stage] || ['Unknown','chip-gray'];
-  return `<span class="chip ${cls}">${label}</span>`;
+function stageChip(s) {
+  const m = {requirement:['Req','ch-gy'],approval:['Approval','ch-bl'],tech:['Tech','ch-or'],devops:['DevOps','ch-pu'],live:['Live','ch-gr']};
+  const [l,c] = m[s]||['?','ch-gy']; return `<span class="ch ${c}">${l}</span>`;
 }
+function riskChip(r) { return `<span class="ch ${r==='High'?'ch-rd':r==='Medium'?'ch-or':'ch-gr'}">${r}</span>`; }
+function catBadge(c) { const m = {admin:['Admin','cat-admin'],member:['Member','cat-member'],public:['Public','cat-public'],infra:['Infra','cat-infra']}; const [l,cl]=m[c]||['?','cat-infra']; return `<span class="cat-badge ${cl}">${l}</span>`; }
 
-function riskChip(risk) {
-  const cls = risk === 'High' ? 'chip-red' : risk === 'Medium' ? 'chip-orange' : 'chip-green';
-  return `<span class="chip ${cls}">${risk}</span>`;
-}
-
-function renderPendingApprovals() {
-  const panel = document.getElementById('pendingApprovalPanel');
-  let items;
-
-  if (currentStakeholder) {
-    items = REQUIREMENTS.filter(r => r.needsApprovalFrom.includes(currentStakeholder.id));
-  } else {
-    items = REQUIREMENTS.filter(r => r.needsApprovalFrom.length > 0);
-  }
-
-  document.getElementById('pendingCnt').textContent = items.length;
-
-  if (items.length === 0) {
-    document.getElementById('pendingApprovalList').innerHTML =
-      '<div class="small-note" style="padding:.5rem 0;">No approvals pending from you. All clear!</div>';
-    return;
-  }
-
-  document.getElementById('pendingApprovalList').innerHTML = items.map(req => {
-    const isStuck = !!req.stuckReason;
-    const iconCls = isStuck ? 'stuck' : 'pending';
-    const iconFa = isStuck ? 'fa-ban' : 'fa-hourglass-half';
-    const neededFrom = req.needsApprovalFrom.map(id => {
-      const s = STAKEHOLDERS.find(x => x.id === id);
-      return s ? s.role : id;
-    }).join(', ');
-
-    return `
-      <div class="approval-card">
-        <div class="icon-col ${iconCls}"><i class="fas ${iconFa}"></i></div>
-        <div class="body-col">
-          <div class="title-row">
-            <strong>${req.id}</strong> — ${req.title}
-            ${stageChip(req.stage)}
-            ${riskChip(req.risk)}
-          </div>
-          <div class="meta-row">
-            Owner: ${req.owner} • ETA: ${req.eta} • Needed from: <strong>${neededFrom}</strong>
-            ${isStuck ? `<br><i class="fas fa-exclamation-circle text-danger me-1"></i><strong class="text-danger">Stuck:</strong> ${req.stuckReason}` : ''}
-          </div>
-        </div>
-      </div>
-    `;
+function renderPending() {
+  const items = curSH ? R.filter(r => r.needsApprovalFrom.includes(curSH.id)) : R.filter(r => r.needsApprovalFrom.length > 0);
+  document.getElementById('pendCnt').textContent = items.length;
+  if (!items.length) { document.getElementById('pendList').innerHTML = '<div class="sn" style="padding:.4rem 0">No approvals pending. All clear!</div>'; return; }
+  document.getElementById('pendList').innerHTML = items.map(r => {
+    const icCls = r.stuck ? 'st' : 'pe', icFa = r.stuck ? 'fa-ban' : 'fa-hourglass-half';
+    const from = r.needsApprovalFrom.map(id => { const s = STAKEHOLDERS.find(x=>x.id===id); return s?s.role:id; }).join(', ');
+    return `<div class="ac"><div class="ic ${icCls}"><i class="fas ${icFa}"></i></div><div class="bd"><div class="tl">${r.id} — ${r.title} ${stageChip(r.stage)} ${riskChip(r.risk)}</div><div class="mt">Owner: ${r.owner} • ETA: ${r.eta} • From: <strong>${from}</strong>${r.stuck?`<br><i class="fas fa-exclamation-circle" style="color:var(--danger)"></i> <strong style="color:var(--danger)">Stuck:</strong> ${r.stuck}`:''}</div></div></div>`;
   }).join('');
+}
+
+function renderCatFilter() {
+  const cats = ['all','admin','member','infra','public'];
+  document.getElementById('catFilter').innerHTML = cats.map(c => `<button class="filter-btn${catFilterActive===c?' active':''}" data-cat="${c}">${c==='all'?'All':c.charAt(0).toUpperCase()+c.slice(1)} (${c==='all'?R.length:R.filter(r=>r.cat===c).length})</button>`).join('');
+  document.querySelectorAll('#catFilter .filter-btn').forEach(b => b.addEventListener('click', () => { catFilterActive = b.dataset.cat; renderCatFilter(); renderReqTable(); }));
 }
 
 function renderReqTable() {
-  document.getElementById('reqTableBody').innerHTML = REQUIREMENTS.map(req => {
-    const fillColor = req.progress === 100 ? '#16a34a' : req.progress >= 70 ? '#2563eb' : req.progress >= 40 ? '#f59e0b' : '#ef4444';
-    const approvalHtml = req.approvedBy
-      ? `<span class="chip chip-green"><i class="fas fa-check me-1"></i>Approved</span><br><span style="font-size:.68rem;color:var(--muted);">by ${req.approvedBy}<br>${req.approvedDate}</span>`
-      : req.needsApprovalFrom.length > 0
-        ? `<span class="chip chip-orange"><i class="fas fa-clock me-1"></i>Pending</span><br><span style="font-size:.68rem;color:var(--muted);">from ${req.needsApprovalFrom.map(id => { const s=STAKEHOLDERS.find(x=>x.id===id); return s?s.role:id; }).join(', ')}</span>`
-        : '<span class="chip chip-gray">N/A</span>';
-
-    return `
-      <tr${req.stuckReason ? ' style="background:#fef2f2;"' : ''}>
-        <td>
-          <div style="font-weight:600;">${req.id} — ${req.title}</div>
-          <div class="small-note">${req.updates[req.updates.length-1]}</div>
-          ${req.stuckReason ? `<div style="font-size:.72rem;color:var(--danger);margin-top:.2rem;"><i class="fas fa-exclamation-circle me-1"></i>${req.stuckReason}</div>` : ''}
-        </td>
-        <td>${req.owner}</td>
-        <td>${stageChip(req.stage)}</td>
-        <td>
-          <div class="progress-thin"><div class="fill" style="width:${req.progress}%;background:${fillColor}"></div></div>
-          <div class="small-note" style="margin-top:.2rem;">${req.progress}%</div>
-        </td>
-        <td>${req.eta}</td>
-        <td>${riskChip(req.risk)}</td>
-        <td>${approvalHtml}</td>
-      </tr>
-    `;
+  const filtered = catFilterActive === 'all' ? R : R.filter(r => r.cat === catFilterActive);
+  document.getElementById('totalCnt').textContent = filtered.length;
+  document.getElementById('reqTb').innerHTML = filtered.map(r => {
+    const fc = r.progress===100?'#16a34a':r.progress>=70?'#2563eb':r.progress>=40?'#f59e0b':'#ef4444';
+    const appr = r.approvedBy
+      ? `<span class="ch ch-gr"><i class="fas fa-check me-1"></i>Approved</span><br><span style="font-size:.6rem;color:var(--mu)">by ${r.approvedBy}<br>${r.approvedDate}</span>`
+      : r.needsApprovalFrom.length > 0
+        ? `<span class="ch ch-or"><i class="fas fa-clock me-1"></i>Pending</span><br><span style="font-size:.6rem;color:var(--mu)">from ${r.needsApprovalFrom.map(id=>{const s=STAKEHOLDERS.find(x=>x.id===id);return s?s.role:id;}).join(', ')}</span>`
+        : '<span class="ch ch-gy">N/A</span>';
+    return `<tr${r.stuck?' style="background:#fef2f2"':''}>
+      <td><div style="font-weight:600">${r.id} — ${r.title}</div><div class="sn">${r.desc}</div>${r.stuck?`<div style="font-size:.65rem;color:var(--danger);margin-top:.15rem"><i class="fas fa-exclamation-circle me-1"></i>${r.stuck}</div>`:''}</td>
+      <td>${catBadge(r.cat)}</td><td style="font-size:.72rem">${r.owner}</td><td>${stageChip(r.stage)}</td>
+      <td><div class="pb"><div class="f" style="width:${r.progress}%;background:${fc}"></div></div><div class="sn" style="margin-top:.15rem">${r.progress}%</div></td>
+      <td style="font-size:.72rem">${r.eta}</td><td>${riskChip(r.risk)}</td><td>${appr}</td></tr>`;
   }).join('');
 }
 
-function renderBlockers() {
-  const stuck = REQUIREMENTS.filter(r => r.stuckReason);
-  document.getElementById('blockerCnt').textContent = stuck.length;
+function renderDomainSections(containerId, sections) {
+  document.getElementById(containerId).innerHTML = sections.map(sec => {
+    const items = sec.ids.map(id => R.find(r => r.id === id)).filter(Boolean);
+    const liveCount = items.filter(i => i.stage === 'live').length;
+    return `<div class="cp">
+      <h2><i class="fas ${sec.icon}" style="color:var(--g)"></i> ${sec.title} <span class="cnt">${liveCount}/${items.length} live</span></h2>
+      <table class="rt"><thead><tr><th style="min-width:180px">ID — Requirement</th><th>Description</th><th>Stage</th><th style="min-width:90px">Progress</th><th>Approval</th></tr></thead>
+      <tbody>${items.map(r => {
+        const fc = r.progress===100?'#16a34a':r.progress>=70?'#2563eb':r.progress>=40?'#f59e0b':'#ef4444';
+        const appr = r.approvedBy ? `<span class="ch ch-gr">Approved</span><br><span style="font-size:.58rem;color:var(--mu)">by ${r.approvedBy}</span>` : r.needsApprovalFrom.length ? `<span class="ch ch-or">Pending</span>` : '';
+        return `<tr${r.stuck?' style="background:#fef2f2"':''}><td style="font-weight:600;font-size:.75rem">${r.id} — ${r.title}</td><td style="font-size:.72rem">${r.desc}</td><td>${stageChip(r.stage)}</td><td><div class="pb"><div class="f" style="width:${r.progress}%;background:${fc}"></div></div><div class="sn">${r.progress}%</div></td><td>${appr}</td></tr>`;
+      }).join('')}</tbody></table>
+    </div>`;
+  }).join('');
+}
 
-  if (stuck.length === 0) {
-    document.getElementById('blockerList').innerHTML = '<div class="small-note">No blockers — all requirements flowing.</div>';
-    return;
-  }
-
-  document.getElementById('blockerList').innerHTML = stuck.map(r => `
-    <div class="blocker-row">
-      <div class="b-icon"><i class="fas fa-hand"></i></div>
-      <div class="b-body">
-        <div class="b-title">${r.id} — ${r.title}</div>
-        <div class="b-meta">
-          ${stageChip(r.stage)} ${riskChip(r.risk)}<br>
-          <i class="fas fa-ban me-1 text-danger"></i>${r.stuckReason}<br>
-          Owner: ${r.owner} • ETA: ${r.eta}
-        </div>
+function renderJourneys() {
+  document.getElementById('journeyCards').innerHTML = JOURNEYS.map(j => `
+    <div class="uj">
+      <div style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap">
+        <span class="name">${j.name}</span>
+        <span class="role-tag ${j.roleCls}">${j.role}</span>
+        <span class="sn">${j.email}</span>
       </div>
+      <div style="font-size:.78rem;color:#374151;margin-top:.35rem"><strong>Scenario:</strong> ${j.scenario}</div>
+      <ol class="steps">${j.steps.map(s => `<li>${s}</li>`).join('')}</ol>
     </div>
   `).join('');
 }
 
+function renderBlockers() {
+  const stuck = R.filter(r => r.stuck);
+  document.getElementById('blkCnt').textContent = stuck.length;
+  document.getElementById('blkList').innerHTML = stuck.length === 0
+    ? '<div class="sn">No blockers — all requirements flowing.</div>'
+    : stuck.map(r => `<div class="bl-r"><div class="bl-i"><i class="fas fa-hand"></i></div><div style="flex:1"><div style="font-size:.78rem;font-weight:600">${r.id} — ${r.title}</div><div class="sn">${stageChip(r.stage)} ${riskChip(r.risk)}<br><i class="fas fa-ban me-1" style="color:var(--danger)"></i>${r.stuck}<br>Owner: ${r.owner} • ETA: ${r.eta}</div></div></div>`).join('');
+}
+
 function renderTimeline() {
-  document.getElementById('timelineList').innerHTML = TRANSITIONS.map(t => `
-    <div class="tl-item">
-      <div class="tl-dot"></div>
-      <div>
-        <div class="tl-text">${t.text}</div>
-        <div class="tl-when">${t.when}</div>
-      </div>
-    </div>
-  `).join('');
+  document.getElementById('tlList').innerHTML = TRANSITIONS.map(t => `<div class="tl-i"><div class="tl-d"></div><div><div style="font-size:.75rem">${t.text}</div><div style="font-size:.65rem;color:var(--mu)">${t.when}</div></div></div>`).join('');
 }
 
 init();
