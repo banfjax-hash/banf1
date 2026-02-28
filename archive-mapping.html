@@ -51,6 +51,30 @@
   .edit-btn:hover { background:#8B0000; color:#fff; border-color:#8B0000; }
   .save-btn { background:#16a34a; color:#fff; border:none; border-radius:5px; padding:2px 8px; font-size:.75rem; cursor:pointer; }
   .cancel-btn { background:#6c757d; color:#fff; border:none; border-radius:5px; padding:2px 8px; font-size:.75rem; cursor:pointer; }
+  .del-btn { background:none; border:1px solid #fca5a5; border-radius:5px; padding:2px 6px; font-size:.75rem; cursor:pointer; color:#dc3545; }
+  .del-btn:hover { background:#dc3545; color:#fff; border-color:#dc3545; }
+  .open-file-btn { background:none; border:none; padding:0 2px; color:#1a73e8; cursor:pointer; font-size:.72rem; vertical-align:middle; }
+  .open-file-btn:hover { color:#1557b0; text-decoration:underline; }
+  .conf-bar-wrap { display:flex; align-items:center; gap:5px; }
+  .conf-bar-track { background:#e2e8f0; border-radius:4px; width:52px; height:7px; overflow:hidden; flex-shrink:0; }
+  .conf-bar { height:100%; border-radius:4px; transition:width .3s; }
+  .conf-high .conf-bar { background:#16a34a; }
+  .conf-medium .conf-bar { background:#f59e0b; }
+  .conf-low .conf-bar { background:#dc3545; }
+  .learned-tag { font-size:.62rem; background:#dbeafe; color:#1e40af; border-radius:10px; padding:1px 6px; margin-left:3px; }
+  /* Add Doc Modal */
+  .add-doc-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,.55); z-index:9999; overflow-y:auto; }
+  .add-doc-modal.show { display:flex; align-items:flex-start; justify-content:center; padding:40px 20px; }
+  .modal-box { background:#fff; border-radius:12px; padding:28px; width:100%; max-width:680px; box-shadow:0 20px 60px rgba(0,0,0,.3); }
+  .modal-box h5 { color:var(--banf); font-weight:700; margin-bottom:16px; }
+  .field-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  /* Field detail expand */
+  .field-detail { background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:10px 14px; margin-top:4px; }
+  .field-row { display:flex; align-items:center; gap:8px; padding:3px 0; border-bottom:1px solid #f0f0f0; }
+  .field-row:last-child { border:none; }
+  .field-label { width:140px; font-size:.72rem; color:#64748b; font-weight:600; flex-shrink:0; }
+  .field-val { font-size:.78rem; color:#1e293b; flex:1; }
+  .field-conf-pill { font-size:.65rem; padding:1px 6px; border-radius:10px; flex-shrink:0; }
 
   .editable-select { font-size:.78rem; border:1px solid #aaa; border-radius:4px; padding:2px 4px; }
   .editable-input  { font-size:.78rem; border:1px solid #aaa; border-radius:4px; padding:2px 4px; width:100%; }
@@ -81,6 +105,9 @@
 <div class="top-bar">
   <i class="fas fa-archive"></i>
   <h1>Archive Document Mapping</h1>
+  <span id="coll-status-badge" class="badge ms-3" style="font-size:.72rem;background:rgba(255,255,255,.15);cursor:pointer" onclick="checkCollectionStatus()" title="Click to check WixData collection status">
+    <i class="fas fa-circle-notch fa-spin me-1"></i>Checking collection…
+  </span>
   <a href="https://banfwix.wixsite.com/banf1/_functions/admin_portal" class="btn btn-sm ms-auto" style="background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3)">
     <i class="fas fa-arrow-left me-1"></i>Admin Portal
   </a>
@@ -130,6 +157,9 @@
   <button class="btn btn-outline-secondary btn-sm ms-auto" onclick="exportCSV()"><i class="fas fa-file-csv me-1"></i>Export CSV</button>
   <button class="btn btn-sm ms-1" id="pdf-report-btn" style="background:#8B0000;color:#fff" onclick="openPdfReport()" title="Generate printable PDF report for current year">
     <i class="fas fa-file-pdf me-1"></i>PDF Report
+  </button>
+  <button class="btn btn-sm ms-1" id="setup-btn" style="background:#374151;color:#fff" onclick="runSetup()" title="Create / initialize the ArchiveDocuments WixData collection">
+    <i class="fas fa-database me-1"></i>Setup Collection
   </button>
   <button class="btn btn-outline-secondary btn-sm ms-1" onclick="document.getElementById('log-panel').classList.toggle('show')"><i class="fas fa-terminal me-1"></i>Log</button>
 </div>
@@ -228,19 +258,15 @@
       <table class="table table-hover mb-0" id="main-table">
         <thead>
           <tr>
-            <th style="width:30px">#</th>
-            <th>Filename</th>
-            <th>Source Folder</th>
-            <th>Type</th>
-            <th>Accounting Year</th>
-            <th>Category</th>
-            <th>Sub-Category</th>
+            <th style="width:26px">#</th>
+            <th>Document <span class="fw-normal text-muted" style="font-size:.7rem">(click 🔗 to open)</span></th>
+            <th>Year</th>
+            <th>Category / Sub</th>
             <th>Target Collection</th>
-            <th>Confidence</th>
+            <th style="width:100px">Confidence</th>
             <th>Status</th>
-            <th>Data Source</th>
             <th>Notes</th>
-            <th>Actions</th>
+            <th style="width:120px">Actions</th>
           </tr>
         </thead>
         <tbody id="tbl-body"></tbody>
@@ -248,7 +274,8 @@
     </div>
     <div class="px-3 py-2 border-top d-flex align-items-center gap-3">
       <span class="small text-muted" id="row-count">0 rows shown</span>
-      <button class="btn btn-sm btn-outline-success ms-auto" onclick="batchVerifyVisible()"><i class="fas fa-check-double me-1"></i>Verify All Visible</button>
+      <button class="btn btn-sm btn-outline-success" onclick="batchVerifyVisible()"><i class="fas fa-check-double me-1"></i>Verify All Visible</button>
+      <button class="btn btn-sm ms-auto" style="background:var(--banf);color:#fff" onclick="showAddModal()"><i class="fas fa-plus me-1"></i>Add Document</button>
     </div>
   </div>
 </div>
@@ -278,6 +305,7 @@ function getHeaders() {
 
 let allDocs = [];      // flat list currently loaded
 let editState = {};    // rowKey → { editing:bool, draft:{} }
+let expandState = {};  // rowKey → bool (field detail open)
 
 // ── Logging ──────────────────────────────────────────────────────────────────
 function log(msg, type='info') {
@@ -499,71 +527,107 @@ function renderTable() {
     const isPending = d.mappingStatus === 'pending-import';
     const catClass  = 'cat-' + (d.category||'other').toLowerCase();
     const stBadge   = statusBadge(d.mappingStatus);
-    const confClass = `conf-${d.confidence||'low'}`;
+    const conf      = d.confidence || 'low';
+    const confPct   = conf==='high'?88:conf==='medium'?55:22;
+    const confColor = conf==='high'?'#16a34a':conf==='medium'?'#f59e0b':'#dc3545';
+    const isExpanded= expandState[key];
+    const learnedTag= d.mappingStatus==='corrected'?'<span class="learned-tag" title="Learned correction">🎓 learned</span>':'';
+    const openBtn   = openFileBtn(d);
+    const srcBadge  = sourceBadge(d.source);
 
     if (isEditing) {
+      const confBar = `<div class="conf-bar-wrap"><div class="conf-bar-track"><div class="conf-bar" style="width:${confPct}%;background:${confColor}"></div></div><span class="small" style="color:${confColor}">${conf}</span></div>`;
       return `<tr class="row-editing ${catClass}" id="row-${i}">
         <td class="text-muted">${i+1}</td>
-        <td><strong>${esc(d.filename)}</strong><div class="text-muted small">${esc(d.originalPath)}</div></td>
-        <td><span class="badge bg-secondary">${esc(d.sourceFolder)}</span></td>
-        <td><span class="badge bg-light text-dark border">${esc(d.fileType)}</span></td>
         <td>
-          <select class="editable-select" id="edit-year-${i}">
-            ${yearOptions(draft.accountingYear)}
-          </select>
+          ${fileTypeIcon(d.fileType)} <strong>${esc(d.filename)}</strong>
+          <div class="text-muted" style="font-size:.68rem;margin-top:2px">${srcBadge} ${openBtn}</div>
+          <div style="margin-top:6px">
+            <div class="fw-semibold" style="font-size:.7rem;color:#64748b;margin-bottom:4px">FIELD MAPPING</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 12px">
+              <div><label style="font-size:.7rem;color:#64748b">Accounting Year</label>
+                <select class="editable-select w-100" id="edit-year-${i}">${yearOptions(draft.accountingYear)}</select></div>
+              <div><label style="font-size:.7rem;color:#64748b">Category</label>
+                <select class="editable-select w-100" id="edit-cat-${i}" onchange="syncCollection(${i}, this.value, '${i}')">${catOptions(draft.category)}</select></div>
+              <div><label style="font-size:.7rem;color:#64748b">Sub-Category</label>
+                <input class="editable-input" id="edit-sub-${i}" value="${esc(draft.subCategory||'')}"></div>
+              <div><label style="font-size:.7rem;color:#64748b">Target Collection</label>
+                <select class="editable-select w-100" id="edit-col-${i}">${colOptions(draft.targetCollection)}</select></div>
+              <div class="" style="grid-column:1/-1"><label style="font-size:.7rem;color:#64748b">Notes (reason for correction)</label>
+                <input class="editable-input" id="edit-notes-${i}" value="${esc(draft.notes||'')}"></div>
+            </div>
+          </div>
         </td>
-        <td>
-          <select class="editable-select" id="edit-cat-${i}" onchange="syncCollection(${i}, this.value, '${i}')">
-            ${catOptions(draft.category)}
-          </select>
-        </td>
-        <td><input class="editable-input" id="edit-sub-${i}" value="${esc(draft.subCategory||'')}"></td>
-        <td>
-          <select class="editable-select" id="edit-col-${i}">
-            ${colOptions(draft.targetCollection)}
-          </select>
-        </td>
-        <td><span class="${confClass} me-1"></span>${draft.confidence||''}</td>
+        <td>${esc(d.accountingYear||'')}</td>
+        <td><span class="badge" style="background:${catColor(d.category)};color:#fff;font-size:.7rem">${esc(d.category||'')}</span></td>
+        <td><code style="font-size:.72rem">${esc(d.targetCollection||'')}</code></td>
+        <td>${confBar}</td>
         <td>${stBadge}</td>
-        <td>${sourceBadge(d.source)}</td>
-        <td><input class="editable-input" id="edit-notes-${i}" value="${esc(draft.notes||'')}"></td>
-        <td>
-          <button class="save-btn me-1" onclick="saveRow('${esc(key)}', ${i}, 'correct')">Save</button>
-          <button class="save-btn me-1" style="background:#16a34a" onclick="saveRow('${esc(key)}', ${i}, 'verify')">✓ Verify</button>
-          <button class="cancel-btn" onclick="cancelEdit('${esc(key)}', ${i})">✕</button>
+        <td></td>
+        <td nowrap>
+          <button class="save-btn me-1" onclick="saveRow('${esc(key)}', ${i}, 'correct')">💾 Save &amp; Learn</button><br>
+          <button class="save-btn me-1" style="background:#1a73e8;margin-top:3px" onclick="saveRow('${esc(key)}', ${i}, 'verify')">✓ Verify</button>
+          <button class="cancel-btn" style="margin-top:3px" onclick="cancelEdit('${esc(key)}', ${i})">✕</button>
         </td>
       </tr>`;
     }
 
+    const confBar = `<div class="conf-bar-wrap"><div class="conf-bar-track"><div class="conf-bar" style="width:${confPct}%;background:${confColor}"></div></div><span class="small" style="font-size:.68rem;color:${confColor}">${confPct}%</span></div>`;
+
+    const expandPanel = isExpanded ? `
+      <tr class="${catClass}" id="expand-${i}">
+        <td colspan="9" style="padding:0 12px 12px 32px">
+          <div class="field-detail">
+            <div style="font-size:.72rem;font-weight:700;color:#475569;margin-bottom:6px">FIELD MAPPING DETAIL — ${esc(d.filename)}</div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:2px 16px">
+              ${fieldDetailRows(d)}
+            </div>
+          </div>
+        </td>
+      </tr>` : '';
+
     return `<tr class="${catClass}${isPending?' pending-import-row':''}" id="row-${i}">
       <td class="text-muted small">${i+1}</td>
       <td>
-        <strong>${esc(d.filename)}</strong>
-        <div class="text-muted" style="font-size:.72rem;word-break:break-all">${esc(d.originalPath)}</div>
+        <div style="display:flex;align-items:flex-start;gap:6px">
+          <span style="margin-top:2px">${fileTypeIcon(d.fileType)}</span>
+          <div style="flex:1;min-width:0">
+            <strong style="font-size:.84rem">${esc(d.filename)}</strong>
+            ${learnedTag}
+            <div style="margin-top:2px;display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+              ${srcBadge}
+              ${openBtn}
+              <button class="open-file-btn" onclick="toggleExpand('${esc(key)}', ${i})" title="Toggle field detail">
+                <i class="fas fa-${isExpanded?'chevron-up':'layer-group'} me-1"></i>${isExpanded?'Hide':'Fields'}
+              </button>
+            </div>
+          </div>
+        </div>
       </td>
-      <td><span class="badge bg-secondary" style="font-size:.7rem">${esc(d.sourceFolder||'')}</span></td>
-      <td><span class="badge bg-light text-dark border" style="font-size:.7rem">${esc(d.fileType||'')}</span></td>
-      <td>${esc(d.accountingYear||'—')}</td>
-      <td><span class="badge" style="background:${catColor(d.category)};color:#fff;font-size:.72rem">${esc(d.category||'')}</span></td>
-      <td class="small">${esc(d.subCategory||'—')}</td>
+      <td style="white-space:nowrap">${esc(d.accountingYear||'—')}</td>
+      <td>
+        <span class="badge" style="background:${catColor(d.category)};color:#fff;font-size:.72rem">${esc(d.category||'')}</span>
+        <div class="text-muted" style="font-size:.68rem;margin-top:2px">${esc(d.subCategory||'')}</div>
+      </td>
       <td><code style="font-size:.72rem">${esc(d.targetCollection||'')}</code></td>
-      <td><span class="${confClass} me-1"></span><span class="small">${d.confidence||''}</span></td>
-      <td>${stBadge}${isPending?'<div style="font-size:.65rem;color:#78350f;margin-top:2px">Run Mapping to save</div>':''}</td>
-      <td>${sourceBadge(d.source)}</td>
-      <td class="small text-muted">${esc(d.notes||'')}</td>
+      <td>${confBar}</td>
+      <td>${stBadge}${isPending?'<div style="font-size:.62rem;color:#78350f">→ Run Mapping</div>':''}</td>
+      <td class="small text-muted" style="max-width:130px;white-space:normal">${esc(d.notes||'')}</td>
       <td nowrap>
-        <button class="edit-btn" onclick="startEdit('${esc(key)}', ${i})" title="Edit mapping"><i class="fas fa-edit"></i></button>
+        <button class="edit-btn" onclick="startEdit('${esc(key)}', ${i})" title="Edit &amp; correct mapping"><i class="fas fa-pen"></i></button>
         ${d.mappingStatus !== 'verified' ? `<button class="save-btn ms-1" onclick="quickVerify('${esc(key)}', ${i})" title="Mark verified"><i class="fas fa-check"></i></button>` : ''}
-        ${d.mappingStatus !== 'rejected' ? `<button class="cancel-btn ms-1" onclick="quickReject('${esc(key)}', ${i})" title="Reject"><i class="fas fa-times"></i></button>` : ''}
+        <button class="del-btn ms-1" onclick="deleteDoc('${esc(key)}', '${esc(d.filename)}')" title="Delete this mapping"><i class="fas fa-trash"></i></button>
       </td>
-    </tr>`;
+    </tr>${expandPanel}`;
   }).join('');
 
   document.getElementById('row-count').textContent = `${filtered.length} of ${allDocs.length} documents`;
   window._filteredDocs = filtered;
 }
 
-// ── Edit helpers ─────────────────────────────────────────────────────────────
+// ── Edit / expand helpers ────────────────────────────────────────────────────
+let expandState = {};
+
 function startEdit(key, idx) {
   editState[key] = { editing: true, draft: { ...allDocs.find(d=>(d.docKey||d.originalPath)===key) } };
   renderTable();
@@ -574,36 +638,167 @@ function cancelEdit(key, idx) {
   delete editState[key];
   renderTable();
 }
+function toggleExpand(key, idx) {
+  expandState[key] = !expandState[key];
+  renderTable();
+}
+
+// Build open-file button based on doc source
+function openOriginalFile(d) {
+  const src = d.source || 'catalogue';
+  if (src === 'gdrive' && d.driveLink) { window.open(d.driveLink, '_blank'); return; }
+  if (src === 'gmail' && d.originalPath) { window.open(d.originalPath, '_blank'); return; }
+  // Catalogue: copy path to clipboard
+  navigator.clipboard?.writeText(d.originalPath || d.filename)
+    .then(() => log('Path copied to clipboard', 'success'))
+    .catch(() => prompt('File path (Ctrl+C to copy):', d.originalPath || d.filename));
+}
+
+function openFileBtn(d) {
+  const src = d.source || 'catalogue';
+  if (src === 'gdrive' && d.driveLink)
+    return `<a href="${esc(d.driveLink)}" target="_blank" class="open-file-btn" title="Open in Google Drive"><i class="fab fa-google-drive me-1"></i>Open in Drive</a>`;
+  if (src === 'gmail' && d.originalPath)
+    return `<a href="${esc(d.originalPath)}" target="_blank" class="open-file-btn" title="Open Gmail search"><i class="fas fa-envelope me-1"></i>Open in Gmail</a>`;
+  // Catalogue path
+  const path = d.originalPath || '';
+  return path ? `<button class="open-file-btn" onclick="navigator.clipboard?.writeText('${esc(path)}').then(()=>log('Path copied','success'))" title="${esc(path)}"><i class="fas fa-copy me-1"></i>Copy Path</button>` : '';
+}
+
+function fileTypeIcon(ft) {
+  const t = (ft||'').toLowerCase();
+  if (t==='pdf') return '<i class="fas fa-file-pdf" style="color:#dc3545"></i>';
+  if (t==='xlsx'||t==='xls') return '<i class="fas fa-file-excel" style="color:#16a34a"></i>';
+  if (t==='docx'||t==='doc') return '<i class="fas fa-file-word" style="color:#1a73e8"></i>';
+  if (t==='pptx'||t==='ppt') return '<i class="fas fa-file-powerpoint" style="color:#f59e0b"></i>';
+  if (t==='csv') return '<i class="fas fa-file-csv" style="color:#475569"></i>';
+  if (t==='html'||t==='htm') return '<i class="fas fa-globe" style="color:#8b5cf6"></i>';
+  if (t==='txt') return '<i class="fas fa-file-alt" style="color:#64748b"></i>';
+  return '<i class="fas fa-file" style="color:#94a3b8"></i>';
+}
+
+function fieldDetailRows(d) {
+  const fields = [
+    ['Filename',   d.filename,          'high'],
+    ['File Type',  d.fileType,          'high'],
+    ['Acc. Year',  d.accountingYear,    'high'],
+    ['Category',   d.category,          d.confidence||'low'],
+    ['Sub-Cat',    d.subCategory,       d.confidence||'low'],
+    ['Collection', d.targetCollection,  d.confidence||'low'],
+    ['Source',     d.source,            'high'],
+    ['Src Folder', d.sourceFolder,      'high'],
+    ['File Size',  d.fileSize,          'high'],
+    ['Dr. File ID',d.driveFileId||'—',  'high'],
+    ['Modified',   d.modifiedTime ? new Date(d.modifiedTime).toLocaleDateString() : '—', 'high'],
+    ['Email Date', d.emailDate||'—',    'high'],
+    ['From',       d.emailFrom||'—',    'high'],
+    ['Subject',    d.emailSubject||'—', 'high'],
+    ['Verified By',d.verifiedBy||'—',   'high'],
+    ['Notes',      d.notes||'—',        'high'],
+  ];
+  const confColor = c => c==='high'?'#d1fae5':c==='medium'?'#fef3c7':'#fee2e2';
+  const confTxt   = c => c==='high'?'#065f46':c==='medium'?'#78350f':'#991b1b';
+  return fields.map(([label, val, conf]) =>
+    `<div class="field-row">
+      <span class="field-label">${label}</span>
+      <span class="field-val" title="${esc(String(val||''))}" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:180px">${esc(String(val||'—'))}</span>
+      <span class="field-conf-pill" style="background:${confColor(conf)};color:${confTxt(conf)}">${conf}</span>
+    </div>`
+  ).join('');
+}
 
 async function saveRow(key, idx, action) {
   const el = id => document.getElementById(id + '-' + idx);
+  const newCat = el('edit-cat')?.value;
+  const oldDoc = allDocs.find(d=>(d.docKey||d.originalPath)===key);
+  const corrected = action==='correct' && oldDoc && (
+    newCat !== oldDoc.category ||
+    el('edit-col')?.value !== oldDoc.targetCollection ||
+    el('edit-sub')?.value !== oldDoc.subCategory
+  );
   const body = {
     docKey:          key,
-    accountingYear:  el('edit-year') ?.value,
-    category:        el('edit-cat')  ?.value,
-    subCategory:     el('edit-sub')  ?.value,
-    targetCollection:el('edit-col')  ?.value,
+    accountingYear:  el('edit-year')?.value,
+    category:        newCat,
+    subCategory:     el('edit-sub')?.value,
+    targetCollection:el('edit-col')?.value,
     notes:           el('edit-notes')?.value,
     action,
+    learnFromCorrection: corrected,  // signal backend to save learning example
     adminEmail: localStorage.getItem('banfAdminEmail') || 'admin',
   };
   try {
-    log(`Saving: ${key} → action=${action}`);
+    log(`Saving: ${key} → action=${action}${corrected?' (+ learning example)':''}`);
     const resp = await fetch(`${API}/archive_map_update`, { method:'POST', headers:getHeaders(), body:JSON.stringify(body) });
     const data = await resp.json();
     if (!data.success) throw new Error(data.message);
-    // Update in-memory
     const docIdx = allDocs.findIndex(d=>(d.docKey||d.originalPath)===key);
     if (docIdx >= 0) {
       allDocs[docIdx] = { ...allDocs[docIdx], ...body, mappingStatus: action==='verify'?'verified':(action==='correct'?'corrected':allDocs[docIdx].mappingStatus), _source:'db' };
     }
     delete editState[key];
-    log(`Saved ${key}`, 'success');
+    if (corrected) log(`🎓 Correction saved as learning example. Future files like "${oldDoc?.filename}" will map to ${newCat}.`, 'success');
+    else log(`Saved ${key}`, 'success');
     renderTable();
   } catch(e) {
     log(`Save failed: ${e.message}`, 'error');
     alert('Save failed: ' + e.message);
   }
+}
+
+// ── Delete document ───────────────────────────────────────────────────────────
+async function deleteDoc(key, filename) {
+  if (!confirm(`Delete mapping for:\n"${filename}"?\n\nThis removes the entry from ArchiveDocuments. The original file is NOT deleted.`)) return;
+  try {
+    log(`Deleting: ${key}…`);
+    const resp = await fetch(`${API}/archive_doc_delete`, {
+      method: 'POST', headers: getHeaders(),
+      body: JSON.stringify({ docKey: key, adminEmail: localStorage.getItem('banfAdminEmail')||'admin' })
+    });
+    const data = await resp.json();
+    if (!data.success) throw new Error(data.message);
+    allDocs = allDocs.filter(d=>(d.docKey||d.originalPath)!==key);
+    delete editState[key]; delete expandState[key];
+    log(`Deleted: ${key}`, 'success');
+    renderStats(null, allDocs); renderTable();
+  } catch(e) { log(`Delete failed: ${e.message}`, 'error'); alert('Delete failed: ' + e.message); }
+}
+
+// ── Add document modal ────────────────────────────────────────────────────────
+function showAddModal() {
+  const yr = YEAR_SEL() || 'FY2024-25';
+  document.getElementById('add-doc-modal').classList.add('show');
+  document.getElementById('add-year').value = yr;
+}
+function closeAddModal() { document.getElementById('add-doc-modal').classList.remove('show'); }
+async function submitAddDoc() {
+  const g = id => document.getElementById(id)?.value?.trim() || '';
+  const filename = g('add-filename');
+  if (!filename) { alert('Filename is required'); return; }
+  const body = {
+    filename,
+    originalPath:     g('add-path'),
+    fileType:         g('add-filetype'),
+    source:           g('add-source'),
+    accountingYear:   g('add-year'),
+    category:         g('add-cat'),
+    subCategory:      g('add-sub'),
+    targetCollection: g('add-col'),
+    notes:            g('add-notes'),
+    adminEmail: localStorage.getItem('banfAdminEmail') || 'admin',
+  };
+  try {
+    log(`Adding document: ${filename}…`);
+    const resp = await fetch(`${API}/archive_doc_add`, {
+      method: 'POST', headers: getHeaders(), body: JSON.stringify(body)
+    });
+    const data = await resp.json();
+    if (!data.success) throw new Error(data.message);
+    allDocs.unshift(data.doc || { ...body, mappingStatus:'corrected', confidence:'high', docKey: data.docKey || filename });
+    log(`Added: ${filename}`, 'success');
+    closeAddModal();
+    renderStats(null, allDocs); renderTable();
+  } catch(e) { log(`Add failed: ${e.message}`, 'error'); alert('Add failed: ' + e.message); }
 }
 
 async function quickVerify(key, idx) {
@@ -649,9 +844,11 @@ async function batchVerifyVisible() {
 }
 
 // ── Collection auto-suggest ───────────────────────────────────────────────────
-function syncCollection(idx, category, sfx) {
+function syncCollection(idx, category, sfxOrId) {
   const catToCol = { Events:'Events', Financial:'FinancialEntries', Membership:'MembershipRegistrations', Governance:'AdminRoles', Communication:'KnowledgeBase', Vendor:'Vendors', Analysis:'KnowledgeBase', Other:'KnowledgeBase' };
-  const colSel = document.getElementById('edit-col-' + sfx);
+  // sfxOrId can be an element ID directly (add modal) or a suffix to append to 'edit-col-'
+  const id = (typeof sfxOrId === 'string' && document.getElementById(sfxOrId)) ? sfxOrId : 'edit-col-' + sfxOrId;
+  const colSel = document.getElementById(id);
   if (colSel) colSel.value = catToCol[category] || 'KnowledgeBase';
 }
 
@@ -680,7 +877,57 @@ function openPdfReport() {
   window.open(url, '_blank');
   log(`Opening PDF report for ${yr} in new tab…`, 'success');
 }
+// ── Collection Setup ─────────────────────────────────────────────────────────
+async function checkCollectionStatus() {
+  const badge = document.getElementById('coll-status-badge');
+  badge.innerHTML = '<i class="fas fa-circle-notch fa-spin me-1"></i>Checking…';
+  badge.style.background = 'rgba(255,255,255,.15)';
+  try {
+    const r = await fetch(`${API}/archive_setup`, { headers: getHeaders() });
+    const d = await r.json();
+    if (d.success && d.ready) {
+      badge.innerHTML = `<i class="fas fa-check-circle me-1"></i>DB Ready (${d.recordCount||0} records)`;
+      badge.style.background = 'rgba(22,163,74,.6)';
+      log(`Collection ready: ${d.recordCount||0} records in ArchiveDocuments`, 'success');
+    } else {
+      badge.innerHTML = '<i class="fas fa-exclamation-triangle me-1"></i>DB Not Created';
+      badge.style.background = 'rgba(220,53,69,.6)';
+      log('Collection not ready. Click "Setup Collection" to create it.', 'error');
+    }
+  } catch(e) {
+    badge.innerHTML = '<i class="fas fa-exclamation-triangle me-1"></i>Status Unknown';
+    badge.style.background = 'rgba(100,116,139,.5)';
+  }
+}
 
+async function runSetup() {
+  const btn = document.getElementById('setup-btn');
+  if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Setting up…'; }
+  log('Creating ArchiveDocuments WixData collection…');
+  document.getElementById('log-panel').classList.add('show');
+  try {
+    const resp = await fetch(`${API}/archive_setup`, {
+      method: 'POST', headers: getHeaders(), body: '{}'
+    });
+    const d = await resp.json();
+    if (d.success && d.ready) {
+      log(`✅ ${d.message}`, 'success');
+      (d.steps||[]).forEach(s => log(`  [${s.step}] ${s.status}: ${s.message||s.error||''}`, s.status==='ok'?'success':'error'));
+      await checkCollectionStatus();
+      // Auto-trigger full scan after successful setup
+      if (confirm('Collection is ready! Run Full Scan for ' + (YEAR_SEL()||'FY2024-25') + ' now?')) {
+        await runFullScan();
+      }
+    } else {
+      log(`❌ Setup failed: ${d.message}`, 'error');
+      (d.steps||[]).forEach(s => log(`  [${s.step}] ${s.status}: ${s.message||s.error||''}`, s.status==='error'?'error':'info'));
+    }
+  } catch(e) {
+    log(`Setup error: ${e.message}`, 'error');
+  } finally {
+    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-database me-1"></i>Setup Collection'; }
+  }
+}
 // ── UI helpers ────────────────────────────────────────────────────────────────
 function showSpinner(v) {
   document.getElementById('loading-spinner').style.display = v?'':'none';
@@ -723,7 +970,77 @@ function colOptions(sel) {
   document.getElementById('year-sel').value = 'FY2024-25';
   document.getElementById('mode-sel').value = 'catalog';
   loadData();
+  // Check WixData collection status on page load
+  checkCollectionStatus();
 })();
 </script>
+
+<!-- Add Document Modal -->
+<div class="add-doc-modal" id="add-doc-modal" onclick="if(event.target===this)closeAddModal()">
+  <div class="modal-box">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+      <h5 class="mb-0"><i class="fas fa-plus-circle me-2"></i>Add Document Mapping</h5>
+      <button class="btn btn-sm btn-outline-secondary" onclick="closeAddModal()">✕ Close</button>
+    </div>
+    <div class="field-grid">
+      <div>
+        <label class="form-label small fw-semibold">Filename <span class="text-danger">*</span></label>
+        <input id="add-filename" class="form-control form-control-sm" placeholder="e.g. BANF_Budget_FY2024-25.xlsx">
+      </div>
+      <div>
+        <label class="form-label small fw-semibold">File Type</label>
+        <select id="add-filetype" class="form-select form-select-sm">
+          <option value="pdf">PDF</option><option value="xlsx">XLSX</option><option value="docx">DOCX</option>
+          <option value="pptx">PPTX</option><option value="csv">CSV</option><option value="txt">TXT</option><option value="html">HTML</option>
+        </select>
+      </div>
+      <div style="grid-column:1/-1">
+        <label class="form-label small fw-semibold">Original Path / URL</label>
+        <input id="add-path" class="form-control form-control-sm" placeholder="Drive link, Gmail URL, or local path">
+      </div>
+      <div>
+        <label class="form-label small fw-semibold">Data Source</label>
+        <select id="add-source" class="form-select form-select-sm">
+          <option value="catalogue">Catalogue</option>
+          <option value="gdrive">Google Drive</option>
+          <option value="gmail">Gmail</option>
+        </select>
+      </div>
+      <div>
+        <label class="form-label small fw-semibold">Accounting Year</label>
+        <select id="add-year" class="form-select form-select-sm">
+          <option>FY2020-21</option><option>FY2021-22</option><option>FY2022-23</option>
+          <option>FY2023-24</option><option selected>FY2024-25</option><option>FY2025-26</option><option>FY2026-27</option>
+        </select>
+      </div>
+      <div>
+        <label class="form-label small fw-semibold">Category</label>
+        <select id="add-cat" class="form-select form-select-sm" onchange="syncCollection(null, this.value, 'add-col')">
+          <option>Events</option><option>Financial</option><option>Membership</option>
+          <option>Governance</option><option>Communication</option><option>Vendor</option><option>Analysis</option><option>Other</option>
+        </select>
+      </div>
+      <div>
+        <label class="form-label small fw-semibold">Sub-Category</label>
+        <input id="add-sub" class="form-control form-control-sm" placeholder="e.g. Bosonto Utsob 2025">
+      </div>
+      <div>
+        <label class="form-label small fw-semibold">Target Collection</label>
+        <select id="add-col" class="form-select form-select-sm">
+          <option>Events</option><option>FinancialEntries</option><option>MembershipRegistrations</option>
+          <option>Members</option><option>AdminRoles</option><option>KnowledgeBase</option><option>Vendors</option>
+        </select>
+      </div>
+      <div style="grid-column:1/-1">
+        <label class="form-label small fw-semibold">Notes</label>
+        <input id="add-notes" class="form-control form-control-sm" placeholder="Optional context or reason">
+      </div>
+    </div>
+    <div class="mt-3 d-flex gap-2 justify-content-end">
+      <button class="btn btn-sm btn-outline-secondary" onclick="closeAddModal()">Cancel</button>
+      <button class="btn btn-sm" style="background:var(--banf);color:#fff" onclick="submitAddDoc()"><i class="fas fa-save me-1"></i>Save Mapping</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>

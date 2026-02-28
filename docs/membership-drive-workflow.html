@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BANF Annual Membership Drive Workflow</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+:root{--banf:#8B0000;--banf-light:#f8e8e8;}
+body{background:#f6f3f3;font-family:'Segoe UI',system-ui,sans-serif;margin:0}
+.top-bar{background:var(--banf);color:#fff;padding:10px 20px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.top-bar h1{font-size:1.15rem;font-weight:700;margin:0}
+.top-bar .pill{background:rgba(255,255,255,.18);border-radius:20px;padding:3px 12px;font-size:.78rem}
+.mode-bar{background:#fff;border-bottom:2px solid #e8d8d8;display:flex;align-items:center;gap:12px;padding:9px 20px;flex-wrap:wrap}
+.mode-btn{border:2px solid;border-radius:20px;padding:4px 16px;font-size:.81rem;font-weight:600;cursor:pointer;transition:.15s}
+.mode-demo{border-color:#f59e0b;color:#f59e0b;background:#fff}.mode-demo.active{background:#f59e0b;color:#fff}
+.mode-live{border-color:#16a34a;color:#16a34a;background:#fff}.mode-live.active{background:#16a34a;color:#fff}
+.year-badge{background:var(--banf);color:#fff;border-radius:6px;padding:3px 10px;font-size:.78rem;font-weight:700}
+.step-card{background:#fff;border-radius:10px;border-left:5px solid #ccc;margin-bottom:14px;box-shadow:0 2px 8px rgba(0,0,0,.06);overflow:hidden}
+.step-card.pending{border-left-color:#adb5bd}.step-card.running{border-left-color:#f59e0b;box-shadow:0 0 0 2px #fef3c7}
+.step-card.done{border-left-color:#16a34a}.step-card.skipped{border-left-color:#6c757d;opacity:.65}.step-card.blocked{border-left-color:#dc3545}
+.step-header{display:flex;align-items:center;gap:10px;padding:13px 16px;cursor:pointer;user-select:none}
+.step-num{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.82rem;flex-shrink:0}
+.pending .step-num{background:#e9ecef;color:#495057}.running .step-num{background:#fef3c7;color:#92400e}
+.done .step-num{background:#d1fae5;color:#065f46}.skipped .step-num{background:#e9ecef;color:#6c757d}.blocked .step-num{background:#fee2e2;color:#991b1b}
+.step-title{font-weight:700;font-size:.93rem}.step-sub{font-size:.72rem;color:#888;font-weight:400;display:block;margin-top:1px}
+.step-badge{font-size:.68rem;font-weight:700;padding:2px 8px;border-radius:10px;letter-spacing:.4px;text-transform:uppercase;white-space:nowrap}
+.badge-pending{background:#e9ecef;color:#495057}.badge-running{background:#fef3c7;color:#92400e}
+.badge-done{background:#d1fae5;color:#065f46}.badge-skipped{background:#e2e8f0;color:#64748b}.badge-blocked{background:#fee2e2;color:#991b1b}
+.mode-tag{font-size:.65rem;padding:2px 6px;border-radius:8px;font-weight:600}
+.tag-auto{background:#dbeafe;color:#1e40af}.tag-interactive{background:#f3e8ff;color:#6b21a8}
+.step-body{padding:0 16px 16px 54px;display:none}.step-body.open{display:block}
+.step-desc{font-size:.84rem;color:#555;margin-bottom:10px;line-height:1.5}
+.step-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.btn-auto{background:#16a34a;color:#fff;border:none;border-radius:6px;padding:6px 16px;font-size:.83rem;font-weight:600;cursor:pointer}
+.btn-auto:disabled{background:#9ca3af;cursor:not-allowed}
+.btn-manual{background:#f59e0b;color:#fff;border:none;border-radius:6px;padding:6px 16px;font-size:.83rem;font-weight:600;cursor:pointer}
+.btn-skip{background:#6c757d;color:#fff;border:none;border-radius:6px;padding:6px 12px;font-size:.83rem;cursor:pointer}
+.log-box{background:#111;color:#0f0;font-size:.76rem;font-family:'Consolas',monospace;border-radius:6px;padding:10px 14px;max-height:150px;overflow-y:auto;margin-top:10px;display:none}
+.log-box.show{display:block}
+.progress-wrap{background:#e9ecef;border-radius:6px;height:6px;margin:0 20px 14px}
+.progress-inner{background:var(--banf);height:6px;border-radius:6px;transition:width .5s}
+.notice-demo{background:#fef3c7;border:1px solid #fcd34d;border-radius:8px;padding:9px 14px;font-size:.82rem;color:#78350f;margin-bottom:14px}
+.notice-live{background:#d1fae5;border:1px solid #6ee7b7;border-radius:8px;padding:9px 14px;font-size:.82rem;color:#065f46;margin-bottom:14px;display:none}
+.tier-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:8px;margin:8px 0}
+.tier-card{border:2px solid #e5e7eb;border-radius:8px;padding:9px 11px;background:#fafafa;transition:.15s}
+.tier-card.selected{border-color:var(--banf);background:#fff5f5}
+.tier-name{font-weight:700;font-size:.86rem}.tier-price{font-size:1.05rem;font-weight:700}
+.tier-desc{font-size:.73rem;color:#666;margin-top:2px}
+.payment-option{border:2px solid #e5e7eb;border-radius:8px;padding:11px;cursor:pointer;transition:.15s;background:#fff}
+.payment-option.selected{border-color:var(--banf);background:#fff5f5}
+.chat-box{background:#f8f8f8;border:1px solid #e5e7eb;border-radius:8px;height:240px;display:flex;flex-direction:column;overflow:hidden}
+.chat-msgs{flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:6px}
+.chat-msg{max-width:82%;padding:7px 10px;border-radius:10px;font-size:.82rem;line-height:1.4}
+.chat-msg.user{background:#fff3ee;align-self:flex-end;border-bottom-right-radius:3px}
+.chat-msg.bot{background:#f0f0f0;align-self:flex-start;border-bottom-left-radius:3px}
+.chat-input-row{padding:6px 9px;border-top:1px solid #e5e7eb;display:flex;gap:6px}
+.pipeline-stage{display:flex;align-items:center;gap:8px;padding:7px 11px;background:#fff;border:1px solid #e5e7eb;border-radius:6px;margin-bottom:5px;font-size:.81rem;transition:.2s}
+.pipeline-stage.active{border-color:#f59e0b;background:#fffbeb}.pipeline-stage.done{border-color:#16a34a;background:#f0fdf4}
+.pi{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.7rem;flex-shrink:0}
+.email-preview{background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:12px;font-size:.82rem;margin-top:8px}
+.ep-row{display:flex;gap:8px;margin-bottom:3px;font-size:.79rem}
+.ep-label{color:#888;min-width:58px;font-weight:600}.ep-val{color:#333;flex:1}
+.ep-body{border-top:1px solid #f0f0f0;margin-top:8px;padding-top:8px;color:#333;line-height:1.55}
+.step-config{background:#f8f8f8;border:1px solid #e5e7eb;border-radius:8px;padding:11px;margin-bottom:8px}
+.step-config label{font-size:.79rem;font-weight:600;color:#555;display:block;margin-bottom:3px}
+.upload-box{border:2px dashed #d0d0d0;border-radius:8px;padding:18px;text-align:center;cursor:pointer;background:#fafafa;font-size:.82rem;color:#888}
+.upload-box:hover{border-color:var(--banf);background:#fff5f5}.upload-box.has-file{border-color:#16a34a;background:#f0fdf4;color:#065f46}
+.demo-path-toggle{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.demo-path-btn{border:1px solid #ccc;border-radius:20px;padding:3px 13px;font-size:.78rem;cursor:pointer;background:#fff;transition:.15s}
+.demo-path-btn.active{background:var(--banf);color:#fff;border-color:var(--banf)}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  <i class="fas fa-users-cog"></i>
+  <h1>Annual Membership Drive</h1>
+  <span class="pill">11 Steps</span>
+  <span class="year-badge ms-1">FY2026-27</span>
+  <a href="./admin-portal.html" class="btn btn-sm ms-auto" style="background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3)">
+    <i class="fas fa-arrow-left me-1"></i>Admin Portal
+  </a>
+</div>
+
+<!-- MODE BAR -->
+<div class="mode-bar">
+  <div>
+    <span class="text-muted small me-1">Year:</span>
+    <input type="text" value="FY2026-27" readonly style="border:1px solid #ccc;border-radius:6px;padding:3px 10px;font-size:.84rem;font-weight:700;color:#8B0000;width:110px;text-align:center">
+  </div>
+  <div class="ms-2">
+    <span class="text-muted small me-1">Mode:</span>
+    <button class="mode-btn mode-demo active" id="btnDemo" onclick="setMode('demo')"><i class="fas fa-flask me-1"></i>Demo</button>
+    <button class="mode-btn mode-live ms-1" id="btnLive" onclick="setMode('live')"><i class="fas fa-satellite-dish me-1"></i>Live</button>
+  </div>
+  <div id="demo-path-bar" class="ms-2 demo-path-toggle">
+    <span class="text-muted small">Demo path:</span>
+    <button class="demo-path-btn active" id="dp-new" onclick="setDemoPath('new')"><i class="fas fa-user-plus me-1"></i>New Member</button>
+    <button class="demo-path-btn" id="dp-ec" onclick="setDemoPath('ec')"><i class="fas fa-id-badge me-1"></i>Existing EC Member</button>
+  </div>
+  <div class="ms-auto">
+    <span class="fw-bold" id="overall-pct">0%</span>
+    <span class="text-muted small ms-1" id="overall-label">— 0 / 11</span>
+  </div>
+</div>
+
+<div style="max-width:920px;margin:0 auto;padding:18px 16px">
+
+<div class="notice-demo" id="notice-demo">
+  <i class="fas fa-flask me-1"></i><strong>Demo Mode:</strong> No live data is modified.
+  Test email: <strong>ranadhir.ghosh@gmail.com</strong>.
+  Use the <em>Demo path</em> toggle to test <strong>New Member</strong> journey or <strong>Existing EC Member</strong> journey independently.
+</div>
+<div class="notice-live" id="notice-live">
+  <i class="fas fa-satellite-dish me-1"></i><strong>Live Mode:</strong> Actions call real Wix APIs. Complete Demo mode first.
+</div>
+
+<div class="progress-wrap">
+  <div class="progress-inner" id="progress-bar" style="width:0%"></div>
+</div>
+
+<!-- ── STEP 1 ── Configure Tiers ──────────────────────────────────────────── -->
+<div class="step-card pending" id="step-1">
+  <div class="step-header" onclick="toggleStep(1)">
+    <div class="step-num">1</div>
+    <div class="flex-grow-1">
+      <div class="step-title">Configure Membership Tiers &amp; Equity Values</div>
+      <span class="step-sub">7 tiers · annual cost · equity value · event mapping · per-event value decomposition</span>
+    </div>
+    <span class="mode-tag tag-auto me-2">Auto</span>
+    <span class="step-badge badge-pending" id="status-1">Pending</span>
+    <i class="fas fa-chevron-down ms-2 text-muted" id="chev-1" style="font-size:.72rem"></i>
+  </div>
+  <div class="step-body" id="body-1">
+    <div class="step-desc">Pull current tier configuration. Each tier shows its annual fee, total equity value, included events, and per-event dollar allocation so members can make an informed decision.</div>
+    <div id="tier-display" style="display:none">
+      <div class="tier-grid" id="tier-grid"></div>
+      <div class="alert alert-info py-1 mt-2 mb-0 small"><i class="fas fa-info-circle me-1"></i>Event value breakdown: Annual Gala=$120, Cultural Fest=$80, Picnic=$40, Charity Drive=$60. Shown in invitation email.</div>
+    </div>
+    <div class="step-actions">
+      <button class="btn-auto" onclick="runStep(1,'auto')"><i class="fas fa-bolt me-1"></i>Auto: Pull Config</button>
+      <button class="btn-manual" onclick="runStep(1,'manual')"><i class="fas fa-hand-pointer me-1"></i>Manual: Open Tier Admin</button>
+      <button class="btn-skip" onclick="skipStep(1)"><i class="fas fa-forward me-1"></i>Skip</button>
+    </div>
+    <div class="log-box" id="log-1"></div>
+  </div>
+</div>
+
+<!-- ── STEP 2 ── Universe Pool ────────────────────────────────────────────── -->
+<div class="step-card pending" id="step-2">
+  <div class="step-header" onclick="toggleStep(2)">
+    <div class="step-num">2</div>
+    <div class="flex-grow-1">
+      <div class="step-title">Build Member Universe Pool</div>
+      <span class="step-sub">Assemble target list: returning members + new CRM contacts; tag prior membership history</span>
+    </div>
+    <span class="mode-tag tag-auto me-2">Auto</span>
+    <span class="step-badge badge-pending" id="status-2">Pending</span>
+    <i class="fas fa-chevron-down ms-2 text-muted" id="chev-2" style="font-size:.72rem"></i>
+  </div>
+  <div class="step-body" id="body-2">
+    <div class="step-desc">Fetch all eligible contacts for FY2026-27. Contacts with prior membership history get a <em>returning</em> tag and carry their last-known tier as the default recommendation seed for the AI Advisor.</div>
+    <div id="universe-stats" style="display:none" class="row g-2 mt-1 mb-2">
+      <div class="col-4"><div class="text-center border rounded p-2"><div class="fs-5 fw-bold" id="u-total">—</div><div class="small text-muted">Total</div></div></div>
+      <div class="col-4"><div class="text-center border rounded p-2"><div class="fs-5 fw-bold text-success" id="u-returning">—</div><div class="small text-muted">Returning</div></div></div>
+      <div class="col-4"><div class="text-center border rounded p-2"><div class="fs-5 fw-bold text-primary" id="u-new">—</div><div class="small text-muted">New</div></div></div>
+    </div>
+    <div class="step-actions">
+      <button class="btn-auto" onclick="runStep(2,'auto')"><i class="fas fa-bolt me-1"></i>Auto: Fetch Universe</button>
+      <button class="btn-manual" onclick="runStep(2,'manual')"><i class="fas fa-hand-pointer me-1"></i>Manual: Universe Manager</button>
+      <button class="btn-skip" onclick="skipStep(2)"><i class="fas fa-forward me-1"></i>Skip</button>
+    </div>
+    <div class="log-box" id="log-2"></div>
+  </div>
+</div>
+
+<!-- ── STEP 3 ── Init Drive ───────────────────────────────────────────────── -->
+<div class="step-card pending" id="step-3">
+  <div class="step-header" onclick="toggleStep(3)">
+    <div class="step-num">3</div>
+    <div class="flex-grow-1">
+      <div class="step-title">Initialize Drive Record</div>
+      <span class="step-sub">POST /membership_drive_init → driveId assigned, status=active</span>
+    </div>
+    <span class="mode-tag tag-auto me-2">Auto</span>
+    <span class="step-badge badge-pending" id="status-3">Pending</span>
+    <i class="fas fa-chevron-down ms-2 text-muted" id="chev-3" style="font-size:.72rem"></i>
+  </div>
+  <div class="step-body" id="body-3">
+    <div class="step-desc">Creates the MembershipDrive record for FY2026-27 in WixData. Idempotent — will not create a duplicate if already initialized. All subsequent steps reference this driveId.</div>
+    <div class="step-actions">
+      <button class="btn-auto" onclick="runStep(3,'auto')"><i class="fas fa-bolt me-1"></i>Auto: Initialize</button>
+      <button class="btn-skip" onclick="skipStep(3)"><i class="fas fa-forward me-1"></i>Skip</button>
+    </div>
+    <div class="log-box" id="log-3"></div>
+  </div>
+</div>
+
+<!-- ── STEP 4 ── Send Invitations ─────────────────────────────────────────── -->
+<div class="step-card pending" id="step-4">
+  <div class="step-header" onclick="toggleStep(4)">
+    <div class="step-num">4</div>
+    <div class="flex-grow-1">
+      <div class="step-title">Send Invitation Emails</div>
+      <span class="step-sub">Rich content: tier table, equity values, event mapping, AI Advisor link, Zelle/Cheque instructions</span>
+    </div>
+    <span class="mode-tag tag-auto me-2">Auto</span>
+    <span class="step-badge badge-pending" id="status-4">Pending</span>
+    <i class="fas fa-chevron-down ms-2 text-muted" id="chev-4" style="font-size:.72rem"></i>
+  </div>
+  <div class="step-body" id="body-4">
+    <div class="step-desc">
+      Sends the BANF membership drive invitation to the universe pool (demo: only ranadhir.ghosh@gmail.com). Email includes:<br>
+      • All 7 membership categories with annual fee and equity value<br>
+      • Event calendar with tier-to-event mapping and per-event dollar decomposition<br>
+      • Link to the AI Membership Advisor agent<br>
+      • Payment instructions: Zelle (treasurer's details) and Cheque (mailing address)
+    </div>
+    <div class="step-config">
+      <label>Email Subject (optional override)</label>
+      <input type="text" class="form-control form-control-sm" id="inv-subject" placeholder="You're Invited: Join BANF FY2026-27 — Choose Your Membership!">
+    </div>
+    <div id="inv-preview" style="display:none" class="email-preview mb-2">
+      <div class="ep-row"><span class="ep-label">To:</span><span class="ep-val" id="inv-to"></span></div>
+      <div class="ep-row"><span class="ep-label">Subject:</span><span class="ep-val" id="inv-subj-preview"></span></div>
+      <div class="ep-body" id="inv-body-preview"></div>
+    </div>
+    <div class="step-actions">
+      <button class="btn-auto" onclick="runStep(4,'auto')"><i class="fas fa-bolt me-1"></i>Auto: Send Now</button>
+      <button class="btn-manual" onclick="runStep(4,'manual')"><i class="fas fa-eye me-1"></i>Preview Email</button>
+      <button class="btn-skip" onclick="skipStep(4)"><i class="fas fa-forward me-1"></i>Skip</button>
+    </div>
+    <div class="log-box" id="log-4"></div>
+  </div>
+</div>
+
+<!-- ── STEP 5 ── AI Advisor ───────────────────────────────────────────────── -->
+<div class="step-card pending" id="step-5">
+  <div class="step-header" onclick="toggleStep(5)">
+    <div class="step-num">5</div>
+    <div class="flex-grow-1">
+      <div class="step-title">AI Membership Advisor</div>
+      <span class="step-sub">Chat agent recommends tier from history + preferences; default pre-filled from past membership</span>
+    </div>
+    <span class="mode-tag tag-interactive me-2">Interactive</span>
+    <span class="step-badge badge-pending" id="status-5">Pending</span>
+    <i class="fas fa-chevron-down ms-2 text-muted" id="chev-5" style="font-size:.72rem"></i>
+  </div>
+  <div class="step-body" id="body-5">
+    <div class="step-desc">The AI Membership Advisor greets the member, shows their default recommended tier (from prior membership history), and offers to refine the recommendation based on family size, budget, or event preferences. Type "confirm" to accept the recommendation and proceed.</div>
+    <div class="chat-box" id="advisor-chat">
+      <div class="chat-msgs" id="chat-msgs"></div>
+      <div class="chat-input-row">
+        <input type="text" class="form-control form-control-sm" id="chat-input" placeholder="Type your response or 'confirm'…" onkeydown="if(event.key==='Enter')sendChat()">
+        <button onclick="sendChat()" style="background:var(--banf);color:#fff;border:none;border-radius:6px;padding:5px 14px;font-size:.82rem;cursor:pointer">Send</button>
+      </div>
+    </div>
+    <div id="advisor-recommendation" style="display:none" class="mt-2 p-3 rounded" style="background:#f0fdf4">
+      <div class="fw-bold text-success mb-2 small"><i class="fas fa-check-circle me-1"></i>Confirmed Recommendation</div>
+      <div id="rec-tier-display"></div>
+    </div>
+    <div class="step-actions mt-2">
+      <button class="btn-auto" onclick="runStep(5,'auto')"><i class="fas fa-play me-1"></i>Start Advisor</button>
+      <button class="btn-skip" onclick="skipStep(5)"><i class="fas fa-forward me-1"></i>Skip (use default tier)</button>
+    </div>
+    <div class="log-box" id="log-5"></div>
+  </div>
+</div>
+
+<!-- ── STEP 6 ── Tier & Payment Selection ────────────────────────────────── -->
+<div class="step-card pending" id="step-6">
+  <div class="step-header" onclick="toggleStep(6)">
+    <div class="step-num">6</div>
+    <div class="flex-grow-1">
+      <div class="step-title">Member Selects Tier &amp; Payment Method</div>
+      <span class="step-sub">Choose tier · pay by Zelle or Cheque · upload cheque image if applicable</span>
+    </div>
+    <span class="mode-tag tag-interactive me-2">Interactive</span>
+    <span class="step-badge badge-pending" id="status-6">Pending</span>
+    <i class="fas fa-chevron-down ms-2 text-muted" id="chev-6" style="font-size:.72rem"></i>
+  </div>
+  <div class="step-body" id="body-6">
+    <div class="step-desc">Member confirms their chosen tier (pre-filled from AI advisor recommendation) and selects a payment method. For Cheque payment, an image upload field is provided.</div>
+
+    <div class="step-config">
+      <label>Membership Tier</label>
+      <select class="form-select form-select-sm" id="sel-tier">
+        <option value="Family">Family — $80/yr  (equity $280 · Gala, Fest, Picnic)</option>
+        <option value="Individual">Individual — $50/yr  (equity $150 · Gala, Fest)</option>
+        <option value="Student">Student — $20/yr  (equity $60 · Cultural Fest)</option>
+        <option value="Senior">Senior — $30/yr  (equity $90 · Gala, Fest)</option>
+        <option value="Patron">Patron — $150/yr  (equity $500 · Gala, Fest, Picnic, Charity)</option>
+        <option value="Corporate">Corporate — $500/yr  (equity $1500 · All Events + VIP)</option>
+        <option value="Lifetime">Lifetime — $1000 one-time  (equity $5000 · All Events forever)</option>
+      </select>
+    </div>
+
+    <label class="small fw-bold mb-1 mt-1" style="color:#555;display:block">Payment Method</label>
+    <div class="row g-2 mb-2">
+      <div class="col-6">
+        <div class="payment-option selected" id="pm-zelle" onclick="selectPayMethod('zelle')">
+          <div class="fw-bold small"><i class="fas fa-mobile-alt me-1 text-primary"></i>Zelle</div>
+          <div style="font-size:.74rem;color:#666;margin-top:2px">Send to treasurer's Zelle. Include name + tier in memo.</div>
+        </div>
+      </div>
+      <div class="col-6">
+        <div class="payment-option" id="pm-cheque" onclick="selectPayMethod('cheque')">
+          <div class="fw-bold small"><i class="fas fa-money-check-alt me-1 text-success"></i>Cheque</div>
+          <div style="font-size:.74rem;color:#666;margin-top:2px">Pay by cheque to BANF. Upload cheque image below.</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="zelle-instructions" class="step-config">
+      <div class="small fw-bold text-primary mb-1"><i class="fas fa-mobile-alt me-1"></i>Zelle Instructions</div>
+      <div class="small">Send to: <strong>banftreasurer@example.com</strong></div>
+      <div class="small mt-1">Memo: <code>BANF FY2026-27 [Your Name] [Tier]</code></div>
+      <div class="alert alert-info py-1 mt-2 mb-0 small"><i class="fas fa-info-circle me-1"></i>After Zelle payment, reply to the invitation email with "Payment sent via Zelle" and the reference number.</div>
+    </div>
+
+    <div id="cheque-section" style="display:none" class="step-config">
+      <div class="small fw-bold text-success mb-2"><i class="fas fa-money-check-alt me-1"></i>Upload Cheque Image</div>
+      <div class="upload-box" id="cheque-upload-box" onclick="document.getElementById('cheque-file').click()">
+        <i class="fas fa-cloud-upload-alt fa-lg mb-1 d-block" style="color:#ccc"></i>
+        Click to upload cheque image (JPG/PNG/PDF)<br><small class="text-muted">Max 5 MB</small>
+      </div>
+      <input type="file" id="cheque-file" style="display:none" accept="image/*,.pdf" onchange="handleChequeUpload(this)">
+      <div id="cheque-filename" class="small text-success mt-1" style="display:none"></div>
+      <div class="small text-muted mt-1">Payable to: <strong>Bengali Association of North Florida</strong></div>
+    </div>
+
+    <div class="step-actions">
+      <button class="btn-auto" onclick="runStep(6,'auto')"><i class="fas fa-check me-1"></i>Confirm Selection</button>
+      <button class="btn-skip" onclick="skipStep(6)"><i class="fas fa-forward me-1"></i>Skip</button>
+    </div>
+    <div class="log-box" id="log-6"></div>
+  </div>
+</div>
+
+<!-- ── STEP 7 ── Synthetic Email ──────────────────────────────────────────── -->
+<div class="step-card pending" id="step-7">
+  <div class="step-header" onclick="toggleStep(7)">
+    <div class="step-num">7</div>
+    <div class="flex-grow-1">
+      <div class="step-title">Simulate Payment Confirmation Email <span class="badge bg-warning text-dark ms-1" style="font-size:.65rem">Demo</span></div>
+      <span class="step-sub">Generate synthetic email as if member sent payment confirmation to BANF inbox</span>
+    </div>
+    <span class="mode-tag tag-auto me-2">Auto</span>
+    <span class="step-badge badge-pending" id="status-7">Pending</span>
+    <i class="fas fa-chevron-down ms-2 text-muted" id="chev-7" style="font-size:.72rem"></i>
+  </div>
+  <div class="step-body" id="body-7">
+    <div class="step-desc">In demo mode, this step creates a realistic synthetic email (from the member's address to BANF) confirming their payment — as would happen in real life when a member replies to the invitation. In live mode this step is skipped and the real email is used. The synthetic email is injected into the queue for the Email Receive Agent to process.</div>
+    <div id="synth-email-preview" style="display:none" class="email-preview">
+      <div class="ep-row"><span class="ep-label">From:</span><span class="ep-val" id="synth-from"></span></div>
+      <div class="ep-row"><span class="ep-label">To:</span><span class="ep-val">banf.treasurer@example.com; banf.secretary@example.com</span></div>
+      <div class="ep-row"><span class="ep-label">Subject:</span><span class="ep-val" id="synth-subject"></span></div>
+      <div class="ep-body" id="synth-body"></div>
+    </div>
+    <div class="step-actions">
+      <button class="btn-auto" onclick="runStep(7,'auto')"><i class="fas fa-bolt me-1"></i>Auto: Generate &amp; Inject Email</button>
+      <button class="btn-skip" onclick="skipStep(7)"><i class="fas fa-forward me-1"></i>Skip</button>
+    </div>
+    <div class="log-box" id="log-7"></div>
+  </div>
+</div>
+
+<!-- ── STEP 8 ── Email Receive Agent ──────────────────────────────────────── -->
+<div class="step-card pending" id="step-8">
+  <div class="step-header" onclick="toggleStep(8)">
+    <div class="step-num">8</div>
+    <div class="flex-grow-1">
+      <div class="step-title">Email Receive Agent — Triggered</div>
+      <span class="step-sub">Fires on new inbox message · extracts sender, subject, body · routes to classifier</span>
+    </div>
+    <span class="mode-tag tag-auto me-2">Auto</span>
+    <span class="step-badge badge-pending" id="status-8">Pending</span>
+    <i class="fas fa-chevron-down ms-2 text-muted" id="chev-8" style="font-size:.72rem"></i>
+  </div>
+  <div class="step-body" id="body-8">
+    <div class="step-desc">The Email Receive Agent is triggered as soon as a new email lands in the BANF inbox (or is injected in demo). It reads the raw email, extracts key fields (sender, subject, body text, attachments), and passes the structured payload to the Email Classification Agent.</div>
+    <div id="email-agent-status" style="display:none">
+      <div class="small fw-bold mb-2 text-muted"><i class="fas fa-satellite-dish me-1 text-warning"></i>EMAIL RECEIVE AGENT — PROCESSING</div>
+      <div class="pipeline-stage" id="ps-receive"><div class="pi bg-secondary text-white"><i class="fas fa-envelope"></i></div><div><div class="fw-semibold" style="font-size:.8rem">Detect new email</div><div class="text-muted" style="font-size:.74rem" id="ps-receive-d">—</div></div></div>
+      <div class="pipeline-stage" id="ps-parse"><div class="pi bg-secondary text-white"><i class="fas fa-code"></i></div><div><div class="fw-semibold" style="font-size:.8rem">Parse &amp; extract fields</div><div class="text-muted" style="font-size:.74rem" id="ps-parse-d">Waiting…</div></div></div>
+      <div class="pipeline-stage" id="ps-route"><div class="pi bg-secondary text-white"><i class="fas fa-route"></i></div><div><div class="fw-semibold" style="font-size:.8rem">Route to EmailClassificationAgent</div><div class="text-muted" style="font-size:.74rem" id="ps-route-d">Waiting…</div></div></div>
+    </div>
+    <div class="step-actions">
+      <button class="btn-auto" onclick="runStep(8,'auto')"><i class="fas fa-bolt me-1"></i>Auto: Trigger Receive Agent</button>
+      <button class="btn-skip" onclick="skipStep(8)"><i class="fas fa-forward me-1"></i>Skip</button>
+    </div>
+    <div class="log-box" id="log-8"></div>
+  </div>
+</div>
+
+<!-- ── STEP 9 ── Email Classification ────────────────────────────────────── -->
+<div class="step-card pending" id="step-9">
+  <div class="step-header" onclick="toggleStep(9)">
+    <div class="step-num">9</div>
+    <div class="flex-grow-1">
+      <div class="step-title">Email Classification &amp; Routing</div>
+      <span class="step-sub">AI intent classification → membership_payment_confirmation → Member Addition Pipeline</span>
+    </div>
+    <span class="mode-tag tag-auto me-2">Auto</span>
+    <span class="step-badge badge-pending" id="status-9">Pending</span>
+    <i class="fas fa-chevron-down ms-2 text-muted" id="chev-9" style="font-size:.72rem"></i>
+  </div>
+  <div class="step-body" id="body-9">
+    <div class="step-desc">The Email Classification Agent runs NLP intent detection on the parsed email payload. Categories: <em>membership_payment_confirmation</em>, <em>complaint</em>, <em>event_rsvp</em>, <em>general_inquiry</em>, <em>unsubscribe</em>. When classified as a membership payment, the record is forwarded to the Member Addition Pipeline.</div>
+    <div id="classification-output" style="display:none" class="step-config">
+      <div class="row g-2">
+        <div class="col-sm-6"><div class="small text-muted">Category</div><div class="fw-bold" style="color:var(--banf)" id="cls-category">—</div></div>
+        <div class="col-sm-6"><div class="small text-muted">Confidence</div><div class="fw-bold text-success" id="cls-confidence">—</div></div>
+        <div class="col-12 mt-1"><div class="small text-muted mb-1">Entities extracted</div><div id="cls-entities"></div></div>
+        <div class="col-12 mt-1"><div class="small text-muted">Routed to</div><div class="fw-bold text-primary" id="cls-routed">—</div></div>
+      </div>
+    </div>
+    <div class="step-actions">
+      <button class="btn-auto" onclick="runStep(9,'auto')"><i class="fas fa-bolt me-1"></i>Auto: Classify &amp; Route</button>
+      <button class="btn-skip" onclick="skipStep(9)"><i class="fas fa-forward me-1"></i>Skip</button>
+    </div>
+    <div class="log-box" id="log-9"></div>
+  </div>
+</div>
+
+<!-- ── STEP 10 ── Member Addition Pipeline ────────────────────────────────── -->
+<div class="step-card pending" id="step-10">
+  <div class="step-header" onclick="toggleStep(10)">
+    <div class="step-num">10</div>
+    <div class="flex-grow-1">
+      <div class="step-title">Member Addition Pipeline</div>
+      <span class="step-sub">Lookup → Create/Update record → Record payment → Assign tier → Link EC profile (if applicable)</span>
+    </div>
+    <span class="mode-tag tag-auto me-2">Auto</span>
+    <span class="step-badge badge-pending" id="status-10">Pending</span>
+    <i class="fas fa-chevron-down ms-2 text-muted" id="chev-10" style="font-size:.72rem"></i>
+  </div>
+  <div class="step-body" id="body-10">
+    <div class="step-desc">Processes the classified email through the Member Addition Pipeline for FY2026-27. Sequentially: looks up existing member, creates or updates the member record, records payment, assigns the selected tier with entitlements, and if the member has an existing EC role, links the AdminRole record to the new membership — portal login credentials remain unchanged.</div>
+    <div id="pipeline-output" style="display:none">
+      <div class="small fw-bold text-muted mb-2 mt-1">PIPELINE STAGES</div>
+      <div class="pipeline-stage" id="pp-lookup"><div class="pi bg-secondary text-white"><i class="fas fa-search"></i></div><div><div class="fw-semibold" style="font-size:.8rem">Lookup existing member</div><div class="text-muted" style="font-size:.74rem" id="pp-lookup-d">—</div></div></div>
+      <div class="pipeline-stage" id="pp-create"><div class="pi bg-secondary text-white"><i class="fas fa-user-plus"></i></div><div><div class="fw-semibold" style="font-size:.8rem">Create / update member record</div><div class="text-muted" style="font-size:.74rem" id="pp-create-d">—</div></div></div>
+      <div class="pipeline-stage" id="pp-payment"><div class="pi bg-secondary text-white"><i class="fas fa-dollar-sign"></i></div><div><div class="fw-semibold" style="font-size:.8rem">Record payment</div><div class="text-muted" style="font-size:.74rem" id="pp-payment-d">—</div></div></div>
+      <div class="pipeline-stage" id="pp-tier"><div class="pi bg-secondary text-white"><i class="fas fa-star"></i></div><div><div class="fw-semibold" style="font-size:.8rem">Assign tier &amp; entitlements</div><div class="text-muted" style="font-size:.74rem" id="pp-tier-d">—</div></div></div>
+      <div class="pipeline-stage" id="pp-ec"><div class="pi bg-secondary text-white"><i class="fas fa-id-badge"></i></div><div><div class="fw-semibold" style="font-size:.8rem">Link EC profile (if applicable)</div><div class="text-muted" style="font-size:.74rem" id="pp-ec-d">—</div></div></div>
+    </div>
+    <div class="step-actions">
+      <button class="btn-auto" onclick="runStep(10,'auto')"><i class="fas fa-bolt me-1"></i>Auto: Run Pipeline</button>
+      <button class="btn-skip" onclick="skipStep(10)"><i class="fas fa-forward me-1"></i>Skip</button>
+    </div>
+    <div class="log-box" id="log-10"></div>
+  </div>
+</div>
+
+<!-- ── STEP 11 ── Welcome Email ───────────────────────────────────────────── -->
+<div class="step-card pending" id="step-11">
+  <div class="step-header" onclick="toggleStep(11)">
+    <div class="step-num">11</div>
+    <div class="flex-grow-1">
+      <div class="step-title">Send Welcome / Congratulations Email</div>
+      <span class="step-sub">Personalized · EC members get admin portal link · new members get member portal link</span>
+    </div>
+    <span class="mode-tag tag-auto me-2">Auto</span>
+    <span class="step-badge badge-pending" id="status-11">Pending</span>
+    <i class="fas fa-chevron-down ms-2 text-muted" id="chev-11" style="font-size:.72rem"></i>
+  </div>
+  <div class="step-body" id="body-11">
+    <div class="step-desc">
+      Sends a personalized congratulations &amp; welcome email confirming the FY2026-27 membership.<br>
+      • <strong>Existing EC Member:</strong> includes a direct login link to the Admin Portal — same credentials, no setup needed.<br>
+      • <strong>New Member:</strong> includes a link to the Member Portal to view their membership card, upcoming events, directory, surveys, and AI assistant.
+    </div>
+    <div id="welcome-email-preview" style="display:none" class="email-preview">
+      <div class="ep-row"><span class="ep-label">To:</span><span class="ep-val" id="we-to"></span></div>
+      <div class="ep-row"><span class="ep-label">Subject:</span><span class="ep-val" id="we-subject"></span></div>
+      <div class="ep-body" id="we-body"></div>
+    </div>
+    <div class="step-actions">
+      <button class="btn-auto" onclick="runStep(11,'auto')"><i class="fas fa-bolt me-1"></i>Auto: Send Welcome Email</button>
+      <button class="btn-manual" onclick="runStep(11,'manual')"><i class="fas fa-eye me-1"></i>Preview First</button>
+      <button class="btn-skip" onclick="skipStep(11)"><i class="fas fa-forward me-1"></i>Skip</button>
+    </div>
+    <div class="log-box" id="log-11"></div>
+  </div>
+</div>
+
+<!-- ── Completion ─────────────────────────────────────────────────────────── -->
+<div id="completion-banner" class="text-center py-5 mt-2" style="display:none">
+  <div style="font-size:3.5rem">🎉</div>
+  <h4 class="fw-bold mt-2" style="color:var(--banf)">All 11 Steps Complete!</h4>
+  <p class="text-muted" id="completion-msg">Membership Drive workflow finished.</p>
+  <div class="d-flex gap-3 justify-content-center mt-3 flex-wrap">
+    <button class="btn btn-outline-secondary" onclick="resetWorkflow()"><i class="fas fa-redo me-1"></i>Reset</button>
+    <a href="./admin-portal.html" class="btn" style="background:var(--banf);color:#fff"><i class="fas fa-arrow-left me-1"></i>Back to Admin Portal</a>
+  </div>
+</div>
+
+</div><!-- /container -->
+
+<script>
+const API            = 'https://banfwix.wixsite.com/banf1/_functions';
+const YEAR           = 'FY2026-27';
+const TOTAL          = 11;
+const DEMO_EMAIL     = 'ranadhir.ghosh@gmail.com';
+const PORTAL_URL     = './admin-portal.html';
+const MEMBER_PORTAL  = './member-portal.html';
+
+let mode = 'demo', demoPath = 'new', demoComplete = false;
+let steps = {};
+let selectedTier = 'Family', selectedPayMethod = 'zelle';
+let uploadedChequeName = null;
+
+function getHeaders() {
+  return { 'Content-Type': 'application/json', 'x-admin-email': localStorage.getItem('banf_admin_email')||'' };
+}
+
+// ── Tier data ─────────────────────────────────────────────────────────────────
+const TIERS = [
+  { name:'Individual', price:50,  equity:150,  events:['Annual Gala($120)','Cultural Fest($80)'],                           color:'#0d6efd' },
+  { name:'Family',     price:80,  equity:280,  events:['Annual Gala($120)','Cultural Fest($80)','Picnic($40)'],             color:'#8B0000' },
+  { name:'Student',    price:20,  equity:60,   events:['Cultural Fest($60)'],                                               color:'#198754' },
+  { name:'Senior',     price:30,  equity:90,   events:['Annual Gala($50)','Cultural Fest($40)'],                            color:'#6f42c1' },
+  { name:'Patron',     price:150, equity:500,  events:['Annual Gala','Cultural Fest','Picnic','Charity Drive($60)'],        color:'#fd7e14' },
+  { name:'Corporate',  price:500, equity:1500, events:['All Events + VIP table'],                                           color:'#20c997' },
+  { name:'Lifetime',   price:1000,equity:5000, events:['All Events (lifetime entitlement)'],                                color:'#dc3545' },
+];
+
+// ── UI helpers ────────────────────────────────────────────────────────────────
+function setMode(m) {
+  if (m==='live' && !demoComplete) { alert('Complete all 11 steps in Demo mode first.'); return; }
+  mode = m;
+  document.getElementById('btnDemo').classList.toggle('active', m==='demo');
+  document.getElementById('btnLive').classList.toggle('active', m==='live');
+  document.getElementById('notice-demo').style.display = m==='demo'?'':'none';
+  document.getElementById('notice-live').style.display = m==='live'?'':'none';
+  document.getElementById('demo-path-bar').style.display = m==='demo'?'':'none';
+  if (m==='live') { for(let i=1;i<=TOTAL;i++) setStepState(i,'pending'); updateProgress(); }
+}
+
+function setDemoPath(p) {
+  demoPath = p;
+  document.getElementById('dp-new').classList.toggle('active', p==='new');
+  document.getElementById('dp-ec').classList.toggle('active', p==='ec');
+  resetWorkflow(true);
+}
+
+function selectPayMethod(m) {
+  selectedPayMethod = m;
+  document.getElementById('pm-zelle').classList.toggle('selected', m==='zelle');
+  document.getElementById('pm-cheque').classList.toggle('selected', m==='cheque');
+  document.getElementById('zelle-instructions').style.display = m==='zelle'?'':'none';
+  document.getElementById('cheque-section').style.display = m==='cheque'?'':'none';
+}
+
+function handleChequeUpload(input) {
+  if (!input.files||!input.files[0]) return;
+  uploadedChequeName = input.files[0].name;
+  const box = document.getElementById('cheque-upload-box');
+  box.classList.add('has-file');
+  box.innerHTML = `<i class="fas fa-check-circle d-block mb-1" style="color:#16a34a;font-size:1.3rem"></i>Uploaded: <strong>${uploadedChequeName}</strong>`;
+  const fn = document.getElementById('cheque-filename');
+  fn.textContent='✓ '+uploadedChequeName; fn.style.display='';
+}
+
+function showEl(id){ const e=document.getElementById(id); if(e) e.style.display=''; }
+function hideEl(id){ const e=document.getElementById(id); if(e) e.style.display='none'; }
+
+// ── Step state ────────────────────────────────────────────────────────────────
+function setStepState(n, state) {
+  steps[n] = state;
+  const card = document.getElementById('step-'+n);
+  const badge = document.getElementById('status-'+n);
+  if (!card||!badge) return;
+  card.className = 'step-card '+state;
+  badge.className = 'step-badge badge-'+state;
+  badge.textContent = state.charAt(0).toUpperCase()+state.slice(1);
+}
+
+function toggleStep(n) {
+  const body=document.getElementById('body-'+n);
+  const chev=document.getElementById('chev-'+n);
+  if (!body) return;
+  const isOpen=body.classList.contains('open');
+  body.classList.toggle('open',!isOpen);
+  if (chev) chev.style.transform=isOpen?'':'rotate(180deg)';
+}
+
+function appendLog(n, msg, type='info') {
+  const box=document.getElementById('log-'+n); if(!box) return;
+  box.classList.add('show');
+  const c=type==='error'?'#f87171':type==='success'?'#4ade80':type==='warn'?'#fbbf24':'#a3e635';
+  box.innerHTML+=`<div style="color:${c}">[${new Date().toLocaleTimeString()}] ${msg}</div>`;
+  box.scrollTop=box.scrollHeight;
+}
+
+function updateProgress() {
+  const done=Object.values(steps).filter(s=>s==='done'||s==='skipped').length;
+  const pct=Math.round((done/TOTAL)*100);
+  document.getElementById('progress-bar').style.width=pct+'%';
+  document.getElementById('overall-pct').textContent=pct+'%';
+  document.getElementById('overall-label').textContent=`— ${done} / ${TOTAL}`;
+  if (done===TOTAL) {
+    document.getElementById('completion-banner').style.display='';
+    if (mode==='demo') {
+      demoComplete=true;
+      const pl = demoPath==='ec'?'Existing EC Member':'New Member';
+      document.getElementById('completion-msg').textContent=
+        `All 11 steps complete for "${pl}" demo path. Switch to Live mode to run with real data.`;
+    } else {
+      document.getElementById('completion-msg').textContent=
+        `FY2026-27 Membership Drive complete — member confirmed, welcome email sent!`;
+    }
+  }
+}
+
+async function runStep(n, type) {
+  setStepState(n,'running');
+  appendLog(n,`[${mode.toUpperCase()}/${demoPath}] Step ${n} — ${type} starting…`);
+  try {
+    if (mode==='demo') await simulateStep(n, type);
+    else               await executeStep(n, type);
+    setStepState(n,'done');
+    appendLog(n,`Step ${n} ✓ completed`,'success');
+    if (n<TOTAL) setTimeout(()=>toggleStep(n+1),280);
+  } catch(e) {
+    setStepState(n,'blocked');
+    appendLog(n,'Error: '+e.message,'error');
+  }
+  updateProgress();
+}
+
+function skipStep(n) {
+  setStepState(n,'skipped');
+  appendLog(n,`Step ${n} skipped.`,'warn');
+  if (n<TOTAL) setTimeout(()=>toggleStep(n+1),200);
+  updateProgress();
+}
+
+function delay(ms){ return new Promise(r=>setTimeout(r,ms)); }
+
+// ── Demo simulations ──────────────────────────────────────────────────────────
+async function simulateStep(n, type) {
+  const isEC = demoPath==='ec';
+
+  if (n===1) {
+    await delay(700);
+    document.getElementById('tier-grid').innerHTML = TIERS.map(t=>
+      `<div class="tier-card"><div class="tier-name" style="color:${t.color}">${t.name}</div>
+       <div class="tier-price">$${t.price}<span style="font-size:.7rem;color:#888">/yr</span></div>
+       <div class="tier-desc">Equity: <strong>$${t.equity}</strong></div>
+       <div class="tier-desc">${t.events.join(' · ')}</div></div>`
+    ).join('');
+    showEl('tier-display');
+    appendLog(n,`${TIERS.length} tiers loaded. Event values: Gala=$120, CulturalFest=$80, Picnic=$40, CharityDrive=$60.`,'success');
+    if (isEC) appendLog(n,`EC path: Ranadhir Ghosh — prior membership FY2025-26 (Family tier). Default=Family.`,'warn');
+  }
+
+  else if (n===2) {
+    await delay(600);
+    const [tot,ret,nw] = isEC?[28,18,10]:[42,12,30];
+    document.getElementById('u-total').textContent=tot;
+    document.getElementById('u-returning').textContent=ret;
+    document.getElementById('u-new').textContent=nw;
+    showEl('universe-stats');
+    appendLog(n,`UNIVERSE: ${tot} contacts (${ret} returning, ${nw} new). Active demo recipient: ${DEMO_EMAIL}`,'success');
+  }
+
+  else if (n===3) {
+    await delay(500);
+    const id='DEMO-'+YEAR+'-'+Date.now().toString(36).toUpperCase().slice(0,8);
+    appendLog(n,`DRIVE INITIALIZED: driveId=${id} | status=active | year=${YEAR}`,'success');
+  }
+
+  else if (n===4) {
+    if (type==='manual') { generateInvitePreview(); appendLog(n,'Preview above. Run Auto to send.','warn'); setStepState(n,'pending'); return; }
+    await delay(800);
+    generateInvitePreview();
+    const subj=document.getElementById('inv-subject').value||"You're Invited: Join BANF FY2026-27 — Choose Your Membership!";
+    appendLog(n,`EMAILS SENT(DEMO): 1 recipient → ${DEMO_EMAIL}`,'success');
+    appendLog(n,`Subject: "${subj}"`,'success');
+    appendLog(n,`Content includes: tier table, equity values, event mapping, AI Advisor link, payment instructions.`,'success');
+  }
+
+  else if (n===5) {
+    // Start advisor session
+    const msgs=document.getElementById('chat-msgs');
+    msgs.innerHTML='';
+    const defTier = isEC?'Family':'Individual';
+    addChatMsg('bot',`Hello${isEC?' Ranadhir':''}, I'm your BANF Membership Advisor! 👋`);
+    await delay(500);
+    addChatMsg('bot',`Based on ${isEC?'your prior <strong>Family</strong> membership (FY2025-26)':'community profiles for new members'}, I recommend: <strong>${defTier} ($${TIERS.find(t=>t.name===defTier).price}/yr · equity $${TIERS.find(t=>t.name===defTier).equity})</strong>.`);
+    await delay(400);
+    addChatMsg('bot',`Type <strong>"confirm"</strong> to accept, or tell me your family size, budget, or event preferences to explore other options.`);
+    window._demoAdvisorTier = defTier;
+    setStepState(5,'running');
+    updateProgress();
+    return; // Hold at running until user confirms
+  }
+
+  else if (n===6) {
+    await delay(400);
+    selectedTier = document.getElementById('sel-tier').value.split(' ')[0];
+    const td = TIERS.find(t=>t.name===selectedTier)||TIERS[1];
+    const chequeInfo = selectedPayMethod==='cheque'&&uploadedChequeName?' · cheque: '+uploadedChequeName:'';
+    appendLog(n,`CONFIRMED: Tier=${selectedTier} ($${td.price}) · Method=${selectedPayMethod}${chequeInfo}`,'success');
+    appendLog(n,`Registration ID: REG-DEMO-${Date.now().toString(36).toUpperCase().slice(0,8)} created.`,'success');
+  }
+
+  else if (n===7) {
+    await delay(700);
+    const tier = selectedTier||'Family';
+    const td = TIERS.find(t=>t.name===tier)||TIERS[1];
+    const m = selectedPayMethod;
+    const ref = m==='zelle'?'ZLL-'+Math.random().toString(36).slice(2,11).toUpperCase():'CHQ-'+Math.floor(Math.random()*9000+1000);
+    const from = isEC?DEMO_EMAIL:'newmember-demo@gmail.com';
+    const name = isEC?'Ranadhir Ghosh':'Sample New Member';
+    const body = m==='zelle'
+      ? `Hi BANF Team,\n\nI have sent my FY2026-27 membership payment via Zelle.\n\n• Name: ${name}\n• Tier: ${tier}\n• Amount: $${td.price}\n• Zelle Ref: ${ref}\n• Date: ${new Date().toLocaleDateString()}\n\nPlease confirm my membership.\n\nThank you,\n${name}`
+      : `Hi BANF Team,\n\nPlease find my FY2026-27 membership cheque below.\n\n• Name: ${name}\n• Tier: ${tier}\n• Amount: $${td.price}\n• Cheque No: ${ref}\n• Attached: ${uploadedChequeName||'cheque_scan.jpg'}\n\nKindly acknowledge.\n\nRegards,\n${name}`;
+    document.getElementById('synth-from').textContent=`${name} <${from}>`;
+    document.getElementById('synth-subject').textContent=`BANF FY2026-27 Membership Payment — ${name} — ${tier} (${m==='zelle'?'Zelle':'Cheque'})`;
+    document.getElementById('synth-body').innerHTML=body.replace(/\n/g,'<br>');
+    showEl('synth-email-preview');
+    window._demoEmailData = { from, name, tier, amount:td.price, method:m, ref, isEC };
+    appendLog(n,`SYNTHETIC EMAIL: from=${from}, tier=${tier}, method=${m}, ref=${ref}`,'success');
+    appendLog(n,`Email injected into inbox queue → awaiting Email Receive Agent.`,'success');
+  }
+
+  else if (n===8) {
+    await delay(300);
+    const e = window._demoEmailData||{ from:DEMO_EMAIL, name:'Demo User', tier:'Family', amount:80, method:'Zelle', ref:'ZLL-DEMO', isEC };
+    showEl('email-agent-status');
+    const stages=[
+      { id:'ps-receive', d:`New email detected from ${e.from}` },
+      { id:'ps-parse',   d:`Headers parsed: sender verified, body extracted, attachments=${e.method==='cheque'?1:0}` },
+      { id:'ps-route',   d:`Payload routed → EmailClassificationAgent (confidence pre-check: ok)` }
+    ];
+    for (const s of stages) {
+      const el=document.getElementById(s.id);
+      const dd=document.getElementById(s.id+'-d');
+      el.classList.add('active');
+      if(dd) dd.textContent=s.d;
+      appendLog(n,s.d,'success');
+      await delay(500);
+      el.classList.remove('active'); el.classList.add('done');
+      const pi=el.querySelector('.pi'); if(pi){ pi.classList.remove('bg-secondary','bg-warning'); pi.classList.add('bg-success'); }
+    }
+  }
+
+  else if (n===9) {
+    await delay(600);
+    const e = window._demoEmailData||{ from:DEMO_EMAIL, name:'Demo User', tier:'Family', amount:80, method:'Zelle', ref:'ZLL-DEMO', isEC };
+    showEl('classification-output');
+    document.getElementById('cls-category').textContent='membership_payment_confirmation';
+    document.getElementById('cls-confidence').textContent='97.4%';
+    document.getElementById('cls-entities').innerHTML=
+      `<span class="badge bg-light text-dark border me-1 mb-1">sender: ${e.name}</span>`+
+      `<span class="badge bg-light text-dark border me-1 mb-1">tier: ${e.tier}</span>`+
+      `<span class="badge bg-light text-dark border me-1 mb-1">amount: $${e.amount}</span>`+
+      `<span class="badge bg-light text-dark border me-1 mb-1">method: ${e.method}</span>`+
+      `<span class="badge bg-light text-dark border me-1 mb-1">ref: ${e.ref}</span>`;
+    document.getElementById('cls-routed').textContent='MemberAdditionPipeline → FY2026-27';
+    appendLog(n,'CLASSIFIED: membership_payment_confirmation @ 97.4% → MemberAdditionPipeline','success');
+  }
+
+  else if (n===10) {
+    const e = window._demoEmailData||{ from:DEMO_EMAIL, name:'Demo User', tier:'Family', amount:80, method:'Zelle', ref:'ZLL-DEMO', isEC };
+    showEl('pipeline-output');
+    const td = TIERS.find(t=>t.name===e.tier)||TIERS[1];
+    const memberId = 'MBR-'+Date.now().toString(36).toUpperCase().slice(0,8);
+    const stages=[
+      { id:'pp-lookup',  d: e.isEC?`EC member found: ${e.name} (role=ec_member)`:`No match — new member registration` },
+      { id:'pp-create',  d:`Member record ${e.isEC?'updated':'created'}: ${memberId}` },
+      { id:'pp-payment', d:`Payment recorded: $${e.amount} via ${e.method}, ref=${e.ref}, status=confirmed` },
+      { id:'pp-tier',    d:`${e.tier} tier assigned. Events: ${td.events.slice(0,2).join(', ')}…` },
+      { id:'pp-ec',      d: e.isEC?`AdminRole linked to ${memberId}. Portal credentials unchanged.`:`N/A — new member, no EC record.` },
+    ];
+    for (const s of stages) {
+      const el=document.getElementById(s.id);
+      const dd=document.getElementById(s.id+'-d');
+      el.classList.add('active');
+      if(dd) dd.textContent=s.d;
+      appendLog(n,s.d,'success');
+      await delay(520);
+      el.classList.remove('active'); el.classList.add('done');
+      const pi=el.querySelector('.pi'); if(pi){ pi.classList.remove('bg-secondary'); pi.classList.add('bg-success'); }
+    }
+    window._demoEmailData = { ...e, memberId };
+  }
+
+  else if (n===11) {
+    if (type==='manual') { generateWelcomePreview(); appendLog(n,'Preview above. Run Auto to send.','warn'); setStepState(n,'pending'); return; }
+    await delay(600);
+    generateWelcomePreview();
+    const e = window._demoEmailData||{ from:DEMO_EMAIL, name:'Demo User', tier:'Family', amount:80, isEC };
+    appendLog(n,`WELCOME EMAIL SENT(DEMO): to=${e.from}`,'success');
+    if (e.isEC) appendLog(n,`EC path → Admin Portal login link included. Credentials unchanged.`,'success');
+    else         appendLog(n,`New Member path → Member Portal link included.`,'success');
+  }
+}
+
+// ── Email preview generators ──────────────────────────────────────────────────
+function generateInvitePreview() {
+  const isEC=demoPath==='ec';
+  const tierTable = TIERS.map(t=>
+    `<tr><td><strong style="color:${t.color}">${t.name}</strong></td><td>$${t.price}/yr</td><td>$${t.equity}</td><td style="font-size:.78rem">${t.events.join(', ')}</td></tr>`
+  ).join('');
+  document.getElementById('inv-to').textContent=DEMO_EMAIL;
+  document.getElementById('inv-subj-preview').textContent=document.getElementById('inv-subject').value||"You're Invited: Join BANF FY2026-27 — Choose Your Membership!";
+  document.getElementById('inv-body-preview').innerHTML=`
+    <p>Dear ${isEC?'Ranadhir':'BANF Community Member'},</p>
+    <p>We warmly invite you to join BANF for <strong>FY2026-27</strong>! Here is a complete overview of your membership options:</p>
+    <table border="1" cellpadding="5" style="width:100%;border-collapse:collapse;font-size:.79rem">
+      <thead style="background:#f8e8e8">
+        <tr><th>Tier</th><th>Annual Cost</th><th>Equity Value</th><th>Events Included</th></tr>
+      </thead><tbody>${tierTable}</tbody>
+    </table>
+    <p style="margin-top:10px"><strong>Event Calendar &amp; Value Breakdown:</strong><br>
+    🎭 Annual Gala — value $120 · 🌸 Cultural Fest — $80 · 🌿 Picnic — $40 · ❤️ Charity Drive — $60</p>
+    <p><strong>How to join:</strong><br>
+    1. Use our <strong>AI Membership Advisor</strong> (link in portal) for a personalized recommendation.<br>
+    2. Select your tier and pay via <strong>Zelle</strong> (banftreasurer@example.com) or <strong>Cheque</strong> (payable to BANF).<br>
+    3. Reply to this email with your payment confirmation and reference number.</p>
+    ${isEC?`<div style="background:#fff5f5;padding:8px;border-radius:6px;font-size:.8rem;margin-top:8px"><strong>Note:</strong> You are already an EC member. After confirming your membership, you may continue to log in to the Admin Portal with your existing credentials.</div>`:''}
+    <p style="margin-top:10px">Questions? Reply to this email and our team will assist you.</p>`;
+  showEl('inv-preview');
+}
+
+function generateWelcomePreview() {
+  const e = window._demoEmailData||{ from:DEMO_EMAIL, name:demoPath==='ec'?'Ranadhir Ghosh':'New Member', tier:'Family', amount:80, isEC:demoPath==='ec' };
+  const td = TIERS.find(t=>t.name===e.tier)||TIERS[1];
+  const subj = e.isEC
+    ? `🎉 Welcome Back, ${e.name}! BANF FY2026-27 Membership Confirmed`
+    : `🎉 Congratulations & Welcome to BANF, ${e.name}!`;
+  const portalBlock = e.isEC
+    ? `<div style="background:#fff5f5;border:1px solid #f0d0d0;border-radius:8px;padding:12px;margin:10px 0;font-size:.81rem">
+        🔐 <strong>Admin Portal Access</strong><br>
+        You can continue to log in with your existing credentials:<br>
+        <a href="${PORTAL_URL}?email=${encodeURIComponent(e.from)}">→ Log in to Admin Portal</a>
+       </div>`
+    : `<div style="background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:12px;margin:10px 0;font-size:.81rem">
+        🏠 <strong>Your Member Portal</strong><br>
+        View your membership card, events, directory & AI assistant:<br>
+        <a href="${MEMBER_PORTAL}?email=${encodeURIComponent(e.from)}">→ Visit Member Portal</a>
+       </div>`;
+  document.getElementById('we-to').textContent=e.from;
+  document.getElementById('we-subject').textContent=subj;
+  document.getElementById('we-body').innerHTML=`
+    <p>Dear ${e.name},</p>
+    <p>🎊 <strong>Congratulations!</strong> Your BANF membership for <strong>${YEAR}</strong> has been confirmed.</p>
+    <table cellpadding="8" style="width:100%;border-collapse:collapse;font-size:.81rem;background:#fafafa;border-radius:6px;border:1px solid #e5e7eb">
+      <tr><td style="color:#888">Tier</td><td><strong>${e.tier}</strong></td></tr>
+      <tr><td style="color:#888">Annual Contribution</td><td><strong>$${e.amount}</strong></td></tr>
+      <tr><td style="color:#888">Equity Value</td><td><strong>$${td.equity}</strong></td></tr>
+      <tr><td style="color:#888">Events Included</td><td>${td.events.join(', ')}</td></tr>
+      <tr><td style="color:#888">Membership Year</td><td><strong>${YEAR}</strong></td></tr>
+    </table>
+    ${portalBlock}
+    <p style="font-size:.81rem">Thank you for being part of the Bengali Association of North Florida.<br>We look forward to celebrating with you at our events!</p>
+    <p style="font-size:.81rem">With warm regards,<br><strong>BANF Executive Committee</strong></p>`;
+  showEl('welcome-email-preview');
+}
+
+// ── AI Advisor Chat ───────────────────────────────────────────────────────────
+function addChatMsg(role, html) {
+  const d=document.getElementById('chat-msgs');
+  const el=document.createElement('div');
+  el.className='chat-msg '+role; el.innerHTML=html;
+  d.appendChild(el); d.scrollTop=d.scrollHeight;
+}
+
+const chatRules=[
+  { re:/confirm|ok|yes|sure|accept|proceed/i, reply:(t)=>`Great! I've confirmed <strong>${t}</strong> as your tier. Proceed to Step 6 to select your payment method. ✅`, done:true },
+  { re:/family|couple|kids|children|2|3|4|5/i, reply:()=>`For families, the <strong>Family tier ($80)</strong> is the best value — $280 equity, includes Gala, Cultural Fest & Picnic.`, done:false },
+  { re:/student|college|university|young/i,   reply:()=>`The <strong>Student tier ($20)</strong> is budget-friendly — includes the Cultural Fest.`, done:false },
+  { re:/senior|retired|elderly|older/i,        reply:()=>`The <strong>Senior tier ($30)</strong> includes Gala & Cultural Fest at a reduced rate.`, done:false },
+  { re:/business|corporate|sponsor|company/i, reply:()=>`For businesses, <strong>Corporate ($500)</strong> provides VIP access to all events plus community sponsorship visibility.`, done:false },
+  { re:/patron|charitable|donate|generous/i,  reply:()=>`The <strong>Patron tier ($150)</strong> includes all major events + the Charity Drive. Perfect for community champions!`, done:false },
+  { re:/lifetime|forever|permanent/i,          reply:()=>`<strong>Lifetime ($1,000 one-time)</strong> = all events forever + $5,000 equity. A truly permanent commitment! 🏆`, done:false },
+];
+
+async function sendChat() {
+  const input=document.getElementById('chat-input');
+  const msg=input.value.trim(); if(!msg) return;
+  input.value=''; addChatMsg('user',msg);
+  await delay(700);
+  const defTier=window._demoAdvisorTier||(demoPath==='ec'?'Family':'Individual');
+  let matched=false;
+  for (const r of chatRules) {
+    if (r.re.test(msg)) {
+      addChatMsg('bot', r.reply(defTier));
+      if (r.done) {
+        await delay(350);
+        showRecommendation(defTier);
+        setStepState(5,'done');
+        appendLog(5,`ADVISOR COMPLETE: Confirmed=${defTier}`,'success');
+        if (5<TOTAL) setTimeout(()=>toggleStep(6),300);
+        updateProgress();
+      } else {
+        await delay(300);
+        addChatMsg('bot',`Would you like to <strong>confirm ${defTier}</strong> or explore further? Type "confirm" to proceed.`);
+      }
+      matched=true; break;
+    }
+  }
+  if (!matched) {
+    addChatMsg('bot',`I suggest the <strong>${defTier} tier</strong> based on ${demoPath==='ec'?'your prior membership':'your profile'}. Type "confirm" to proceed or ask about a specific tier.`);
+  }
+}
+
+function showRecommendation(tier) {
+  const t=TIERS.find(x=>x.name===tier)||TIERS[1];
+  document.getElementById('rec-tier-display').innerHTML=
+    `<div class="tier-card selected" style="max-width:280px;display:inline-block">
+       <div class="tier-name" style="color:${t.color}">${t.name}</div>
+       <div class="tier-price">$${t.price}<span style="font-size:.7rem;color:#888">/yr</span></div>
+       <div class="tier-desc">Equity: <strong>$${t.equity}</strong></div>
+       <div class="tier-desc">${t.events.slice(0,2).join(' · ')}…</div>
+     </div>`;
+  showEl('advisor-recommendation');
+  // Pre-select in step 6 dropdown
+  const sel=document.getElementById('sel-tier');
+  for(let i=0;i<sel.options.length;i++){
+    if(sel.options[i].value===tier){ sel.selectedIndex=i; break; }
+  }
+}
+
+// ── Live execution ────────────────────────────────────────────────────────────
+async function executeStep(n, type) {
+  const h=getHeaders();
+  if (n===1) { const r=await fetch(`${API}/membership_config`,{headers:h}); const d=await r.json(); appendLog(n,`TIERS: ${d.tiers?.length||0} loaded`,'success'); }
+  else if (n===2) { const r=await fetch(`${API}/membership_universe`,{headers:h}); const d=await r.json(); appendLog(n,`UNIVERSE: ${d.count||0}`,'success'); }
+  else if (n===3) { const r=await fetch(`${API}/membership_drive_init`,{method:'POST',headers:h,body:JSON.stringify({year:YEAR})}); const d=await r.json(); if(!d.success) throw new Error(d.message); appendLog(n,`DRIVE: ${d.driveId}`,'success'); }
+  else if (n===4) { const subj=document.getElementById('inv-subject').value; const r=await fetch(`${API}/membership_drive_notify`,{method:'POST',headers:h,body:JSON.stringify({year:YEAR,subject:subj||undefined})}); const d=await r.json(); if(!d.success) throw new Error(d.message); appendLog(n,`${d.sent||0} emails sent`,'success'); }
+  else if (n===5) { appendLog(n,'Live advisor session — use chat above.','warn'); setStepState(5,'running'); return; }
+  else if (n===6) { selectedTier=document.getElementById('sel-tier').value.split(' ')[0]; appendLog(n,`${selectedTier} via ${selectedPayMethod}`,'success'); }
+  else if (n===7) { appendLog(n,'Live: await real payment email in inbox.','warn'); }
+  else if (n===8) { const r=await fetch(`${API}/email_agent_trigger`,{method:'POST',headers:h,body:JSON.stringify({year:YEAR})}); const d=await r.json(); appendLog(n,d.message||'Triggered','success'); }
+  else if (n===9) { const r=await fetch(`${API}/email_classify_latest`,{method:'POST',headers:h,body:JSON.stringify({year:YEAR})}); const d=await r.json(); appendLog(n,`${d.category||'—'} @ ${d.confidence||'—'}%`,'success'); }
+  else if (n===10) { const r=await fetch(`${API}/membership_add_pipeline`,{method:'POST',headers:h,body:JSON.stringify({year:YEAR,tier:selectedTier,method:selectedPayMethod})}); const d=await r.json(); if(!d.success) throw new Error(d.message); appendLog(n,`memberId=${d.memberId}`,'success'); }
+  else if (n===11) { if(type==='manual'){generateWelcomePreview();setStepState(n,'pending');return;} const r=await fetch(`${API}/membership_welcome_email`,{method:'POST',headers:h,body:JSON.stringify({year:YEAR})}); const d=await r.json(); if(!d.success) throw new Error(d.message); appendLog(n,`${d.sent} sent`,'success'); }
+}
+
+// ── Reset ─────────────────────────────────────────────────────────────────────
+function resetWorkflow(soft=false) {
+  for(let i=1;i<=TOTAL;i++){
+    setStepState(i,'pending');
+    const lb=document.getElementById('log-'+i); if(lb){lb.innerHTML='';lb.classList.remove('show');}
+    const bd=document.getElementById('body-'+i); if(bd) bd.classList.remove('open');
+    const ch=document.getElementById('chev-'+i); if(ch) ch.style.transform='';
+  }
+  if(!soft) document.getElementById('completion-banner').style.display='none';
+  const ids=['tier-display','universe-stats','inv-preview','synth-email-preview','email-agent-status','classification-output','pipeline-output','welcome-email-preview','advisor-recommendation'];
+  ids.forEach(hideEl);
+  document.getElementById('chat-msgs').innerHTML='';
+  uploadedChequeName=null; window._demoEmailData=null; window._demoAdvisorTier=null;
+  selectedTier='Family'; selectedPayMethod='zelle';
+  selectPayMethod('zelle');
+  updateProgress();
+  if (!soft) toggleStep(1);
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+(function(){
+  for(let i=1;i<=TOTAL;i++) steps[i]='pending';
+  updateProgress();
+  toggleStep(1);
+})();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

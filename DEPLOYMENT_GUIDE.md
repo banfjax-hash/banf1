@@ -19,7 +19,7 @@ This auto-syncs your GitHub repo to the Wix Editor — the BEST approach.
 5. At the bottom-left, click the **⚙️ gear icon** → **GitHub**
 6. Click **Connect to GitHub**
 7. Authorize Wix to access your GitHub account
-8. Select repository: **ranadhir19/banf1**, branch: **main**
+8. Select repository: **banfjax-hash/banf1**, branch: **main**
 9. Click **Connect**
 
 ### Step 2: Sync Files
@@ -225,7 +225,7 @@ In the Code panel (left sidebar, `{ }` icon):
    - Click **+** (Add Elements) → **Embed & Social** → **HTML iFrame**
 3. Set the iFrame source to:
    ```
-   https://raw.githubusercontent.com/ranadhir19/banf1/main/src/public/wix-embed-landing.html
+   https://raw.githubusercontent.com/banfjax-hash/banf1/main/src/public/wix-embed-landing.html
    ```
    **OR** use the Wix public file URL (after upload):
    ```
