@@ -177,18 +177,29 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:'Segoe UI',syst
       <div class="back-link" onclick="showAuth('signin')"><i class="fas fa-arrow-left"></i> Back to Sign In</div>
       <h1 style="font-size:1rem;margin-bottom:14px"><i class="fas fa-user-plus me-1"></i>Super Admin Sign Up</h1>
 
-      <!-- Step 1: Email verification -->
+      <!-- Step 1: Email — send verification code -->
       <div class="auth-step active" id="signup-step-1">
         <div class="field-label">Admin Email (must be in AdminRoles)</div>
         <input type="email" id="signup-email" placeholder="your-email@example.com" autocomplete="email">
-        <button class="btn-login" onclick="signupStep1()"><i class="fas fa-arrow-right me-1"></i>Verify Email</button>
+        <button class="btn-login" onclick="signupStep1()"><i class="fas fa-paper-plane me-1"></i>Send Verification Code</button>
         <div class="error-msg" id="signup-error-1"></div>
         <div class="info-msg" id="signup-info-1"></div>
-        <div style="margin-top:10px;font-size:.72rem;color:var(--dim)">You must be an authorized admin to sign up. Contact the Super Admin if you need access.</div>
+        <div style="margin-top:10px;font-size:.72rem;color:var(--dim)">A 6-digit verification code will be sent to your email. You must be an authorized admin to sign up.</div>
       </div>
 
-      <!-- Step 2: Set password + security question -->
+      <!-- Step 2: Enter verification code -->
       <div class="auth-step" id="signup-step-2">
+        <div style="font-size:.82rem;color:var(--green);margin-bottom:8px"><i class="fas fa-envelope me-1"></i>Verification code sent to <strong id="signup-code-email"></strong></div>
+        <div class="field-label">Enter 6-Digit Code</div>
+        <input type="text" id="signup-code" placeholder="Enter the 6-digit code" maxlength="6" style="text-align:center;letter-spacing:6px;font-size:1.2rem;font-weight:700" autocomplete="one-time-code">
+        <button class="btn-login" onclick="signupStep2Code()"><i class="fas fa-check-circle me-1"></i>Verify Code</button>
+        <div class="error-msg" id="signup-error-2"></div>
+        <div style="margin-top:8px;font-size:.72rem;color:var(--dim)">Code expires in 10 minutes. <a href="#" onclick="signupResend();return false" style="color:var(--accent)">Resend code</a></div>
+        <div class="info-msg" id="signup-info-2"></div>
+      </div>
+
+      <!-- Step 3: Set password + security question -->
+      <div class="auth-step" id="signup-step-3">
         <div style="font-size:.82rem;color:var(--green);margin-bottom:14px"><i class="fas fa-check-circle me-1"></i>Email verified: <strong id="signup-confirmed-email"></strong></div>
         <div class="field-label">Create Password</div>
         <div class="pwd-toggle">
@@ -214,12 +225,12 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:'Segoe UI',syst
         </select>
         <div class="field-label">Security Answer</div>
         <input type="text" id="signup-sa" placeholder="Your answer (case-insensitive)">
-        <button class="btn-login" onclick="signupStep2()"><i class="fas fa-user-shield me-1"></i>Create Account</button>
-        <div class="error-msg" id="signup-error-2"></div>
+        <button class="btn-login" onclick="signupStep3()"><i class="fas fa-user-shield me-1"></i>Create Account</button>
+        <div class="error-msg" id="signup-error-3"></div>
       </div>
 
-      <!-- Step 3: Success -->
-      <div class="auth-step" id="signup-step-3">
+      <!-- Step 4: Success -->
+      <div class="auth-step" id="signup-step-4">
         <div style="font-size:2rem;color:var(--green);margin-bottom:10px"><i class="fas fa-check-circle"></i></div>
         <div style="font-size:.95rem;font-weight:700;color:var(--green);margin-bottom:8px">Account Created Successfully!</div>
         <div style="font-size:.82rem;color:var(--muted);margin-bottom:20px">Your admin account is ready. You can now sign in with your email and password.</div>
@@ -1089,55 +1100,80 @@ document.querySelector('.sb-user').addEventListener('click', () => {
   }
 });
 
-// ── SIGN UP FLOW ──
+// ── SIGN UP FLOW (4 steps: email → code → password+SQ → success) ──
 async function signupStep1() {
   const email = (document.getElementById('signup-email').value || '').trim().toLowerCase();
   hideMsg('signup-error-1'); hideMsg('signup-info-1');
 
   if (!email || !email.includes('@')) return showError('signup-error-1', 'Please enter a valid email address.');
 
-  showInfo('signup-info-1', 'Verifying email...');
+  showInfo('signup-info-1', 'Sending verification code to your email...');
 
-  // Check if admin exists via verify login
-  const result = await apiCall('admin_verify_login', { email });
+  // Send 6-digit verification code
+  const result = await apiCall('admin_signup_send_code', { email });
 
   hideMsg('signup-info-1');
 
-  if (result.success && !result.noPassword) {
-    return showError('signup-error-1', 'This account already has a password. Please sign in instead.');
+  if (!result.success && result.error) {
+    return showError('signup-error-1', result.error);
   }
 
-  if (result.success && result.noPassword) {
-    // Legacy admin — needs password setup. Generate token first.
-    const tokenResult = await apiCall('admin_role_add', { email, role: 'super_admin', firstName: '', lastName: '' });
-    SIGNUP_STATE = { email, token: tokenResult.setupToken || '' };
-    document.getElementById('signup-confirmed-email').textContent = email;
+  if (result.success) {
+    SIGNUP_STATE = { email };
+    document.getElementById('signup-code-email').textContent = email;
     showStep('signup', 2);
     return;
   }
 
-  if (result.needsOnboarding) {
-    SIGNUP_STATE = { email, token: result.setupToken || '' };
-    document.getElementById('signup-confirmed-email').textContent = email;
-    showStep('signup', 2);
-    return;
-  }
-
-  // error — not found or other
-  showError('signup-error-1', result.error || 'Email not found in AdminRoles. Contact the Super Admin to get access.');
+  showError('signup-error-1', result.error || 'Failed to send verification code. Please try again.');
 }
 
-async function signupStep2() {
+// Resend the verification code
+async function signupResend() {
+  hideMsg('signup-error-2'); hideMsg('signup-info-2');
+  showInfo('signup-info-2', 'Resending code...');
+  const result = await apiCall('admin_signup_send_code', { email: SIGNUP_STATE.email });
+  hideMsg('signup-info-2');
+  if (result.success) {
+    showInfo('signup-info-2', 'New verification code sent! Check your email.');
+  } else {
+    showError('signup-error-2', result.error || 'Failed to resend code.');
+  }
+}
+
+// Step 2: Verify the 6-digit code
+async function signupStep2Code() {
+  const code = (document.getElementById('signup-code').value || '').trim();
+  hideMsg('signup-error-2'); hideMsg('signup-info-2');
+
+  if (!code || code.length !== 6) return showError('signup-error-2', 'Please enter the 6-digit verification code.');
+
+  showInfo('signup-info-2', 'Verifying code...');
+  const result = await apiCall('admin_signup_verify_code', { email: SIGNUP_STATE.email, code });
+  hideMsg('signup-info-2');
+
+  if (!result.success) {
+    return showError('signup-error-2', result.error || 'Invalid code. Please try again.');
+  }
+
+  // Code verified — store token and proceed to password setup
+  SIGNUP_STATE.token = result.setupToken;
+  document.getElementById('signup-confirmed-email').textContent = SIGNUP_STATE.email;
+  showStep('signup', 3);
+}
+
+// Step 3: Set password + security question
+async function signupStep3() {
   const pass = document.getElementById('signup-pass').value;
   const pass2 = document.getElementById('signup-pass2').value;
   const sq = document.getElementById('signup-sq').value;
   const sa = document.getElementById('signup-sa').value.trim();
-  hideMsg('signup-error-2');
+  hideMsg('signup-error-3');
 
-  if (!pass || pass.length < 8) return showError('signup-error-2', 'Password must be at least 8 characters.');
-  if (pass !== pass2) return showError('signup-error-2', 'Passwords do not match.');
-  if (!sq) return showError('signup-error-2', 'Please select a security question.');
-  if (!sa || sa.length < 2) return showError('signup-error-2', 'Please provide a security answer (at least 2 characters).');
+  if (!pass || pass.length < 8) return showError('signup-error-3', 'Password must be at least 8 characters.');
+  if (pass !== pass2) return showError('signup-error-3', 'Passwords do not match.');
+  if (!sq) return showError('signup-error-3', 'Please select a security question.');
+  if (!sa || sa.length < 2) return showError('signup-error-3', 'Please provide a security answer (at least 2 characters).');
 
   // Set password via API
   const pwResult = await apiCall('admin_set_password', {
@@ -1147,7 +1183,7 @@ async function signupStep2() {
   });
 
   if (!pwResult.success) {
-    return showError('signup-error-2', pwResult.error || 'Failed to set password.');
+    return showError('signup-error-3', pwResult.error || 'Failed to set password.');
   }
 
   // Save security question via profile endpoint
@@ -1165,7 +1201,7 @@ async function signupStep2() {
     token: SIGNUP_STATE.token
   });
 
-  showStep('signup', 3);
+  showStep('signup', 4);
 }
 
 // ── FORGOT PASSWORD FLOW ──
