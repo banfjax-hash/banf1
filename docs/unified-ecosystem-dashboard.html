@@ -860,6 +860,12 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:'Segoe UI',syst
         <p style="font-size:.78rem;color:var(--muted);margin-bottom:10px">Tickets auto-generated from stakeholder acceptance notes and expert reviews flow here for development assignment.</p>
         <div id="jira-summary"></div>
       </div>
+      <div class="card-d">
+        <h2><i class="fas fa-chart-line" style="color:var(--accent)"></i> TK-046 Membership Drive Analytics</h2>
+        <p style="font-size:.78rem;color:var(--muted);margin-bottom:10px">Implements SN-008: invites sent, responses received, and conversion rate by membership tier.</p>
+        <div class="kpi-grid" id="drive-analytics-kpis" style="margin-bottom:10px"></div>
+        <div id="drive-analytics-table"></div>
+      </div>
     </div>
 
     <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
@@ -2034,9 +2040,16 @@ let STAKEHOLDER_NOTES = [
   {id:'SN-005',author:'EC Secretary',section:'Comms Correction',type:'feedback',priority:'low',target:'Email Templates',body:'Correction drive emails look professional. Suggest adding Bengali greeting option for cultural touch.',status:'in-review',ticketId:null,ts:'Feb 22, 2026 11:00 AM',flow:'Note â†’ Expert Review (in progress)'},
   {id:'SN-006',author:'General Member',section:'Member API',type:'bug',priority:'high',target:'Profile Update',body:'Profile photo upload fails on mobile Safari. Works on Chrome desktop.',status:'in-development',ticketId:'TK-044',ts:'Feb 23, 2026 3:30 PM',flow:'Note â†’ Expert Review âœ“ â†’ Design âœ“ â†’ TK-044 â†’ dev-agent (Sprint 1)'},
   {id:'SN-007',author:'Ranadhir Ghosh',section:'Testing',type:'requirement',priority:'high',target:'Browser Suite',body:'Browser agent test pass rate must reach 70% before next release. Current: 57%. Focus on flaky test stabilization.',status:'in-development',ticketId:'TK-040',ts:'Feb 22, 2026 8:00 AM',flow:'Note â†’ Expert Review âœ“ â†’ Design âœ“ â†’ TK-040 â†’ tst-agent'},
-  {id:'SN-008',author:'EC President',section:'Membership Drive',type:'enhancement',priority:'medium',target:'Drive Analytics',body:'Need a dashboard showing membership drive progress: invites sent, responses received, conversion rate by tier.',status:'submitted',ticketId:null,ts:'Feb 24, 2026 10:00 AM',flow:'Note â†’ Pending Expert Review'},
+  {id:'SN-008',author:'EC President',section:'Membership Drive',type:'enhancement',priority:'medium',target:'Drive Analytics',body:'Need a dashboard showing membership drive progress: invites sent, responses received, conversion rate by tier.',status:'completed',ticketId:'TK-046',ts:'Feb 24, 2026 10:00 AM',flow:'Note â†’ Expert Review âœ“ â†’ Design âœ“ â†’ TK-046 â†’ Completed âœ“'},
   {id:'SN-009',author:'Ranadhir Ghosh',section:'RBAC & Auth',type:'requirement',priority:'critical',target:'Secret Rotation',body:'All API keys must be migrated to Wix Secrets Manager. No hardcoded secrets in source. Sprint 1 priority.',status:'in-development',ticketId:'TK-031',ts:'Feb 17, 2026 9:00 AM',flow:'Note â†’ Expert Review âœ“ â†’ Design âœ“ â†’ TK-031 (STY-01) â†’ Sprint 1'},
   {id:'SN-010',author:'EC Treasurer',section:'Landing Pages',type:'feedback',priority:'low',target:'Sponsor Section',body:'Landing page sponsor section should show tier badges (Gold, Silver, Bronze) with logo placement.',status:'submitted',ticketId:null,ts:'Feb 25, 2026 1:00 PM',flow:'Note â†’ Pending Expert Review'},
+];
+
+const MEMBERSHIP_DRIVE_ANALYTICS = [
+  {tier:'Family',invites:48,responses:32},
+  {tier:'Couple',invites:26,responses:18},
+  {tier:'Individual',invites:40,responses:19},
+  {tier:'Student',invites:20,responses:15},
 ];
 
 const DEV_AGENTS = [
@@ -2074,6 +2087,7 @@ const DEV_TICKETS = [
   {id:'TK-043',title:'RSVP Email Location Map Link',assignee:'integration-agent',pri:'P1',status:'in-progress',sprint:'Sprint 2',section:'Evite System'},
   {id:'TK-044',title:'Mobile Safari Photo Upload Fix',assignee:'frontend-agent',pri:'P1',status:'in-progress',sprint:'Sprint 1',section:'Member API'},
   {id:'TK-045',title:'Unified Observability Pipeline',assignee:'devops-agent',pri:'P1',status:'planned',sprint:'Sprint 3',section:'Observability Pipeline'},
+  {id:'TK-046',title:'Membership Drive Analytics by Tier',assignee:'backend-agent',pri:'P1',status:'completed',sprint:'Sprint 2',section:'Membership Drive'},
 ];
 
 function renderRequirements() {
@@ -2109,6 +2123,28 @@ function renderRequirements() {
     return `<tr><td><span class="badge-s badge-blue">${t.id}</span></td><td>${t.title}</td><td>${t.section}</td><td>${t.assignee}</td>
     <td><span class="badge-s badge-${t.pri==='P0'?'red':t.pri==='P1'?'orange':'dim'}">${t.pri}</span></td><td>${t.sprint}</td>
     <td><span class="badge-s badge-${sc}">${t.status}</span></td></tr>`;}).join('')}</tbody></table>`;
+
+  // TK-046 Drive Analytics
+  const totalInvites = MEMBERSHIP_DRIVE_ANALYTICS.reduce((sum,row)=>sum+row.invites,0);
+  const totalResponses = MEMBERSHIP_DRIVE_ANALYTICS.reduce((sum,row)=>sum+row.responses,0);
+  const overallConversion = totalInvites>0 ? Math.round((totalResponses/totalInvites)*100) : 0;
+
+  const dKpiEl = document.getElementById('drive-analytics-kpis');
+  dKpiEl.innerHTML = [
+    {v:MEMBERSHIP_DRIVE_ANALYTICS.length,k:'Tiers',cls:'blue'},
+    {v:totalInvites,k:'Invites Sent',cls:'purple'},
+    {v:totalResponses,k:'Responses',cls:'cyan'},
+    {v:overallConversion+'%',k:'Conversion',cls:overallConversion>=60?'green':'yellow'}
+  ].map(k=>`<div class="kpi ${k.cls}"><div class="v">${k.v}</div><div class="k">${k.k}</div></div>`).join('');
+
+  const dTableEl = document.getElementById('drive-analytics-table');
+  dTableEl.innerHTML = `<table class="t"><thead><tr><th>Tier</th><th>Invites</th><th>Responses</th><th>Conversion</th></tr></thead><tbody>
+    ${MEMBERSHIP_DRIVE_ANALYTICS.map(row=>{
+      const pct = row.invites>0 ? Math.round((row.responses/row.invites)*100) : 0;
+      const sc = pct>=60?'green':pct>=30?'yellow':'red';
+      return `<tr><td><strong>${row.tier}</strong></td><td>${row.invites}</td><td>${row.responses}</td><td><span class="badge-s badge-${sc}">${pct}%</span></td></tr>`;
+    }).join('')}
+  </tbody></table>`;
 }
 
 function renderDevStatus() {
