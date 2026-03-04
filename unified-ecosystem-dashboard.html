@@ -1241,6 +1241,7 @@ const SPRINTS = [
 const LINKS = [
   {title:'Live Site',desc:'banfwix.wixsite.com/banf1',url:'https://banfwix.wixsite.com/banf1',icon:'fa-globe',color:'var(--green)'},
   {title:'Health Check',desc:'API health endpoint',url:'https://banfwix.wixsite.com/banf1/_functions/health',icon:'fa-heartbeat',color:'var(--green)'},
+  {title:'Stakeholder Journey',desc:'Requirements lifecycle tracker',url:'stakeholder-requirements-journey.html',icon:'fa-route',color:'var(--indigo)'},
   {title:'EC Onboarding',desc:'EC gate chain dashboard',url:'ec-onboard-dashboard.html',icon:'fa-shield-alt',color:'var(--red)'},
   {title:'Comms Dashboard',desc:'Communications correction drive',url:'comms-dashboard.html',icon:'fa-envelope',color:'var(--blue)'},
   {title:'Browser Agent Report',desc:'Playwright + LLM test results',url:'banf-browser-agent-report.html',icon:'fa-robot',color:'var(--cyan)'},
@@ -1572,7 +1573,7 @@ const INTERNALS_DATA = [
    models:['AdminRoles (role-based visibility)','AgentEventLog (event-filtered widgets)'],
    workflow:'User authenticates â†’ AdminRoles queried for role â†’ dashboard widgets filtered to role-relevant set â†’ AgentEventLog events streamed to matching widgets â†’ real-time updates via 5-min polling.'},
   {key:'links',label:'Quick Links',icon:'fa-external-link-alt',
-   desc:'16 ecosystem quick links connecting to live site, reports, architecture docs, and management tools.',
+  desc:'17 ecosystem quick links connecting to live site, reports, architecture docs, and management tools.',
    flow:[{t:'Link Registry',c:'input'},{t:'Render Grid',c:'output'}],
    models:['Static LINKS array in dashboard JS'],
    workflow:'Dashboard loads â†’ LINKS array iterated â†’ cards rendered with icons, descriptions, and target URLs â†’ onClick opens in new tab.'},

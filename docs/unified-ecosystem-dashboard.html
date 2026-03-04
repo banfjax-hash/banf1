@@ -1573,7 +1573,7 @@ const INTERNALS_DATA = [
    models:['AdminRoles (role-based visibility)','AgentEventLog (event-filtered widgets)'],
    workflow:'User authenticates â†’ AdminRoles queried for role â†’ dashboard widgets filtered to role-relevant set â†’ AgentEventLog events streamed to matching widgets â†’ real-time updates via 5-min polling.'},
   {key:'links',label:'Quick Links',icon:'fa-external-link-alt',
-    desc:'17 ecosystem quick links connecting to live site, reports, architecture docs, and management tools.',
+  desc:'17 ecosystem quick links connecting to live site, reports, architecture docs, and management tools.',
    flow:[{t:'Link Registry',c:'input'},{t:'Render Grid',c:'output'}],
    models:['Static LINKS array in dashboard JS'],
    workflow:'Dashboard loads â†’ LINKS array iterated â†’ cards rendered with icons, descriptions, and target URLs â†’ onClick opens in new tab.'},
